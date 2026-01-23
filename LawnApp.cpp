@@ -116,10 +116,12 @@ LawnApp::LawnApp()
 	mDebugKeysEnabled = false;
 	mProdName = "PopCap/PlantsVsZombies";
 	std::string aTitleName = "Plants vs. Zombies";
+/*
 #ifdef _DEBUG
 	aTitleName += " BETA ";
 	aTitleName += mProductVersion;
 #endif
+*/
 	mTitle = StringToSexyStringFast(aTitleName);
 	mCustomCursorsEnabled = false;
 	mPlayerInfo = nullptr;
