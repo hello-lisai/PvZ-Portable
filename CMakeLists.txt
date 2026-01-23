@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.5...4.0)
 
 project(re-plants-vs-zombies LANGUAGES C CXX ASM)
 
@@ -72,6 +72,8 @@ endif()
 option(ENABLE_DEBUG "Define _DEBUG macro" ON)
 option(CONSOLE "Show console on Windows" ${ENABLE_DEBUG})
 option(DO_FIX_BUGS "Define DO_FIX_BUGS macro" ON)
+
+set(OpenGL_GL_PREFERENCE GLVND)
 
 find_package(ZLIB REQUIRED)
 find_package(JPEG REQUIRED)
