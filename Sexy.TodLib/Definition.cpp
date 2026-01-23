@@ -12,6 +12,7 @@
 #include "misc/PerfTimer.h"
 #include "misc/XMLParser.h"
 #include "../Resources.h"
+#include "Common.h"
 
 DefSymbol gTrailFlagDefSymbols[] = {  //0x69E150
     { 0, "Loops" },                 { -1, nullptr }
@@ -572,7 +573,14 @@ bool DefinitionReadCompiledFile(const SexyString& theCompiledFilePath, DefMap* t
 {
     PerfTimer aTimer;
     aTimer.Start();
-    FILE* pFile = fopen(theCompiledFilePath.c_str(), "rb");
+
+    SexyString aFullCompiledPath = GetAppDataFolder() + theCompiledFilePath;
+    FILE* pFile = fopen(aFullCompiledPath.c_str(), "rb");
+    if (!pFile)
+    {
+        pFile = fopen(theCompiledFilePath.c_str(), "rb");
+    }
+
     if (!pFile) return false;
 
     fseek(pFile, 0, 2);  // 将读取位置的指针移动至文件末尾
@@ -652,13 +660,17 @@ bool DefinitionIsCompiled(const SexyString& theXMLFilePath)
 
     struct stat attr;
 
-    if (stat(aCompiledFilePath.c_str(), &attr) != 0)
-        return false;
+    SexyString aFullCompiledPath = GetAppDataFolder() + aCompiledFilePath;
+    if (stat(aFullCompiledPath.c_str(), &attr) != 0)
+    {
+        if (stat(aCompiledFilePath.c_str(), &attr) != 0)
+            return false;
+    }
     time_t aCompiledFileTime = attr.st_mtime;
 
     if (stat(theXMLFilePath.c_str(), &attr) != 0)
     {
-        TodTrace(__S("Can't file source file to compile '%s'"), theXMLFilePath.c_str());
+        TodTrace(__S("Can't find source file to compile '%s'"), theXMLFilePath.c_str());
         return false;
     }
     time_t aXMLFileTime = attr.st_mtime;
@@ -1287,10 +1299,11 @@ bool DefinitionWriteCompiledFile(const SexyString& theCompiledFilePath, DefMap* 
 
     delete[] (uint *)aDefBasePtr; // already compressed, no need to keep this instance alive
 
-    std::string aFilePath = GetFileDir(theCompiledFilePath);
+    SexyString aFullCompiledPath = GetAppDataFolder() + theCompiledFilePath;
+    std::string aFilePath = GetFileDir(aFullCompiledPath);
     MkDir(aFilePath);
 
-    auto aFileStream = fopen(theCompiledFilePath.c_str(), "wb");
+    auto aFileStream = fopen(aFullCompiledPath.c_str(), "wb");
     if (aFileStream) {
         unsigned int aBytesWritten = fwrite(aCompressedDef, 1u, aCompressedSize, aFileStream);
 

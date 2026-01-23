@@ -178,7 +178,16 @@ SexyAppBase::SexyAppBase()
 #elifdef __3DS__
 	mChangeDirTo = "sdmc:/3ds/PlantsvsZombies/";
 #else
-	mChangeDirTo = "./";
+	char* aBasePath = SDL_GetBasePath();
+	if (aBasePath)
+	{
+		mChangeDirTo = aBasePath;
+		SDL_free(aBasePath);
+	}
+	else
+	{
+		mChangeDirTo = "./";
+	}
 #endif
 
 	mNoDefer = false;	
@@ -1996,7 +2005,7 @@ void SexyAppBase::ReadFromRegistry()
 	if (mRegKey.length() == 0)
 		return;
 
-	regemu::SetRegFile("registry.regemu");
+	regemu::SetRegFile(GetAppDataFolder() + "registry.regemu");
 
 	int anInt;
 	if (RegistryReadInteger("MusicVolume", &anInt))
@@ -5033,6 +5042,16 @@ void SexyAppBase::Init()
 	*/
 
 	InitPropertiesHook();
+
+#if !defined(__SWITCH__) && !defined(__3DS__)
+	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PlantsVsZombies"); // Avoid conflict with official Plants vs. Zombies
+	if (aPrefPath)
+	{
+		SetAppDataFolder(aPrefPath);
+		SDL_free(aPrefPath);
+	}
+#endif
+
 	ReadFromRegistry();	
 
 	/*
@@ -5078,10 +5097,13 @@ void SexyAppBase::Init()
 	if (!ChangeDirHook(mChangeDirTo.c_str()))
 		chdir(mChangeDirTo.c_str());
 
-	char aPath[512];
-	getcwd(aPath, 512);
-	strcat(aPath, "/savedata/");
-	SetAppDataFolder(aPath);
+	if (GetAppDataFolder().empty())
+	{
+		char aPath[512];
+		getcwd(aPath, 512);
+		strcat(aPath, "/savedata/");
+		SetAppDataFolder(aPath);
+	}
 
 	gPakInterface->AddPakFile("main.pak");
 

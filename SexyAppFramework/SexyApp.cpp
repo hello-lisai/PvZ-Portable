@@ -120,11 +120,9 @@ void SexyApp::ReadFromRegistry()
 		mTimesPlayed = 0;
 		mTimesExecuted = 0;
 
-		char aFileName[256];
-		getcwd(aFileName, sizeof(aFileName));
-		strcat(aFileName, "/savedata/popcinfo.dat");
+		std::string aFileName = GetAppDataFolder() + "popcinfo.dat";
 
-		FILE* fp = fopen(aFileName, "rb");
+		FILE* fp = fopen(aFileName.c_str(), "rb");
 		if (fp != NULL)
 		{
 			for (;;)
@@ -229,11 +227,9 @@ void SexyApp::WriteToRegistry()
 
 	if (!mPlayingDemoBuffer)
 	{
-		char aFileName[256];
-		getcwd(aFileName, sizeof(aFileName));
-		strcat(aFileName, "/savedata/popcinfo.dat");
+		std::string aFileName = GetAppDataFolder() + "popcinfo.dat";
 
-		FILE* fp = fopen(aFileName, "r+b");
+		FILE* fp = fopen(aFileName.c_str(), "r+b");
 		if (fp != NULL)
 		{
 			for (;;)
@@ -259,7 +255,7 @@ void SexyApp::WriteToRegistry()
 			}
 		}
 		else
-			fp = fopen(aFileName, "wb");
+			fp = fopen(aFileName.c_str(), "wb");
 			
 		if (fp != NULL)
 		{
