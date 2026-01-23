@@ -57,7 +57,14 @@ bool Music::TodLoadMusic(MusicFile theMusicFile, const std::string& theFileName)
 	p_fclose(pFile);  // 关闭文件流
 
 	aHMusic = Mix_LoadMUS_RW(SDL_RWFromMem(aData, aSize), 1);
-	delete[] (char *)aData;
+	if (theMusicFile == MusicFile::MUSIC_FILE_CREDITS_ZOMBIES_ON_YOUR_LAWN)
+	{
+		gMusicFileData[theMusicFile].mFileData = (unsigned int*)aData;
+	}
+	else
+	{
+		delete[] (char *)aData;
+	}
 
 	if (aHMusic == 0)
 		return false;
@@ -81,7 +88,7 @@ bool Music::TodLoadMusic(MusicFile theMusicFile, const std::string& theFileName)
 			return false;
 	}
 	*/
-	
+
 	SDLMusicInfo aMusicInfo;
 	aMusicInfo.mHMusic = aHMusic;
 	anSDL->mMusicMap.insert(SDLMusicMap::value_type(theMusicFile, aMusicInfo));  // 将目标音乐文件编号和音乐信息的对组加入音乐数据容器
@@ -184,9 +191,10 @@ void Music::MusicInit()
 	LoadSong(MusicFile::MUSIC_FILE_HIHATS, "sounds/mainmusic_hihats.mo3");
 	mApp->mCompletedLoadingThreadTasks += /*原版*/3500;///*内测版*/800;
 
-#ifdef _DEBUG
 	LoadSong(MusicFile::MUSIC_FILE_CREDITS_ZOMBIES_ON_YOUR_LAWN, "sounds/ZombiesOnYourLawn.ogg");
 	mApp->mCompletedLoadingThreadTasks += /*原版*/3500;///*内测版*/800;
+
+#ifdef _DEBUG
 	if (mApp->mCompletedLoadingThreadTasks != aNumLoadingTasks)
 		TodTrace("Didn't calculate loading task count correctly!!!!");
 #endif
@@ -195,11 +203,9 @@ void Music::MusicInit()
 //0x45AAC0
 void Music::MusicCreditScreenInit()
 {
-#ifndef _DEBUG
 	SDLMusicInterface* anSDL = (SDLMusicInterface*)mApp->mMusicInterface;
 	if (anSDL->mMusicMap.find((int)MusicFile::MUSIC_FILE_CREDITS_ZOMBIES_ON_YOUR_LAWN) == anSDL->mMusicMap.end())  // 如果尚未加载
-		LoadSong(MusicFile::MUSIC_FILE_MAIN_MUSIC, "sounds/ZombiesOnYourLawn.ogg");
-#endif
+		LoadSong(MusicFile::MUSIC_FILE_CREDITS_ZOMBIES_ON_YOUR_LAWN, "sounds/ZombiesOnYourLawn.ogg");
 }
 
 //0x45ABB0
