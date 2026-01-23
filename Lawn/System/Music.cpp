@@ -251,14 +251,12 @@ void Music::PlayFromOffset(MusicFile theMusicFile, int theOffset, double theVolu
 	TOD_ASSERT(anItr != anSDL->mMusicMap.end());
 	SDLMusicInfo* aMusicInfo = &anItr->second;
 
-	/*
-	if (aMusicInfo->mHStream)
+	if (mCurMusicTune == MusicTune::MUSIC_TUNE_CREDITS_ZOMBIES_ON_YOUR_LAWN)
 	{
 		bool aNoLoop = theMusicFile == MusicFile::MUSIC_FILE_CREDITS_ZOMBIES_ON_YOUR_LAWN;  // MV 音乐不循环
 		mMusicInterface->PlayMusic(theMusicFile, theOffset, aNoLoop);
 	}
 	else
-	*/
 	{
 		Mix_HaltMusicStream(aMusicInfo->mHMusic);
 		aMusicInfo->mStopOnFade = false;
