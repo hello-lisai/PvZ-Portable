@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5...4.0)
 
-project(re-plants-vs-zombies LANGUAGES C CXX ASM)
+project(pvz-portable LANGUAGES C CXX ASM)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -94,24 +94,24 @@ set(USE_DRFLAC OFF CACHE BOOL "SDL Mixer X flac")
 set(USE_PXTONE OFF CACHE BOOL "SDL Mixer X pxtone")
 add_subdirectory(SexyAppFramework/sound/SDL-Mixer-X)
 
-add_executable(re-plants-vs-zombies ${SOURCES})
-target_include_directories(re-plants-vs-zombies PRIVATE
+add_executable(pvz-portable ${SOURCES})
+target_include_directories(pvz-portable PRIVATE
 	${PROJECT_SOURCE_DIR}/SexyAppFramework
 	${PROJECT_SOURCE_DIR}/SexyAppFramework/sound/SDL-Mixer-X/include
 	${SDL2_INCLUDE_DIRS}
 	${PLAT_INCLUDES}
 )
-target_compile_definitions(re-plants-vs-zombies PRIVATE
+target_compile_definitions(pvz-portable PRIVATE
 	$<$<BOOL:${ENABLE_DEBUG}>:_DEBUG>
 	$<$<BOOL:${DO_FIX_BUGS}>:DO_FIX_BUGS>
 )
 
 if (LOW_MEMORY)
-	target_compile_definitions(re-plants-vs-zombies PRIVATE LOW_MEMORY)
+	target_compile_definitions(pvz-portable PRIVATE LOW_MEMORY)
 endif()
-target_compile_definitions(re-plants-vs-zombies PRIVATE IMG_DOWNSCALE=${DOWNSCALE_COUNT})
+target_compile_definitions(pvz-portable PRIVATE IMG_DOWNSCALE=${DOWNSCALE_COUNT})
 
-target_link_libraries(re-plants-vs-zombies 
+target_link_libraries(pvz-portable 
 	SDL2_mixer_ext_Static 
 	openmpt 
 	mpg123 
@@ -126,48 +126,48 @@ target_link_libraries(re-plants-vs-zombies
 
 if (WIN32)
 	if(MSVC)
-		target_compile_options(re-plants-vs-zombies PRIVATE /utf-8)
+		target_compile_options(pvz-portable PRIVATE /utf-8)
 	else()
-		target_link_options(re-plants-vs-zombies PRIVATE -static -static-libgcc -static-libstdc++)
+		target_link_options(pvz-portable PRIVATE -static -static-libgcc -static-libstdc++)
 	endif()
 	
-	target_link_libraries(re-plants-vs-zombies OpenGL::GL ws2_32 user32 gdi32 winmm imm32 shlwapi)
-	target_compile_definitions(re-plants-vs-zombies PRIVATE WINDOWS)
+	target_link_libraries(pvz-portable OpenGL::GL ws2_32 user32 gdi32 winmm imm32 shlwapi)
+	target_compile_definitions(pvz-portable PRIVATE WINDOWS)
 
 	if(NOT CONSOLE)
 		if(MSVC)
-			set_target_properties(re-plants-vs-zombies PROPERTIES WIN32_EXECUTABLE TRUE)
+			set_target_properties(pvz-portable PROPERTIES WIN32_EXECUTABLE TRUE)
 		else()
-			target_link_options(re-plants-vs-zombies PRIVATE -mwindows)
+			target_link_options(pvz-portable PRIVATE -mwindows)
 		endif()
 	endif()
 elseif (NINTENDO_SWITCH)
-	target_link_libraries(re-plants-vs-zombies glad EGL glapi drm_nouveau)
+	target_link_libraries(pvz-portable glad EGL glapi drm_nouveau)
 
-	nx_generate_nacp(re-plants-vs-zombies.nacp
+	nx_generate_nacp(pvz-portable.nacp
 		NAME "Plants vs. Zombies"
-		AUTHOR "PopCap Games, Unofficial Switch port by Headshotnoby"
+		AUTHOR "PopCap Games, unofficial Switch port by the community"
 		VERSION "0.1"
 	)
 
-	nx_create_nro(re-plants-vs-zombies
-		NACP re-plants-vs-zombies.nacp
+	nx_create_nro(pvz-portable
+		NACP pvz-portable.nacp
 		ICON ${CMAKE_CURRENT_SOURCE_DIR}/icon-switch.jpg
 	)
 elseif (NINTENDO_3DS)
-	target_link_libraries(re-plants-vs-zombies citro3d shaders)
+	target_link_libraries(pvz-portable citro3d shaders)
 
-	ctr_generate_smdh(re-plants-vs-zombies.smdh
+	ctr_generate_smdh(pvz-portable.smdh
 		NAME "Plants vs. Zombies"
 		DESCRIPTION "GOTY Edition"
-		AUTHOR "PopCap Games, Unofficial 3DS port by Headshotnoby"
+		AUTHOR "PopCap Games, unofficial 3DS port by the community"
 		VERSION "0.1"
 		ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon-3ds.png"
 	)
 
-	ctr_create_3dsx(re-plants-vs-zombies
-		SMDH re-plants-vs-zombies.smdh
+	ctr_create_3dsx(pvz-portable
+		SMDH pvz-portable.smdh
 	)
 else()
-	target_link_libraries(re-plants-vs-zombies GL)
+	target_link_libraries(pvz-portable GL)
 endif()
