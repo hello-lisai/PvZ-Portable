@@ -1,0 +1,151 @@
+name: CI build
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: >-
+          base-devel
+          mingw-w64-ucrt-x86_64-cmake
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-glew
+          mingw-w64-ucrt-x86_64-libjpeg-turbo
+          mingw-w64-ucrt-x86_64-libopenmpt
+          mingw-w64-ucrt-x86_64-libogg
+          mingw-w64-ucrt-x86_64-libpng
+          mingw-w64-ucrt-x86_64-libvorbis
+          mingw-w64-ucrt-x86_64-mpg123
+          mingw-w64-ucrt-x86_64-ninja
+          mingw-w64-ucrt-x86_64-ntldd
+          mingw-w64-ucrt-x86_64-SDL2
+
+    - name: Compile PvZ-Portable for Windows
+      shell: msys2 {0}
+      run: |
+        mkdir build
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCONSOLE=OFF -DCMAKE_COLOR_DIAGNOSTICS=ON
+        cmake --build build
+        
+        mkdir -p dist
+        
+        cp build/pvz-portable.exe dist/
+        strip dist/pvz-portable.exe
+        
+        echo "Collecting dependencies..."
+        ntldd -R dist/pvz-portable.exe \
+          | grep "=>" \
+          | awk '{print $3}' \
+          | grep -vE '^not$' \
+          | grep -ivE '[\\/]windows[\\/]' \
+          | sed 's/\\/\//g' \
+          | sort -u \
+          | xargs -I {} cp "{}" dist/
+
+        echo "Packed files:"
+        ls -lh dist/
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pvz-portable-windows
+        path: dist/
+
+  build-archlinux:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Base Dependencies
+      run: |
+        pacman -Syu --noconfirm
+        pacman -S --noconfirm \
+          base-devel \
+          cmake \
+          glew \
+          libjpeg-turbo \
+          libogg \
+          libopenmpt \
+          libpng \
+          libvorbis \
+          mpg123 \
+          ninja \
+          sdl2-compat \
+          sudo
+
+    - name: Create Builder User
+      run: |
+        useradd -m builder
+        echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+        chmod 0440 /etc/sudoers.d/builder
+
+    - name: Fix Directory Permissions
+      run: |
+        chown -R builder:builder .
+
+    - name: Build PvZ-Portable
+      run: |
+        sudo -u builder mkdir build
+        sudo -u builder cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
+        sudo -u builder cmake --build build
+        
+        sudo -u builder mkdir -p dist
+        sudo -u builder cp build/pvz-portable dist/
+        sudo -u builder strip dist/pvz-portable
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pvz-portable-archlinux
+        path: dist/
+
+  build-switch:
+    runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkita64:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile libopenmpt for Switch
+        shell: bash
+        run: |
+          source $DEVKITPRO/switchvars.sh
+          git clone https://github.com/OpenMPT/openmpt
+          cd openmpt
+          make CONFIG=gcc SHARED_LIB=0 DYNLINK=0 EXAMPLES=0 OPENMPT123=0 TEST=0 PREFIX=$PORTLIBS_PREFIX install 
+
+      - name: Compile PvZ-Portable for Switch
+        shell: bash
+        run: |
+          source $DEVKITPRO/switchvars.sh
+          mkdir build
+          cd build
+          aarch64-none-elf-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE=-O2
+          make
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pvz-portable-switch
+          path: |
+            ./build/pvz-portable.nro
+            ./build/pvz-portable.elf
