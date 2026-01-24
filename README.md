@@ -108,7 +108,7 @@ You can customize the game features by adding options to the first `cmake` comma
 | Option | Default | Description |
 | :--- | :--- | :--- |
 | `PVZ_DEBUG` | `ON` | Enable cheat keys, beta features, and debug displays. Can be used in any build type no matter debug or release. |
-| `DO_FIX_BUGS` | `ON` | Apply community fixes for original game bugs. |
+| `DO_FIX_BUGS` | `OFF` | Apply community fixes for original game bugs of 1.2.0.1073 GOTY Edition. |
 | `CONSOLE` | `OFF`* | Show a console window (Windows only). *Defaults to `ON` if build type is Debug. |
 
 Example: Disable debug features and console window in a Release build

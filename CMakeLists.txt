@@ -94,7 +94,7 @@ endif()
 
 option(PVZ_DEBUG "Enable _PVZ_DEBUG macro (cheats, hidden features, etc.)" ON)
 option(CONSOLE "Show console on Windows" ${WIN_CONSOLE_DEFAULT})
-option(DO_FIX_BUGS "Define DO_FIX_BUGS macro (Fix bugs in the original 1.0.0.1051 but not in the 1.2.0.1073 GOTY Edition)" ON)
+option(DO_FIX_BUGS "Define DO_FIX_BUGS macro (Community fixes for original game bugs of 1.2.0.1073 GOTY Edition)" OFF)
 
 set(OpenGL_GL_PREFERENCE GLVND)
 
