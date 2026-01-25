@@ -6,7 +6,7 @@ A **cross-platform** community-driven reimplementation of Plants vs. Zombies: Ga
 
 | 🌿 Authentic | 🎮 Portable | 🛠️ Open |
 | :---: | :---: | :---: |
-| Almost 100% gameplay recreation | Run on Linux, Windows, Switch... | OpenGL & SDL |
+| Almost 100% gameplay recreation | Run on Linux, Windows, macOS, Switch... | OpenGL & SDL |
 
 ## License
 
@@ -39,8 +39,9 @@ This is a **fork** of [Patoke](https://github.com/Patoke/re-plants-vs-zombies) a
 
 | Platform        | Data path                    | Status                                                                                 |
 |-----------------|------------------------------|----------------------------------------------------------------------------------------|
-| Windows (SDL2)  | Executable dir (resources); per-user app-data for writable files | Works                                                                                  |
 | Linux (SDL2)    | Executable dir (resources); per-user app-data for writable files | Works                                                                                  |
+| Windows (SDL2)  | Executable dir (resources); per-user app-data for writable files | Works                                                                                  |
+| macOS (SDL2)    | Executable dir (resources); per-user app-data for writable files | Works                                                                                  |
 | Haiku (SDL2)    | Executable dir (resources); per-user app-data for writable files | Partially works: no music                                                              |
 | Nintendo Switch | sdmc:/switch/PlantsvsZombies | Works on real hardware. Kenji-NX crashes on boot.                           |
 | Nintendo 3DS    | sdmc:/3ds/PlantsvsZombies    | In development, might not have enough memory for Old 3DS, might barely work on New 3DS |
@@ -62,6 +63,7 @@ Examples:
 
 - Linux: `~/.local/share/io.github.wszqkzqk/PlantsVsZombies/`
 - Windows: `%APPDATA%\io.github.wszqkzqk\PlantsVsZombies\`
+- macOS: `~/Library/Application Support/io.github.wszqkzqk/PlantsVsZombies/`
 
 If you prefer to keep everything in the same folder as the executable, you can still configure a custom data directory via the `-changedir` command-line parameter when launching the game.
 
@@ -89,6 +91,14 @@ You can install the required dependencies using the following command:
 
 ```bash
 pacman -S --needed base-devel mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-glew mingw-w64-ucrt-x86_64-libjpeg-turbo mingw-w64-ucrt-x86_64-libopenmpt mingw-w64-ucrt-x86_64-libogg mingw-w64-ucrt-x86_64-libpng mingw-w64-ucrt-x86_64-libvorbis mingw-w64-ucrt-x86_64-mpg123 mingw-w64-ucrt-x86_64-ninja mingw-w64-ucrt-x86_64-SDL2
+```
+
+### macOS (Homebrew)
+
+You can install the required dependencies using [Homebrew](https://brew.sh/) with the following command:
+
+```bash
+brew install cmake dylibbundler glew jpeg-turbo libogg libopenmpt libpng libvorbis mpg123 ninja sdl2
 ```
 
 ## Build Instructions
