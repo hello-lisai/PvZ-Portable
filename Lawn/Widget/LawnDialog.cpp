@@ -391,7 +391,7 @@ ReanimationWidget::ReanimationWidget()
     mHasAlpha = true;
 }
 
-//0x4579F0、0x457A10
+//0x4579F0and 0x457A10
 ReanimationWidget::~ReanimationWidget()
 {
     Dispose();

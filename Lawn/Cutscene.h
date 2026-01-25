@@ -28,12 +28,11 @@ public:
     bool                        mPreloaded;                       //+0x34
     bool                        mPlacedZombies;                   //+0x35
     bool                        mPlacedLawnItems;                 //+0x36
-    int                         mCrazyDaveCountDown;              //+0x38 【推销戴夫倒计时】
-    int                         mCrazyDaveLastTalkIndex;          //+0x3C 【戴夫推销的话的编号】
-    bool                        mUpsellHideBoard;                 //+0x40 【推销隐藏关卡界面】
-    ChallengeScreen*            mUpsellChallengeScreen;           //+0x44 【推销插入的小游戏界面】
-    bool                        mPreUpdatingBoard;                //+0x48 【场景布置阶段的关卡预更新】
-
+    int                         mCrazyDaveCountDown;              //+0x38 Countdown for Crazy Dave's upsell dialog
+    int                         mCrazyDaveLastTalkIndex;          //+0x3C Index of Crazy Dave's upsell dialog lines
+    bool                        mUpsellHideBoard;                 //+0x40 Whether to hide the board during upsell
+    ChallengeScreen*            mUpsellChallengeScreen;           //+0x44 The challenge screen inserted during upsell
+    bool                        mPreUpdatingBoard;                //+0x48 Whether the board is pre-updating during scene setup
 	std::vector<std::string> mLoadedResourceNames;
 
 public:

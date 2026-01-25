@@ -57,7 +57,7 @@ UserDialog::UserDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_USE
     CalcSize(210, 270);
 }
 
-//0x51CBC0¡¢0x51CBE0
+//0x51CBC0 and 0x51CBE0
 UserDialog::~UserDialog()
 {
     delete mUserList;
@@ -156,7 +156,7 @@ void UserDialog::ListClicked(int theId, int theIdx, int theClickCount)
     else
     {
         mUserList->SetSelect(theIdx);
-        if (theClickCount == 2)  // ×ó¼üË«»÷
+        if (theClickCount == 2)  // å·¦é”®åŒå‡»
         {
             mApp->FinishUserDialog(true);
         }

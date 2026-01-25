@@ -46,7 +46,7 @@ TitleScreen::TitleScreen(LawnApp* theApp)
 	mStartButton->mVisible = false;
 }
 
-//0x48D6B0¡¢0x48D6D0
+//0x48D6B0 and 0x48D6D0
 TitleScreen::~TitleScreen()
 {
 	if (mStartButton)

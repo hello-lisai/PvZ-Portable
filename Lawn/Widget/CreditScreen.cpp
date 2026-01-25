@@ -347,7 +347,7 @@ CreditScreen::CreditScreen(LawnApp* theApp)
 	}
 }
 
-//0x433E20、0x433E40
+//0x433E20and 0x433E40
 CreditScreen::~CreditScreen()
 {
 	mApp->SetMusicVolume(mOriginalMusicVolume);

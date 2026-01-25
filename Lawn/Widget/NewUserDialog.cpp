@@ -23,7 +23,7 @@ NewUserDialog::NewUserDialog(LawnApp* theApp, bool isRename) : LawnDialog(
 	CalcSize(110, 40);
 }
 
-//0x45D7E0¡¢0x45D800
+//0x45D7E0 and 0x45D800
 NewUserDialog::~NewUserDialog()
 {
 	delete mNameEditWidget;

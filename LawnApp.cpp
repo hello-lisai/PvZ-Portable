@@ -149,7 +149,7 @@ LawnApp::LawnApp()
 	mDRM = nullptr;
 }
 
-//0x44EDD0、0x44EDF0
+//0x44EDD0and 0x44EDF0
 LawnApp::~LawnApp()
 {
 	if (mBoard)

@@ -343,7 +343,7 @@ GameSelector::GameSelector(LawnApp* theApp)
 	TodHesitationTrace("gameselectorinit");
 }
 
-//0x449D00、0x449D20
+//0x449D00and 0x449D20
 GameSelector::~GameSelector()
 {
 	if (mAdventureButton)

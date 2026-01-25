@@ -127,7 +127,7 @@ StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STOR
     mTrialLockedWhenStoreOpened = mApp->IsTrialStageLocked();
 }
 
-//0x48A610、0x48A630
+//0x48A610and 0x48A630
 StoreScreen::~StoreScreen()
 {
     mCoins.DataArrayDispose();
