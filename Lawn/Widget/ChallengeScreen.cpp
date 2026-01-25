@@ -348,16 +348,16 @@ bool ChallengeScreen::ShowPageButtons()
 //0x42E710
 void ChallengeScreen::UpdateButtons()
 {
-#ifdef _PVZ_DEBUG
-	for (int aPage = 0; aPage < MAX_CHALLANGE_PAGES; aPage++)
-		mPageButton[aPage]->mVisible = true;
-#endif
-
 	for (int aChallengeMode = 0; aChallengeMode < NUM_CHALLENGE_MODES; aChallengeMode++)
 		mChallengeButtons[aChallengeMode]->mVisible = GetChallengeDefinition(aChallengeMode).mPage == mPageIndex;
 	for (int aPage = 0; aPage < MAX_CHALLANGE_PAGES; aPage++)
 	{
 		ButtonWidget* aPageButton = mPageButton[aPage];
+
+#ifdef _PVZ_LIMBO_PAGE
+		aPageButton->mVisible = true;
+#endif
+
 		if (aPage == mPageIndex)
 		{
 			aPageButton->mColors[ButtonWidget::COLOR_LABEL] = Color(64, 64, 64);

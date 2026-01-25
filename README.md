@@ -109,7 +109,8 @@ You can customize the game features by adding options to the first `cmake` comma
 
 | Option | Default | Description |
 | :--- | :--- | :--- |
-| `PVZ_DEBUG` | `ON` | Enable cheat keys, beta features, and debug displays. Can be used in any build type no matter debug or release. |
+| `PVZ_DEBUG` | `ON` | Enable **cheat keys** and debug displays, etc. Can be used in any build type no matter debug or release. |
+| `LIMBO_PAGE` | `ON` | Enable access to the limbo page which contains hidden levels. |
 | `DO_FIX_BUGS` | `OFF` | Apply community fixes for "bugs" of official 1.2.0.1073 GOTY Edition.[^1] These "bugs" usually be ***considered as "features"*** by many players, though. |
 | `CONSOLE` | `OFF`* | Show a console window (Windows only). *Defaults to `ON` if build type is `Debug`. (Don't be confused with `PVZ_DEBUG`.) |
 
