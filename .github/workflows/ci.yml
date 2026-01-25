@@ -188,3 +188,46 @@ jobs:
           path: |
             ./build/pvz-portable.nro
             ./build/pvz-portable.elf
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install Dependencies
+      run: |
+        brew update
+        brew install cmake \
+          dylibbundler \
+          glew \
+          jpeg-turbo \
+          libogg \
+          libopenmpt \
+          libpng \
+          libvorbis \
+          mpg123 \
+          ninja \
+          sdl2
+
+    - name: Build PvZ-Portable
+      run: |
+        mkdir build
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
+
+        mkdir -p dist
+        mkdir -p dist/libs
+        cp build/pvz-portable dist/
+
+        echo "Bundling dependencies..."
+        dylibbundler -of -b -x dist/pvz-portable -d dist/libs -p @executable_path/libs/
+
+        codesign --force --deep -s - dist/pvz-portable
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pvz-portable-macos
+        path: dist/

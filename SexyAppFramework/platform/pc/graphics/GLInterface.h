@@ -9,7 +9,11 @@
 #include "misc/Ratio.h"
 #include "misc/SexyMatrix.h"
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 namespace Sexy
 {

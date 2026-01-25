@@ -4,8 +4,7 @@
 #  OpenMPT_INCLUDE_DIRS - The libopenmpt include directories
 #  OpenMPT_LIBRARIES - The libraries needed to use libopenmpt
 
-find_path(OpenMPT_INCLUDE_DIR "libopenmpt.h"
-          PATH_SUFFIXES libopenmpt)
+find_path(OpenMPT_INCLUDE_DIR "libopenmpt/libopenmpt.h")
 find_library(OpenMPT_LIBRARY NAMES openmpt)
 
 if(OpenMPT_INCLUDE_DIR AND OpenMPT_LIBRARY)

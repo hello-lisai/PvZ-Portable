@@ -34,12 +34,9 @@ list(REMOVE_ITEM SOURCES
 set(NO_GLEW OFF CACHE BOOL "Disable GLEW")
 set(LOW_MEMORY OFF CACHE BOOL "Enable low memory mode")
 set(DOWNSCALE_COUNT 1 CACHE STRING "Image downscale count")
-set(OGG_LIBRARIES ogg)
-set(OPENMPT_LIBRARIES openmpt)
-set(MPG123_LIBRARIES mpg123)
 if(NINTENDO_SWITCH)
 	set(NO_GLEW ON)
-	set(VORBIS_LIBRARIES vorbisfile vorbis)
+	set(VORBIS_LIB vorbisfile vorbis)
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/switch/graphics/Window.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/switch/graphics/GLInterface.cpp
@@ -69,12 +66,21 @@ else()
 		find_package(Ogg CONFIG REQUIRED)
 		find_package(libopenmpt CONFIG REQUIRED)
 		find_package(mpg123 CONFIG REQUIRED)
-		set(VORBIS_LIBRARIES Vorbis::vorbis Vorbis::vorbisfile)
-		set(OGG_LIBRARIES Ogg::ogg)
-		set(OPENMPT_LIBRARIES libopenmpt::libopenmpt)
-		set(MPG123_LIBRARIES MPG123::libmpg123)
+		set(VORBIS_LIB Vorbis::vorbis Vorbis::vorbisfile)
+		set(OGG_LIB Ogg::ogg)
+		set(OPENMPT_LIB libopenmpt::libopenmpt)
+		set(MPG123_LIB MPG123::libmpg123)
 	else()
-		set(VORBIS_LIBRARIES vorbisfile vorbis)
+		find_library(OGG_LIBRARY NAMES ogg libogg REQUIRED)
+		find_library(VORBIS_LIBRARY NAMES vorbis libvorbis REQUIRED)
+		find_library(VORBISFILE_LIBRARY NAMES vorbisfile libvorbisfile REQUIRED)
+		find_library(OPENMPT_LIBRARY NAMES openmpt libopenmpt REQUIRED)
+		find_library(MPG123_LIBRARY NAMES mpg123 libmpg123 REQUIRED)
+
+		set(VORBIS_LIB ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY})
+		set(OGG_LIB ${OGG_LIBRARY})
+		set(OPENMPT_LIB ${OPENMPT_LIBRARY})
+		set(MPG123_LIB ${MPG123_LIBRARY})
 	endif()
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/pc/graphics/Window.cpp
@@ -146,15 +152,15 @@ target_compile_definitions(pvz-portable PRIVATE IMG_DOWNSCALE=${DOWNSCALE_COUNT}
 
 target_link_libraries(pvz-portable PRIVATE
 	SDL2_mixer_ext_Static 
-	${OPENMPT_LIBRARIES} 
-	${MPG123_LIBRARIES} 
-	${VORBIS_LIBRARIES} 
-	${OGG_LIBRARIES} 
-	${PNG_LIBRARIES} 
-	${JPEG_LIBRARIES} 
-	${ZLIB_LIBRARIES} 
-	${SDL2_LIBRARIES} 
-	${GLEW_LIBRARIES}
+	${OPENMPT_LIB} 
+	${MPG123_LIB} 
+	${VORBIS_LIB} 
+	${OGG_LIB} 
+	PNG::PNG
+	JPEG::JPEG
+	ZLIB::ZLIB
+	SDL2::SDL2main
+	SDL2::SDL2
 )
 
 if (WIN32)
@@ -205,5 +211,9 @@ elseif (NINTENDO_3DS)
 		SMDH pvz-portable.smdh
 	)
 else()
-	target_link_libraries(pvz-portable PRIVATE GL)
+	target_link_libraries(pvz-portable PRIVATE OpenGL::GL)
+endif()
+
+if (NOT NO_GLEW)
+	target_link_libraries(pvz-portable PRIVATE GLEW::GLEW)
 endif()

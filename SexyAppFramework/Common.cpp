@@ -14,7 +14,7 @@
 
 #ifdef __SWITCH__
 #include <switch.h>
-#elifdef __3DS__
+#elif defined(__3DS__)
 #include <3ds.h>
 #endif
 
