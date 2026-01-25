@@ -2057,6 +2057,7 @@ void Zombie::UpdateZombieGargantuar()
                 }
             }
             else
+#endif
             {
                 Plant* aPlant = FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW);
                 if (aPlant)
@@ -2095,44 +2096,6 @@ void Zombie::UpdateZombieGargantuar()
                     }
                 }
             }
-#else
-            Plant* aPlant = FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW);
-            if (aPlant)
-            {
-                if (aPlant->mSeedType == SeedType::SEED_SPIKEROCK)
-                {
-                    TakeDamage(20, 32U);
-                    aPlant->SpikeRockTakeDamage();
-                    if (aPlant->mPlantHealth <= 0)
-                    {
-                        SquishAllInSquare(aPlant->mPlantCol, aPlant->mRow, ZombieAttackType::ATTACKTYPE_CHEW);
-                    }
-                }
-                else
-                {
-                    SquishAllInSquare(aPlant->mPlantCol, aPlant->mRow, ZombieAttackType::ATTACKTYPE_CHEW);
-                }
-            }
-
-            if (mApp->IsScaryPotterLevel())
-            {
-                int aGridX = mBoard->PixelToGridX(mPosX, mPosY);
-                GridItem* aScaryPot = mBoard->GetScaryPotAt(aGridX, mRow);
-                if (aScaryPot)
-                {
-                    mBoard->mChallenge->ScaryPotterOpenPot(aScaryPot);
-                }
-            }
-
-            if (mApp->IsIZombieLevel())
-            {
-                GridItem* aBrain = mBoard->mChallenge->IZombieGetBrainTarget(this);
-                if (aBrain)
-                {
-                    mBoard->mChallenge->IZombieSquishBrain(aBrain);
-                }
-            }
-#endif
 
             mApp->PlayFoley(FoleyType::FOLEY_THUMP);
             mBoard->ShakeBoard(0, 3);
