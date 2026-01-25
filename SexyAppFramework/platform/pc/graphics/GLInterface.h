@@ -73,9 +73,10 @@ struct VertexList
 	typedef int size_type;
 
 	VertexList() : mVerts(mStackVerts), mSize(0), mCapacity(MAX_STACK_VERTS) { }
-	VertexList(const VertexList& theList) : mVerts(mStackVerts), mSize(theList.mSize), mCapacity(MAX_STACK_VERTS)
+	VertexList(const VertexList& theList) : mVerts(mStackVerts), mSize(0), mCapacity(MAX_STACK_VERTS)
 	{
-		reserve(mSize);
+		reserve(theList.mSize);
+		mSize = theList.mSize;
 		memcpy(mVerts, theList.mVerts, mSize * sizeof(mVerts[0]));
 	}
 
