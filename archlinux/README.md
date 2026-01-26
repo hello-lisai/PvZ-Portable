@@ -40,12 +40,12 @@ Locate your legally installed copy of Plants vs. Zombies 1.2.0.1073 GOTY. If you
 **Common Installation Paths:**
 
 *   **Steam (Linux/Proton):**
-    `~/.steam/steam/steamapps/common/Plants Vs Zombies/`
+    `~/.steam/steam/steamapps/common/PlantsVsZombies/`
 *   **Steam (Windows):**
-    `C:\Program Files (x86)\Steam\steamapps\common\Plants Vs Zombies\`
+    `C:\Program Files (x86)\Steam\steamapps\common\PlantsVsZombies\`
 *   **PopCap (Windows):**
-    `C:\Program Files (x86)\PopCap Games\Plants vs. Zombies\` or
-    `C:\Program Files\PopCap Games\Plants vs. Zombies\`
+    `C:\Program Files (x86)\PopCap Games\PlantsVsZombies\` or
+    `C:\Program Files\PopCap Games\PlantsVsZombies\`
 
 **Note:** If you installed the game via Steam on Linux, it will be in the Linux path listed above. If you are copying files from a Windows partition or an external drive, look for the Windows paths.
 
