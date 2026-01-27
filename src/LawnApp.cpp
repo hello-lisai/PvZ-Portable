@@ -452,7 +452,10 @@ void LawnApp::StartPlaying()
 bool LawnApp::SaveFileExists()
 {
 	std::string aFileName = GetSavedGameName(GameMode::GAMEMODE_ADVENTURE, mPlayerInfo->mId);
-	return this->FileExists(aFileName);
+	if (this->FileExists(aFileName))
+		return true;
+	std::string aLegacyFileName = GetLegacySavedGameName(GameMode::GAMEMODE_ADVENTURE, mPlayerInfo->mId);
+	return this->FileExists(aLegacyFileName);
 }
 
 //0x44F7A0
@@ -460,12 +463,25 @@ bool LawnApp::SaveFileExists()
 bool LawnApp::TryLoadGame()
 {
 	std::string aSaveName = GetSavedGameName(mGameMode, mPlayerInfo->mId);
+	std::string aLegacySaveName = GetLegacySavedGameName(mGameMode, mPlayerInfo->mId);
 	mMusic->StopAllMusic();
 
 	if (this->FileExists(aSaveName))
 	{
 		MakeNewBoard();
 		if (mBoard->LoadGame(aSaveName))
+		{
+			mFirstTimeGameSelector = false;
+			DoContinueDialog();
+			return true;
+		}
+
+		KillBoard();
+	}
+	if (this->FileExists(aLegacySaveName))
+	{
+		MakeNewBoard();
+		if (mBoard->LoadGame(aLegacySaveName))
 		{
 			mFirstTimeGameSelector = false;
 			DoContinueDialog();
