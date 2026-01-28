@@ -31,12 +31,16 @@ bool SexyAppBase::ProcessDeferredMessages(bool singleMessage)
 		switch(event.type)
 		{
 			case SDL_QUIT:
-				mShutdown = true;
+				CloseRequestAsync();
 				break;
 
 			case SDL_WINDOWEVENT:
 				switch(event.window.event)
 				{
+					case SDL_WINDOWEVENT_CLOSE:
+						CloseRequestAsync();
+						break;
+
 					case SDL_WINDOWEVENT_RESIZED:
 						mGLInterface->UpdateViewport();
 						mWidgetManager->Resize(mScreenBounds, mGLInterface->mPresentationRect);
