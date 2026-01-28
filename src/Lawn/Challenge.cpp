@@ -2982,7 +2982,8 @@ void Challenge::GraveDangerSpawnRandomGrave()
 		{
 			if (mBoard->CanAddGraveStoneAt(aCol, aRow))
 			{
-				aPicks[aPickCount].mWeight = mBoard->GetTopPlantAt(aCol, aRow, TOPPLANT_ANY) ? 100000 : 1;
+				// Source: https://wiki.pvz1.com/doku.php?id=%E6%94%BB%E7%95%A5:%E5%A2%93%E7%A2%91
+				aPicks[aPickCount].mWeight = mBoard->GetTopPlantAt(aCol, aRow, TOPPLANT_ANY) ? 1 : 100000;
 				aPicks[aPickCount].mX = aCol;
 				aPicks[aPickCount].mY = aRow;
 				aPickCount++;
