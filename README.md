@@ -141,10 +141,10 @@ You can customize the game features by adding options to the first `cmake` comma
 
 | Option | Default | Description |
 | :--- | :--- | :--- |
-| `PVZ_DEBUG` | `ON` | Enable **cheat keys** and debug displays, etc. Can be used in any build type no matter debug or release. |
+| `PVZ_DEBUG` | `OFF`<br>(`ON` if `CMAKE_BUILD_TYPE` is `Debug`) | Enable **cheat keys**, debug displays and other debug features. |
 | `LIMBO_PAGE` | `ON` | Enable access to the limbo page which contains hidden levels. |
 | `DO_FIX_BUGS` | `OFF` | Apply community fixes for "bugs" of official 1.2.0.1073 GOTY Edition.[^1] These "bugs" usually be ***considered as "features"*** by many players, though. |
-| `CONSOLE` | `OFF`* | Show a console window (Windows only). *Defaults to `ON` if build type is `Debug`. (Don't be confused with `PVZ_DEBUG`.) |
+| `CONSOLE` | `OFF`<br>(`ON` if `CMAKE_BUILD_TYPE` is `Debug`) | Show a console window (Windows only). |
 
 [^1]: Current `DO_FIX_BUGS` includes the following fixes:
     - Fix bungee zombie duplicate sun/item drop in I, Zombie mode.
@@ -159,10 +159,10 @@ You can customize the game features by adding options to the first `cmake` comma
     - Fix visual glitch of Ladder Zombie's arm recovery.
     - Fix Dr. Zomboss' attack (RV, Fireball/Iceball) and summon range coverage for 6-lane (Pool) levels.
 
-Example: Enable `DO_FIX_BUGS` in Release build
+Example: Manually enable `PVZ_DEBUG` in **Release build** so that you can use **cheat keys** while having optimized performance:
 
 ```bash
-cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DDO_FIX_BUGS=ON
+cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DPVZ_DEBUG=ON
 ```
 
 If running these commands does not create a successful build please create an issue and detail your problem.

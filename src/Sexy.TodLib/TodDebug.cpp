@@ -112,6 +112,7 @@ void TodLog(const char* theFormat, ...)
 
 void TodLogString(const char* theMsg)
 {
+#ifdef _PVZ_DEBUG
 	FILE* f = fopen(gLogFileName, "a");
 	if (f == nullptr)
 	{
@@ -125,6 +126,7 @@ void TodLogString(const char* theMsg)
 	}
 
 	fclose(f);
+#endif
 }
 
 void TodTrace(const char* theFormat, ...)
