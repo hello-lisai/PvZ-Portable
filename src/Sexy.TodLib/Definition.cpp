@@ -568,13 +568,25 @@ void* DefinitionUncompressCompiledBuffer(void* theCompressedBuffer, size_t theCo
     return aUncompressedBuffer;
 }
 
+//0x444770
+SexyString DefinitionGetCompiledFilePathFromXMLFilePath(const SexyString& theXMLFilePath)
+{
+    return __S("compiled/") + theXMLFilePath + __S(".compiled");
+}
+
+static SexyString DefinitionGetCompiledCacheFullPath(const SexyString& theCompiledFilePath)
+{
+    const SexyString aCacheRoot = (sizeof(void*) == 8) ? __S("cache64/") : __S("cache32/");
+    return GetAppDataFolder() + aCacheRoot + theCompiledFilePath;
+}
+
 //0x444560 : (void* def, *defMap, eax = string& compiledFilePath)  //esp -= 8
 bool DefinitionReadCompiledFile(const SexyString& theCompiledFilePath, DefMap* theDefMap, void* theDefinition)
 {
     PerfTimer aTimer;
     aTimer.Start();
 
-    SexyString aFullCompiledPath = GetAppDataFolder() + theCompiledFilePath;
+    SexyString aFullCompiledPath = DefinitionGetCompiledCacheFullPath(theCompiledFilePath);
     FILE* pFile = fopen(aFullCompiledPath.c_str(), "rb");
     if (!pFile)
     {
@@ -635,12 +647,6 @@ bool DefinitionReadCompiledFile(const SexyString& theCompiledFilePath, DefMap* t
     return aResult;
 }
 
-//0x444770
-SexyString DefinitionGetCompiledFilePathFromXMLFilePath(const SexyString& theXMLFilePath)
-{
-    return __S("compiled/") + theXMLFilePath + __S(".compiled");
-}
-
 bool IsFileInPakFile(const SexyString& theFilePath)
 {
     PFILE* pFile = p_fopen(theFilePath.c_str(), __S("rb"));
@@ -660,7 +666,7 @@ bool DefinitionIsCompiled(const SexyString& theXMLFilePath)
 
     struct stat attr;
 
-    SexyString aFullCompiledPath = GetAppDataFolder() + aCompiledFilePath;
+    SexyString aFullCompiledPath = DefinitionGetCompiledCacheFullPath(aCompiledFilePath);
     if (stat(aFullCompiledPath.c_str(), &attr) != 0)
     {
         if (stat(aCompiledFilePath.c_str(), &attr) != 0)
@@ -1299,7 +1305,7 @@ bool DefinitionWriteCompiledFile(const SexyString& theCompiledFilePath, DefMap* 
 
     delete[] (uint *)aDefBasePtr; // already compressed, no need to keep this instance alive
 
-    SexyString aFullCompiledPath = GetAppDataFolder() + theCompiledFilePath;
+    SexyString aFullCompiledPath = DefinitionGetCompiledCacheFullPath(theCompiledFilePath);
     std::string aFilePath = GetFileDir(aFullCompiledPath);
     MkDir(aFilePath);
 
@@ -1334,35 +1340,35 @@ bool DefinitionCompileFile(const SexyString theXMLFilePath, const SexyString& th
 //0x4447F0 : (void* def, *defMap, string& xmlFilePath)  //esp -= 0xC
 bool DefinitionCompileAndLoad(const SexyString& theXMLFilePath, DefMap* theDefMap, void* theDefinition)
 {
-#ifdef _PVZ_DEBUG  // 内测版执行的内容
+#ifdef _PVZ_DEBUG
+    const bool aRequireCompiledUpToDate = true;
+#else
+    const bool aRequireCompiledUpToDate = false;
+#endif
 
     TodHesitationTrace(__S("predef"));
     SexyString aCompiledFilePath = DefinitionGetCompiledFilePathFromXMLFilePath(theXMLFilePath);
-    if (DefinitionIsCompiled(theXMLFilePath) && DefinitionReadCompiledFile(aCompiledFilePath, theDefMap, theDefinition))
+
+    const bool aShouldTryCompiled = !aRequireCompiledUpToDate || DefinitionIsCompiled(theXMLFilePath);
+    if (aShouldTryCompiled && DefinitionReadCompiledFile(aCompiledFilePath, theDefMap, theDefinition))
     {
         TodHesitationTrace(__S("loaded %s"), aCompiledFilePath.c_str());
         return true;
     }
-    else
-    {
-        PerfTimer aTimer;
-        aTimer.Start();
-        bool aResult = DefinitionCompileFile(theXMLFilePath, aCompiledFilePath, theDefMap, theDefinition);
-        TodTrace(__S("compile %d ms:'%s'"), (int)aTimer.GetDuration(), aCompiledFilePath.c_str());
-        TodHesitationTrace(__S("compiled %s"), aCompiledFilePath.c_str());
-        return aResult;
-    }
 
-#else  // 原版执行的内容
-
-    SexyString aCompiledFilePath = DefinitionGetCompiledFilePathFromXMLFilePath(theXMLFilePath);
-    if (DefinitionReadCompiledFile(aCompiledFilePath, theDefMap, theDefinition))
+    PerfTimer aTimer;
+    aTimer.Start();
+    bool aResult = DefinitionCompileFile(theXMLFilePath, aCompiledFilePath, theDefMap, theDefinition);
+    TodTrace(__S("compile %d ms:'%s'"), (int)aTimer.GetDuration(), aCompiledFilePath.c_str());
+    TodHesitationTrace(__S("compiled %s"), aCompiledFilePath.c_str());
+    if (aResult)
         return true;
 
+#ifndef _PVZ_DEBUG
     TodErrorMessageBox(StrFormat(__S("missing resource %s"), aCompiledFilePath.c_str()).c_str(), __S("Error"));
     exit(0);
-    
 #endif
+    return false;
 }
 
 //0x4448E0
