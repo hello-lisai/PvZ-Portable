@@ -7,6 +7,14 @@ if (CMAKE_GENERATOR MATCHES "Ninja")
 	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 endif()
 
+if(MSVC)
+	if(DEFINED VCPKG_TARGET_TRIPLET AND VCPKG_TARGET_TRIPLET MATCHES "-static")
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	elseif(DEFINED VCPKG_TARGET_TRIPLET)
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>")
+	endif()
+endif()
+
 file(GLOB SOURCES
 	src/*.cpp
 	src/SexyAppFramework/*.cpp
@@ -171,11 +179,8 @@ if (WIN32)
 		target_compile_options(pvz-portable PRIVATE /utf-8)
 		target_link_libraries(pvz-portable PRIVATE PThreads4W::PThreads4W)
 		target_compile_definitions(pvz-portable PRIVATE GLEW_STATIC)
-		set_property(TARGET pvz-portable PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-	else()
-		target_link_options(pvz-portable PRIVATE -static -static-libgcc -static-libstdc++)
 	endif()
-	
+
 	target_link_libraries(pvz-portable PRIVATE OpenGL::GL ws2_32 user32 gdi32 winmm imm32 shlwapi)
 	target_compile_definitions(pvz-portable PRIVATE WINDOWS)
 
