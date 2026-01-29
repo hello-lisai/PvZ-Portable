@@ -13,6 +13,7 @@ concurrency:
 
 jobs:
   build-archlinux:
+    name: Build for Arch Linux (x86_64)
     runs-on: ubuntu-latest
     container: archlinux:latest
     steps:
@@ -66,6 +67,7 @@ jobs:
         path: dist/
 
   build-windows-msys2-ucrt64:
+    name: Build for Windows (MSYS2 UCRT64)
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
@@ -122,7 +124,8 @@ jobs:
         name: pvz-portable-windows-msys2-ucrt64
         path: dist/
 
-  build-windows-msvc:
+  build-windows-msvc-x64:
+    name: Build for Windows (MSVC x64)
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
@@ -152,10 +155,11 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: pvz-portable-windows-msvc
+        name: pvz-portable-windows-msvc-x64
         path: dist/
 
   build-switch:
+    name: Build for Switch
     runs-on: ubuntu-latest
     container:
       image: devkitpro/devkita64:latest
@@ -191,6 +195,7 @@ jobs:
             ./build/pvz-portable.elf
 
   build-macos:
+    name: Build for macOS (aarch64)
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
