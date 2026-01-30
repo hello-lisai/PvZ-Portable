@@ -737,7 +737,19 @@ static void SyncMusicTailPortable(PortableSaveContext& theContext, Music& theMus
 	theContext.SyncInt32(theMusic.mPauseOffset);
 	theContext.SyncInt32(theMusic.mPauseOffsetDrums);
 	theContext.SyncBool(theMusic.mPaused);
-	theContext.SyncBool(theMusic.mMusicDisabled);
+	// When loading, do not override a runtime music-disable flag that may have been set
+	// because this platform don't have audio support; keep it if already true.
+	if (theContext.mReading)
+	{
+		bool aSavedMusicDisabled = false;
+		theContext.SyncBool(aSavedMusicDisabled);
+		if (!theMusic.mMusicDisabled)
+			theMusic.mMusicDisabled = aSavedMusicDisabled;
+	}
+	else
+	{
+		theContext.SyncBool(theMusic.mMusicDisabled);
+	}
 	theContext.SyncInt32(theMusic.mFadeOutCounter);
 	theContext.SyncInt32(theMusic.mFadeOutDuration);
 }
