@@ -36,6 +36,7 @@ This is a **fork** of [Patoke](https://github.com/Patoke/re-plants-vs-zombies) a
 - [x] main.pak support
 - [x] **Compatible** with original PvZ GOTY Edition's ***global user data*** (profile info, adventure progress, coins, Zen Garden, etc., stored in `user*.dat`)
 - [x] **Portable mid-level save game** format `.v4` support (share **mid-level saves** between Windows, Linux, macOS, Switch, etc.)
+  - [x] Support export/import of `.v4` save files to/from human-readable YAML format for easy editing
 - [x] Optimize memory usage for console ports (Partial)
 
 * Port the game to these platforms:
@@ -201,6 +202,30 @@ As a result, legacy saves are generally not guaranteed to load across those vari
 - Add new fields as new TLV IDs; do not reuse IDs.
 - Keep defaults for missing fields when loading older saves.
 - Avoid raw struct dumps for data that may change layout; prefer explicit per-field sync with fixed-width primitives.
+
+### Save Editing & Conversion Tool
+
+There's a Python script `scripts/pvzp-v4-converter.py` to inspect and modify `.v4` save files. 
+
+**Features:**
+*   **Info**: View basic save stats (Wave, Sun, Zombies, etc.).
+*   **Export to YAML**: Convert binary `.v4` files to human-readable YAML to view/edit gameplay-relevant data.
+*   **Import from YAML**: Convert modified YAML back to `.v4` format with correct checksums.
+
+**Usage:**
+```bash
+# Modify these paths as needed
+# View basic info
+python scripts/pvzp-v4-converter.py info ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4
+
+# Export to YAML for editing
+python scripts/pvzp-v4-converter.py export ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4 level.yaml
+
+# Import back to savegame
+# **BACKUP** your original .v4 file fist!
+mv ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4 ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4.bak
+python scripts/pvzp-v4-converter.py import level.yaml ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4
+```
 
 ## Contributing
 
