@@ -1939,7 +1939,22 @@ def export_to_text(save: SaveFile) -> str:
             row = base.get("row", -1)
             pos_x = zombie.get("pos_x", 0)
             body_health = zombie.get("body_health", 0)
-            lines.append(f"  [Row {row}] {name} (HP: {body_health}, X: {pos_x:.0f})")
+            # Build status labels
+            status_labels = []
+            if zombie.get("mind_controlled"):
+                status_labels.append("Hypnotized")
+            if zombie.get("ice_trap_counter", 0) > 0:
+                status_labels.append("Frozen")
+            elif zombie.get("chilled_counter", 0) > 0:
+                status_labels.append("Chilled")
+            if zombie.get("buttered_counter", 0) > 0:
+                status_labels.append("Buttered")
+            if zombie.get("blowing_away"):
+                status_labels.append("Blowing")
+            if zombie.get("is_eating"):
+                status_labels.append("Eating")
+            status_str = f" [{', '.join(status_labels)}]" if status_labels else ""
+            lines.append(f"  [Row {row}] {name}{status_str} (HP: {body_health}, X: {pos_x:.0f})")
     else:
         lines.append("  (None)")
     lines.append("")
