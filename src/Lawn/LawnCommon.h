@@ -56,6 +56,7 @@ void						DrawEditBox(Graphics* g, EditWidget* theWidget);
 // ★ 其他
 // ====================================================================================================
 std::string					GetSavedGameName(GameMode theGameMode, int theProfileId);
+std::string					GetLegacySavedGameName(GameMode theGameMode, int theProfileId);
 int							GetCurrentDaysSince2000();
 
 #endif

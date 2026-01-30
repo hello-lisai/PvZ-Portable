@@ -338,6 +338,7 @@ void Board::TryToSaveGame()
 		MkDir(GetAppDataFolder() + "userdata");
 		mApp->mMusic->GameMusicPause(true);
 		LawnSaveGame(this, aFileName);
+		LawnSaveGameLegacy(this, GetLegacySavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId));
 		mApp->ClearUpdateBacklog();
 		SurvivalSaveScore();
 	}
@@ -358,6 +359,7 @@ bool Board::NeedSaveGame()
 void Board::SaveGame(const std::string& theFileName)
 { 
 	LawnSaveGame(this, theFileName);
+	LawnSaveGameLegacy(this, GetLegacySavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId));
 }
 
 // GOTY @Patoke: 0x40B739

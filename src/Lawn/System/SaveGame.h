@@ -54,5 +54,6 @@ void                SyncBoard(SaveGameContext& theContext, Board* theBoard);
 void				FixBoardAfterLoad(Board* theBoard);
 bool				LawnLoadGame(Board* theBoard, const std::string& theFilePath);
 bool				LawnSaveGame(Board* theBoard, const std::string& theFilePath);
+bool				LawnSaveGameLegacy(Board* theBoard, const std::string& theFilePath);
 
 #endif

@@ -1183,6 +1183,7 @@ void GameSelector::KeyChar(char theChar)
 		SyncProfile(true);
 
 		mApp->EraseFile(GetSavedGameName(GameMode::GAMEMODE_ADVENTURE, mApp->mPlayerInfo->mId));
+		mApp->EraseFile(GetLegacySavedGameName(GameMode::GAMEMODE_ADVENTURE, mApp->mPlayerInfo->mId));
 	}
 
 	if (mApp->mDebugKeysEnabled)
@@ -1259,6 +1260,7 @@ void GameSelector::ClickedAdventure()
 		mApp->mPlayerInfo->mLevel = 24;
 		mApp->mPlayerInfo->mFinishedAdventure = 0;
 		mApp->EraseFile(GetSavedGameName(GameMode::GAMEMODE_ADVENTURE, mApp->mPlayerInfo->mId));
+		mApp->EraseFile(GetLegacySavedGameName(GameMode::GAMEMODE_ADVENTURE, mApp->mPlayerInfo->mId));
 	}
 
 	mApp->mMusic->StopAllMusic();

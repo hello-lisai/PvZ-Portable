@@ -34,7 +34,11 @@ This is a **fork** of [Patoke](https://github.com/Patoke/re-plants-vs-zombies) a
 - [x] Replace DirectSound/BASS/FMod with [SDL Mixer X](https://github.com/WohlSoft/SDL-Mixer-X)
   * This project uses a fork of SDL Mixer X that adds compatibility with the MO3 format by using libopenmpt. This fork is located under SexyAppFramework/sound/SDL-Mixer-X
 - [x] main.pak support
+- [x] **Compatible** with original PvZ GOTY Edition's ***global user data*** (profile info, adventure progress, coins, Zen Garden, etc., stored in `user*.dat`)
+- [x] **Portable mid-level save game** format `.v4` support (share **mid-level saves** between Windows, Linux, macOS, Switch, etc.)
+  - [x] Support export/import of `.v4` save files to/from human-readable YAML format for easy editing
 - [x] Optimize memory usage for console ports (Partial)
+
 * Port the game to these platforms:
 
 | Platform        | Data path                    | Status                                                                                 |
@@ -166,6 +170,62 @@ cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DPVZ_DEBUG=ON
 ```
 
 If running these commands does not create a successful build please create an issue and detail your problem.
+
+## Save data compatibility (user data and mid-level saves)
+
+PvZ-Portable uses two distinct types of save data:
+
+1.  **Global User Data** (`users.dat`, `user1.dat`, etc.):
+    *   Stores profile info, adventure progress, coins, Zen Garden, etc.
+    *   **Fully compatible** with the original PC game format.
+    *   Already portable by design (uses explicit serialization).
+
+2.  **Mid-Level Save States** (`game1_0.v4` and `game1_0.dat`, etc.):
+    *   Stores the exact state of a level when "Save and Exit" is used (zombies, projectiles, plants, etc.).
+    *   The game generates **two files** for each save:
+        *   `*.v4` files: **Portable format**. Sharing these files to transfer progress between different platforms is fully **supported**.
+        *   `*.dat` files: **Legacy dump**. Contains raw memory dumps. **Do not share this file** across platforms as it will cause crashes due to architecture differences.
+    *   When loading, the game **prefers** the `.v4` file if available.
+
+### Why a new mid-level save format?
+
+The original game's mid-level save format (`.dat`) effectively dumps raw memory structures to disk. This is fast but fragile, as it relies on specific memory layouts that break across:
+
+*   **Different CPU Architectures**: x86, ARM, RISC-V, LoongArch (alignment).
+*   **32-bit vs 64-bit builds**: Pointer sizes and struct layouts differ.
+*   **Different Compilers**: MSVC vs GCC/Clang (padding, enum size, struct packing).
+
+As a result, legacy saves are generally not guaranteed to load across those variants. To solve this, **Format v4** serializes game objects field-by-field using Type-Length-Value (TLV) tags. This ensures that a level saved on a x86_64 Linux machine can be loaded on a LoongArch or ARM (Switch) machine without crashing.
+
+### Developer Guidelines for Format v4
+
+- Add new fields as new TLV IDs; do not reuse IDs.
+- Keep defaults for missing fields when loading older saves.
+- Avoid raw struct dumps for data that may change layout; prefer explicit per-field sync with fixed-width primitives.
+
+### Save Editing & Conversion Tool
+
+There's a Python script `scripts/pvzp-v4-converter.py` to inspect and modify `.v4` save files. 
+
+**Features:**
+*   **Info**: View basic save stats (Wave, Sun, Zombies, etc.).
+*   **Export to YAML**: Convert binary `.v4` files to human-readable YAML to view/edit gameplay-relevant data.
+*   **Import from YAML**: Convert modified YAML back to `.v4` format with correct checksums.
+
+**Usage:**
+```bash
+# Modify these paths as needed
+# View basic info
+python scripts/pvzp-v4-converter.py info ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4
+
+# Export to YAML for editing
+python scripts/pvzp-v4-converter.py export ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4 level.yaml
+
+# Import back to savegame
+# **BACKUP** your original .v4 file fist!
+mv ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4 ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4.bak
+python scripts/pvzp-v4-converter.py import level.yaml ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4
+```
 
 ## Contributing
 
