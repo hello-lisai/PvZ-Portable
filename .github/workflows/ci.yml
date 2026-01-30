@@ -158,41 +158,41 @@ jobs:
         name: pvz-portable-windows-msvc-x64
         path: dist/
 
-  build-switch:
-    name: Build for Switch
-    runs-on: ubuntu-latest
-    container:
-      image: devkitpro/devkita64:latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  # build-switch:
+  #   name: Build for Switch
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: devkitpro/devkita64:latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Compile libopenmpt for Switch
-        shell: bash
-        run: |
-          source $DEVKITPRO/switchvars.sh
-          git clone https://github.com/OpenMPT/openmpt
-          cd openmpt
-          make CONFIG=gcc SHARED_LIB=0 DYNLINK=0 EXAMPLES=0 OPENMPT123=0 TEST=0 PREFIX=$PORTLIBS_PREFIX install 
+  #     - name: Compile libopenmpt for Switch
+  #       shell: bash
+  #       run: |
+  #         source $DEVKITPRO/switchvars.sh
+  #         git clone https://github.com/OpenMPT/openmpt
+  #         cd openmpt
+  #         make CONFIG=gcc SHARED_LIB=0 DYNLINK=0 EXAMPLES=0 OPENMPT123=0 TEST=0 PREFIX=$PORTLIBS_PREFIX install 
 
-      - name: Compile PvZ-Portable for Switch
-        shell: bash
-        run: |
-          source $DEVKITPRO/switchvars.sh
-          mkdir build
-          cd build
-          aarch64-none-elf-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE=-O2
-          make
-          aarch64-none-elf-strip pvz-portable.elf
+  #     - name: Compile PvZ-Portable for Switch
+  #       shell: bash
+  #       run: |
+  #         source $DEVKITPRO/switchvars.sh
+  #         mkdir build
+  #         cd build
+  #         aarch64-none-elf-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE=-O2
+  #         make
+  #         aarch64-none-elf-strip pvz-portable.elf
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pvz-portable-switch
-          path: |
-            ./build/pvz-portable.nro
-            ./build/pvz-portable.elf
+  #     - name: Upload Artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: pvz-portable-switch
+  #         path: |
+  #           ./build/pvz-portable.nro
+  #           ./build/pvz-portable.elf
 
   build-macos:
     name: Build for macOS (aarch64)
