@@ -36,7 +36,7 @@ void SDLSoundInstance::RehupVolume()
 
 void SDLSoundInstance::RehupPan()
 {
-	//if (mSoundBuffer != NULL)
+	//if (mSoundBuffer != nullptr)
 		//mSoundBuffer->SetPan(mBasePan + mPan);
 }
 

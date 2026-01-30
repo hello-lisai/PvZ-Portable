@@ -185,7 +185,7 @@ void TodTraceAndLog(const char* theFormat, ...)
 void TodTraceWithoutSpamming(const char* theFormat, ...)
 {
 	static uint64_t gLastTraceTime = 0LL;
-	uint64_t aTime = time(NULL);
+	uint64_t aTime = time(nullptr);
 	if (aTime < gLastTraceTime)
 	{
 		return;
@@ -224,5 +224,5 @@ void TodAssertInitForApp()
 	strcpy(gLogFileName + strlen(gLogFileName), "log.txt");
 	TOD_ASSERT(strlen(gLogFileName) < 512);
 
-	TodLog("Started %d\n", (uint64_t)time(NULL));
+	TodLog("Started %d\n", (uint64_t)time(nullptr));
 }

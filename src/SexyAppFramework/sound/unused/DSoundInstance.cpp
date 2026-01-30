@@ -11,7 +11,7 @@ DSoundInstance::DSoundInstance(DSoundManager* theSoundManager, LPDIRECTSOUNDBUFF
 	mAutoRelease = false;
 	mHasPlayed = false;
 	mSourceSoundBuffer = theSourceSound;
-	mSoundBuffer = NULL;
+	mSoundBuffer = nullptr;
 
 	mBaseVolume = 1.0;
 	mBasePan = 0;
@@ -23,7 +23,7 @@ DSoundInstance::DSoundInstance(DSoundManager* theSoundManager, LPDIRECTSOUNDBUFF
 
 	HRESULT hr;
 
-	if (mSourceSoundBuffer != NULL)
+	if (mSourceSoundBuffer != nullptr)
 	{
 		hr=mSoundManagerP->mDirectSound->DuplicateSoundBuffer(mSourceSoundBuffer, &mSoundBuffer);
 		if (hr!=DS_OK)
@@ -47,19 +47,19 @@ DSoundInstance::DSoundInstance(DSoundManager* theSoundManager, LPDIRECTSOUNDBUFF
 
 DSoundInstance::~DSoundInstance()
 {
-	if (mSoundBuffer != NULL)
+	if (mSoundBuffer != nullptr)
 		mSoundBuffer->Release();
 }
 
 void DSoundInstance::RehupVolume()
 {
-	if (mSoundBuffer != NULL)
+	if (mSoundBuffer != nullptr)
 		mSoundBuffer->SetVolume(mSoundManagerP->VolumeToDB(mBaseVolume * mVolume * mSoundManagerP->mMasterVolume));
 }
 
 void DSoundInstance::RehupPan()
 {
-	if (mSoundBuffer != NULL)
+	if (mSoundBuffer != nullptr)
 		mSoundBuffer->SetPan(mBasePan + mPan);
 }
 
@@ -100,7 +100,7 @@ bool DSoundInstance::Play(bool looping, bool autoRelease)
 	mHasPlayed = true;	
 	mAutoRelease = autoRelease;	
 
-	if (mSoundBuffer == NULL)
+	if (mSoundBuffer == nullptr)
 	{
 		return false;
 	}
@@ -123,7 +123,7 @@ bool DSoundInstance::Play(bool looping, bool autoRelease)
 
 void DSoundInstance::Stop()
 {
-	if (mSoundBuffer != NULL)
+	if (mSoundBuffer != nullptr)
 	{
 		mSoundBuffer->Stop();
 		mSoundBuffer->SetCurrentPosition(0);
@@ -134,7 +134,7 @@ void DSoundInstance::Stop()
 #include "misc/DirectXErrorString.h"
 void DSoundInstance::AdjustPitch(double theNumSteps)
 {
-	if (mSoundBuffer != NULL)
+	if (mSoundBuffer != nullptr)
 	{
 		double aFrequencyMult = pow(1.0594630943592952645618252949463, theNumSteps);
 		double aNewFrequency = mDefaultFrequency*aFrequencyMult;
@@ -152,7 +152,7 @@ bool DSoundInstance::IsPlaying()
 	if (!mHasPlayed)
 		return false;
 
-	if (mSoundBuffer == NULL)
+	if (mSoundBuffer == nullptr)
 		return false;
 
 	DWORD aStatus;

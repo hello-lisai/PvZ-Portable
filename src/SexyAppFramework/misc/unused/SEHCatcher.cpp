@@ -6,28 +6,28 @@
 using namespace Sexy;
 
 LPTOP_LEVEL_EXCEPTION_FILTER SEHCatcher::mPreviousFilter;
-SexyAppBase*                SEHCatcher::mApp = NULL;
-HFONT                       SEHCatcher::mDialogFont = NULL;
-HFONT                       SEHCatcher::mBoldFont = NULL;
+SexyAppBase*                SEHCatcher::mApp = nullptr;
+HFONT                       SEHCatcher::mDialogFont = nullptr;
+HFONT                       SEHCatcher::mBoldFont = nullptr;
 bool                        SEHCatcher::mHasDemoFile = false;
 bool                        SEHCatcher::mDebugError = false;
 std::string                 SEHCatcher::mErrorTitle;
 std::string                 SEHCatcher::mErrorText;
 std::string                 SEHCatcher::mUserText;
 std::string                 SEHCatcher::mUploadFileName;
-HWND                        SEHCatcher::mYesButtonWindow = NULL;
-HWND                        SEHCatcher::mNoButtonWindow = NULL;
-HWND                        SEHCatcher::mDebugButtonWindow = NULL;
-HWND                        SEHCatcher::mEditWindow = NULL;
-HMODULE                     SEHCatcher::mImageHelpLib = NULL;
-SYMINITIALIZEPROC           SEHCatcher::mSymInitialize = NULL;
-SYMSETOPTIONSPROC           SEHCatcher::mSymSetOptions = NULL;
-UNDECORATESYMBOLNAMEPROC    SEHCatcher::mUnDecorateSymbolName = NULL;
-SYMCLEANUPPROC              SEHCatcher::mSymCleanup = NULL;
-STACKWALKPROC               SEHCatcher::mStackWalk = NULL;
-SYMFUNCTIONTABLEACCESSPROC  SEHCatcher::mSymFunctionTableAccess = NULL;
-SYMGETMODULEBASEPROC        SEHCatcher::mSymGetModuleBase = NULL;
-SYMGETSYMFROMADDRPROC       SEHCatcher::mSymGetSymFromAddr = NULL;
+HWND                        SEHCatcher::mYesButtonWindow = nullptr;
+HWND                        SEHCatcher::mNoButtonWindow = nullptr;
+HWND                        SEHCatcher::mDebugButtonWindow = nullptr;
+HWND                        SEHCatcher::mEditWindow = nullptr;
+HMODULE                     SEHCatcher::mImageHelpLib = nullptr;
+SYMINITIALIZEPROC           SEHCatcher::mSymInitialize = nullptr;
+SYMSETOPTIONSPROC           SEHCatcher::mSymSetOptions = nullptr;
+UNDECORATESYMBOLNAMEPROC    SEHCatcher::mUnDecorateSymbolName = nullptr;
+SYMCLEANUPPROC              SEHCatcher::mSymCleanup = nullptr;
+STACKWALKPROC               SEHCatcher::mStackWalk = nullptr;
+SYMFUNCTIONTABLEACCESSPROC  SEHCatcher::mSymFunctionTableAccess = nullptr;
+SYMGETMODULEBASEPROC        SEHCatcher::mSymGetModuleBase = nullptr;
+SYMGETSYMFROMADDRPROC       SEHCatcher::mSymGetSymFromAddr = nullptr;
 HTTPTransfer                SEHCatcher::mSubmitReportTransfer;
 bool                        SEHCatcher::mExiting = false;
 bool                        SEHCatcher::mShowUI = true;
@@ -90,7 +90,7 @@ SEHCatcher::~SEHCatcher()
 
 long __stdcall SEHCatcher::UnhandledExceptionFilter(LPEXCEPTION_POINTERS lpExceptPtr)
 {
-	if (mApp != NULL)
+	if (mApp != nullptr)
 		mApp->SEHOccured(); 
 
 	DoHandleDebugEvent(lpExceptPtr);
@@ -143,16 +143,16 @@ bool SEHCatcher::LoadImageHelp()
 
 	// Get image filename of the main executable
 	char filepath[MAX_PATH], *lastdir, *pPath;
-	DWORD filepathlen = GetModuleFileNameA ( NULL, filepath, sizeof(filepath));
+	DWORD filepathlen = GetModuleFileNameA ( nullptr, filepath, sizeof(filepath));
 	(void)filepathlen;
 		
 	lastdir = strrchr (filepath, '/');
-	if (lastdir == NULL) lastdir = strrchr (filepath, '\\');
-	if (lastdir != NULL) lastdir[0] = '\0';
+	if (lastdir == nullptr) lastdir = strrchr (filepath, '\\');
+	if (lastdir != nullptr) lastdir[0] = '\0';
 
 	// Initialize the symbol table routines, supplying a pointer to the path
 	pPath = filepath;
-	if (strlen (filepath) == 0) pPath = NULL;
+	if (strlen (filepath) == 0) pPath = nullptr;
 
 	 if (!mSymInitialize (GetCurrentProcess(), pPath, TRUE))
 		return false;
@@ -162,7 +162,7 @@ bool SEHCatcher::LoadImageHelp()
 
 void SEHCatcher::UnloadImageHelp()
 {
-	if (mImageHelpLib != NULL)
+	if (mImageHelpLib != nullptr)
 		FreeLibrary(mImageHelpLib);
 }
 
@@ -336,7 +336,7 @@ void SEHCatcher::GetSymbolsFromMapFile(std::string &theDebugDump)
 		}
 	}
 
-//  MessageBox(NULL,StrFormat("%d",GetTickCount()-aTick).c_str(),"Time",MB_OK);
+//  MessageBox(nullptr,StrFormat("%d",GetTickCount()-aTick).c_str(),"Time",MB_OK);
 }
 
 void SEHCatcher::DoHandleDebugEvent(LPEXCEPTION_POINTERS lpEP)
@@ -350,7 +350,7 @@ void SEHCatcher::DoHandleDebugEvent(LPEXCEPTION_POINTERS lpEP)
    
 		///////////////////////////
 	// first name the exception 
-	char  *szName = NULL;
+	char  *szName = nullptr;
 	for (int i=0; gMsgTable[i].dwExceptionCode != 0xFFFFFFFF; i++) 
 	{
 		if (gMsgTable[i].dwExceptionCode == lpEP->ExceptionRecord->ExceptionCode) 
@@ -360,7 +360,7 @@ void SEHCatcher::DoHandleDebugEvent(LPEXCEPTION_POINTERS lpEP)
 		}
 	}   
 
-	if (szName != NULL)
+	if (szName != nullptr)
 	{       
 		sprintf(aBuffer,"Exception: %s (code 0x%lx) at address %p in thread %lX\r\n",
 				szName, lpEP->ExceptionRecord->ExceptionCode, 
@@ -423,7 +423,7 @@ void SEHCatcher::DoHandleDebugEvent(LPEXCEPTION_POINTERS lpEP)
 	aDebugDump += "\r\n";
 	aDebugDump += GetSysInfo(); 
 
-	if (mApp != NULL)
+	if (mApp != nullptr)
 	{
 		std::string aGameSEHInfo = mApp->GetGameSEHInfo();
 		if (aGameSEHInfo.length() > 0)
@@ -443,7 +443,7 @@ void SEHCatcher::DoHandleDebugEvent(LPEXCEPTION_POINTERS lpEP)
 #ifdef ZYLOM
 	ZylomGS_StandAlone_SendBugReport((char*) aDebugDump.c_str());
 #else
-	if (mApp != NULL)
+	if (mApp != nullptr)
 	{
 		if (mApp->mRecordingDemoBuffer)
 		{
@@ -472,7 +472,7 @@ void SEHCatcher::DoHandleDebugEvent(LPEXCEPTION_POINTERS lpEP)
 		ShowErrorDialog(anErrorTitle, aDebugDump);
 #endif
 
-	//::MessageBox(NULL, aDebugDump.c_str(), "ERROR", MB_ICONERROR);    
+	//::MessageBox(nullptr, aDebugDump.c_str(), "ERROR", MB_ICONERROR);    
 
 	UnloadImageHelp();  
 }
@@ -551,7 +551,7 @@ std::string SEHCatcher::ImageHelpWalk(PCONTEXT theContext, int theSkipCount)
 	for (;;)
 	{
 		if (!mStackWalk(IMAGE_FILE_MACHINE_I386, GetCurrentProcess(), GetCurrentThread(),
-						&sf, NULL  /*theContext*/, NULL, mSymFunctionTableAccess, mSymGetModuleBase, 0))
+						&sf, nullptr  /*theContext*/, nullptr, mSymFunctionTableAccess, mSymGetModuleBase, 0))
 		{
 			DWORD lastErr = GetLastError();
 			sprintf(aBuffer, "StackWalk failed (error %ld)\r\n", lastErr);
@@ -665,7 +665,7 @@ std::string SEHCatcher::GetFilename(const std::string& thePath)
 		return thePath;
 }
 
-HWND gEditWindow = NULL;
+HWND gEditWindow = nullptr;
 int aCount = 0;
 
 static LRESULT CALLBACK SEHProgressWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -736,12 +736,12 @@ static void CreateProgressWindow()
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hbrBackground = ::GetSysColorBrush(COLOR_BTNFACE);
-	wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-	wc.hIcon = ::LoadIcon(NULL, IDI_ERROR);
+	wc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
+	wc.hIcon = ::LoadIcon(nullptr, IDI_ERROR);
 	wc.hInstance = gHInstance;
 	wc.lpfnWndProc = SEHProgressWindowProc;
 	wc.lpszClassName = "SEHProgressWindow";
-	wc.lpszMenuName = NULL; 
+	wc.lpszMenuName = nullptr; 
 	RegisterClassA(&wc);
 
 	RECT aRect;
@@ -760,16 +760,16 @@ static void CreateProgressWindow()
 		64, 64,
 		aRect.right - aRect.left, 
 		aRect.bottom - aRect.top,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		gHInstance,
 		0);
 
 	// Check every 20ms to see if the transfer has completed
-	SetTimer(aHWnd, 0, 20, NULL);
+	SetTimer(aHWnd, 0, 20, nullptr);
 
 	// Every second we should change the edit text
-	SetTimer(aHWnd, 1, 1000, NULL);
+	SetTimer(aHWnd, 1, 1000, nullptr);
 
 	gEditWindow = CreateWindowA("EDIT", 
 		"Please Wait",
@@ -779,7 +779,7 @@ static void CreateProgressWindow()
 		240-8-8,
 		24,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0); 
 	if (!gUseDefaultFonts)
@@ -791,7 +791,7 @@ static void CreateProgressWindow()
 		96,
 		22,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0);
 	if (!gUseDefaultFonts)
@@ -981,12 +981,12 @@ void SEHCatcher::ShowSubmitInfoDialog()
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hbrBackground = ::GetSysColorBrush(COLOR_BTNFACE);
-	wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-	wc.hIcon = ::LoadIcon(NULL, IDI_ERROR);
+	wc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
+	wc.hIcon = ::LoadIcon(nullptr, IDI_ERROR);
 	wc.hInstance = gHInstance;
 	wc.lpfnWndProc = SubmitInfoWindowProc;
 	wc.lpszClassName = "SubmitInfoWindow";
-	wc.lpszMenuName = NULL; 
+	wc.lpszMenuName = nullptr; 
 	RegisterClassA(&wc);
 
 	RECT aRect;
@@ -1005,8 +1005,8 @@ void SEHCatcher::ShowSubmitInfoDialog()
 		64+16, 64+16,
 		aRect.right - aRect.left, 
 		aRect.bottom - aRect.top,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		gHInstance,
 		0);
 
@@ -1017,7 +1017,7 @@ void SEHCatcher::ShowSubmitInfoDialog()
 		400-8-8,
 		84,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0);
 
@@ -1037,7 +1037,7 @@ void SEHCatcher::ShowSubmitInfoDialog()
 		400-8-8,
 		168,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0); 
 
@@ -1057,7 +1057,7 @@ void SEHCatcher::ShowSubmitInfoDialog()
 
 	aWindowStyle = WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_PUSHBUTTON;
 
-	if (mApp == NULL)
+	if (mApp == nullptr)
 		aWindowStyle |= WS_DISABLED;
 
 	mYesButtonWindow = CreateWindowA("BUTTON", "Continue", 
@@ -1066,7 +1066,7 @@ void SEHCatcher::ShowSubmitInfoDialog()
 		aButtonWidth,
 		24,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0);
 	if (!gUseDefaultFonts)
@@ -1080,7 +1080,7 @@ void SEHCatcher::ShowSubmitInfoDialog()
 		aButtonWidth,
 		24,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0);
 	if (!gUseDefaultFonts)
@@ -1111,7 +1111,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 			false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 			DEFAULT_PITCH | FF_DONTCARE, "Tahoma"); 
 
-	::SetCursor(::LoadCursor(NULL, IDC_ARROW));
+	::SetCursor(::LoadCursor(nullptr, IDC_ARROW));
 
 	mErrorTitle = theErrorTitle;
 	mErrorText = theErrorText;  
@@ -1122,12 +1122,12 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hbrBackground = ::GetSysColorBrush(COLOR_BTNFACE);
-	wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-	wc.hIcon = ::LoadIcon(NULL, IDI_ERROR);
+	wc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
+	wc.hIcon = ::LoadIcon(nullptr, IDI_ERROR);
 	wc.hInstance = gHInstance;
 	wc.lpfnWndProc = SEHWindowProc;
 	wc.lpszClassName = "SEHWindow";
-	wc.lpszMenuName = NULL; 
+	wc.lpszMenuName = nullptr; 
 	RegisterClassA(&wc);
 
 	RECT aRect;
@@ -1146,8 +1146,8 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 		64, 64,
 		aRect.right - aRect.left, 
 		aRect.bottom - aRect.top,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		gHInstance,
 		0);
 
@@ -1158,7 +1158,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 		400-8-8,
 		84,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0);
 	
@@ -1176,7 +1176,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 		400-8-8,
 		168,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0); 
 	
@@ -1189,7 +1189,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 
 	aWindowStyle = WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_PUSHBUTTON;
 
-	if (mApp == NULL)
+	if (mApp == nullptr)
 		aWindowStyle |= WS_DISABLED;
 
 #ifdef _PVZ_DEBUG
@@ -1213,7 +1213,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 			aButtonWidth,
 			24,
 			aHWnd,
-			NULL,
+			nullptr,
 			gHInstance,
 			0);
 		if (!gUseDefaultFonts)
@@ -1230,7 +1230,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 			aButtonWidth,
 			24,
 			aHWnd,
-			NULL,
+			nullptr,
 			gHInstance,
 			0);     
 		if (!gUseDefaultFonts)
@@ -1245,7 +1245,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 		aButtonWidth,
 		24,
 		aHWnd,
-		NULL,
+		nullptr,
 		gHInstance,
 		0);
 
@@ -1255,7 +1255,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 	ShowWindow(aHWnd, SW_NORMAL);
 
 	MSG msg;
-	while ((GetMessage(&msg, NULL, 0, 0) > 0) && (!mExiting))
+	while ((GetMessage(&msg, nullptr, 0, 0) > 0) && (!mExiting))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -1298,10 +1298,10 @@ std::string SEHCatcher::GetSysInfo()
 	HMODULE aMod;
 	char aPath[256];
 
-	if (mApp != NULL)
+	if (mApp != nullptr)
 	{
 		aMod = LoadLibraryA("ddraw.dll");
-		if (aMod != NULL)
+		if (aMod != nullptr)
 		{
 			GetModuleFileNameA(aMod, aPath, 256);           
 			aDebugDump += "DDraw Ver: " + mApp->GetProductVersion(aPath) + "\r\n";
@@ -1309,7 +1309,7 @@ std::string SEHCatcher::GetSysInfo()
 		}
 
 		aMod = LoadLibraryA("dsound.dll");
-		if (aMod != NULL)
+		if (aMod != nullptr)
 		{
 			GetModuleFileNameA(aMod, aPath, 256);           
 			aDebugDump += "DSound Ver: " + mApp->GetProductVersion(aPath) + "\r\n";

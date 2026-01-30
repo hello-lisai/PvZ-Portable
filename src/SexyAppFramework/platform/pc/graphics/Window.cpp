@@ -32,7 +32,7 @@ void SexyAppBase::MakeWindow()
 		SDL_GL_SetSwapInterval(1);
 	}
 
-	if (mGLInterface == NULL)
+	if (mGLInterface == nullptr)
 	{
 		mGLInterface = new GLInterface(this);
 		InitGLInterface();

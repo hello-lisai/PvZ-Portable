@@ -76,7 +76,7 @@ void SexyAppBase::MakeWindow()
 
 	eglSwapInterval(mWindow, 1);
 
-	if (mGLInterface == NULL)
+	if (mGLInterface == nullptr)
 	{
 		mGLInterface = new GLInterface(this);
 		InitGLInterface();

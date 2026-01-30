@@ -534,7 +534,7 @@ typedef struct {
 
 typedef void (CALLBACK DOWNLOADPROC)(const void *buffer, DWORD length, void *user);
 /* Internet stream download callback function.
-buffer : Buffer containing the downloaded data... NULL=end of download
+buffer : Buffer containing the downloaded data... nullptr=end of download
 length : Number of bytes in the buffer
 user   : The 'user' parameter value given when calling BASS_StreamCreateURL */
 

@@ -19,7 +19,7 @@ HyperlinkWidget::HyperlinkWidget(int theId, ButtonListener* theButtonListener) :
 
 void HyperlinkWidget::Draw(Graphics* g)
 {
-	if (mFont == NULL)
+	if (mFont == nullptr)
 		mFont = FONT_PICO129->Duplicate();
 		//mFont = new SysFont(mWidgetManager->mApp, "Arial Unicode MS", 10); //baz changed
 

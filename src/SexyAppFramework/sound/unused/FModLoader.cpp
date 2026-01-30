@@ -3,7 +3,7 @@
 
 using namespace Sexy;
 
-FMOD_INSTANCE* Sexy::gFMod = NULL;
+FMOD_INSTANCE* Sexy::gFMod = nullptr;
 static long gFModLoadCount = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@ static void CheckFModFunction(unsigned int theFunc, const char *theName)
 	{
 		char aBuf[1024];
 		sprintf(aBuf,"%s function not found in fmod.dll",theName);
-		MessageBoxA(NULL,aBuf,"Error",MB_OK | MB_ICONERROR);
+		MessageBoxA(nullptr,aBuf,"Error",MB_OK | MB_ICONERROR);
 		exit(0);
 	}
 }
@@ -259,13 +259,13 @@ FMOD_INSTANCE::~FMOD_INSTANCE()
 void Sexy::LoadFModDLL()
 {
 	InterlockedIncrement(&gFModLoadCount);
-	if (gFMod!=NULL)
+	if (gFMod!=nullptr)
 		return;
 
 	gFMod = new FMOD_INSTANCE("fmod.dll");
-	if (gFMod->mModule==NULL)
+	if (gFMod->mModule==nullptr)
 	{
-		MessageBoxA(NULL,"Can't find fmod.dll." ,"Error",MB_OK | MB_ICONERROR);
+		MessageBoxA(nullptr,"Can't find fmod.dll." ,"Error",MB_OK | MB_ICONERROR);
 		exit(0);
 	}
 }
@@ -274,12 +274,12 @@ void Sexy::LoadFModDLL()
 ///////////////////////////////////////////////////////////////////////////////
 void Sexy::FreeFModDLL()
 {
-	if (gFMod!=NULL)
+	if (gFMod!=nullptr)
 	{
 		if (InterlockedDecrement(&gFModLoadCount) <= 0)
 		{
 			delete gFMod;
-			gFMod = NULL;
+			gFMod = nullptr;
 		}
 	}
 }

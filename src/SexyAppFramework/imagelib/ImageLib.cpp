@@ -18,7 +18,7 @@ Image::Image()
 {
 	mWidth = 0;
 	mHeight = 0;
-	mBits = NULL;
+	mBits = nullptr;
 }
 
 Image::~Image()
@@ -69,26 +69,26 @@ Image* GetPNGImage(const std::string& theFileName)
 	//int bit_depth, color_type, interlace_type;
 	PFILE *fp;
 
-	if ((fp = p_fopen(theFileName.c_str(), "rb")) == NULL)
-		return NULL;
+	if ((fp = p_fopen(theFileName.c_str(), "rb")) == nullptr)
+		return nullptr;
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-	  NULL, NULL, NULL);
+	  nullptr, nullptr, nullptr);
 	png_set_read_fn(png_ptr, (png_voidp)fp, png_pak_read_data);
 
-	if (png_ptr == NULL)
+	if (png_ptr == nullptr)
 	{
 		p_fclose(fp);
-		return NULL;
+		return nullptr;
 	}
 
 	/* Allocate/initialize the memory for image information.  REQUIRED. */
 	info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL)
+	if (info_ptr == nullptr)
 	{
 		p_fclose(fp);
-		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
-		return NULL;
+		png_destroy_read_struct(&png_ptr, (png_infopp)nullptr, (png_infopp)nullptr);
+		return nullptr;
 	}
 
    /* Set error handling if you are using the setjmp/longjmp method (this is
@@ -98,10 +98,10 @@ Image* GetPNGImage(const std::string& theFileName)
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
 		/* Free all of the memory associated with the png_ptr and info_ptr */
-		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
 		p_fclose(fp);
 		/* If we get here, we had a problem reading the file */
-		return NULL;
+		return nullptr;
 	}
 
 	//png_init_io(png_ptr, fp);
@@ -109,8 +109,8 @@ Image* GetPNGImage(const std::string& theFileName)
 	//png_ptr->io_ptr = (png_voidp)fp;
 
 	png_read_info(png_ptr, info_ptr);
-	png_get_IHDR(png_ptr, info_ptr, &width, &height, NULL, NULL,
-       NULL, NULL, NULL);
+	png_get_IHDR(png_ptr, info_ptr, &width, &height, nullptr, nullptr,
+       nullptr, nullptr, nullptr);
 
 	/* Add filler (or alpha) byte (before/after each RGB triplet) */
 	png_set_expand(png_ptr);
@@ -132,7 +132,7 @@ Image* GetPNGImage(const std::string& theFileName)
 	unsigned long* anAddr = aBits;
 	for (unsigned int i = 0; i < height; i++)
 	{
-		png_read_rows(png_ptr, (png_bytepp) &anAddr, NULL, 1);
+		png_read_rows(png_ptr, (png_bytepp) &anAddr, nullptr, 1);
 		anAddr += width;
 	}*/
 
@@ -140,7 +140,7 @@ Image* GetPNGImage(const std::string& theFileName)
 	png_read_end(png_ptr, info_ptr);
 
 	/* clean up after the read, and free any memory allocated - REQUIRED */
-	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
 
 	/* close the file */
 	p_fclose(fp);
@@ -157,8 +157,8 @@ Image* GetPNGImage(const std::string& theFileName)
 Image* GetTGAImage(const std::string& theFileName)
 {
 	PFILE* aTGAFile = p_fopen(theFileName.c_str(), "rb");
-	if (aTGAFile == NULL)
-		return NULL;
+	if (aTGAFile == nullptr)
+		return nullptr;
 
 	BYTE aHeaderIDLen;
 	p_fread(&aHeaderIDLen, sizeof(BYTE), 1, aTGAFile);
@@ -200,7 +200,7 @@ Image* GetTGAImage(const std::string& theFileName)
 		(anImageDescriptor != (8 | (1<<5))))
 	{
 		p_fclose(aTGAFile);
-		return NULL;
+		return nullptr;
 	}
 
 	Image* anImage = new Image();
@@ -258,8 +258,8 @@ Image* GetGIFImage(const std::string& theFileName)
 
 	PFILE *fp;
 
-	if ((fp = p_fopen(theFileName.c_str(), "rb")) == NULL)
-		return NULL;
+	if ((fp = p_fopen(theFileName.c_str(), "rb")) == nullptr)
+		return nullptr;
 	/*
 	Determine if this is a GIF file.
 	*/
@@ -268,10 +268,10 @@ Image* GetGIFImage(const std::string& theFileName)
 
 	// 文件头的 ASCII 值为“GIF87a”或”GIF89a”，其中前三位为 GIF 签名，后三位为不同年份的版本号
 	if (((strncmp((char*)magick, "GIF87", 5) != 0) && (strncmp((char*)magick, "GIF89", 5) != 0)))
-		return NULL;
+		return nullptr;
 
 	global_colors = 0;
-	global_colormap = (unsigned char*)NULL;
+	global_colormap = (unsigned char*)nullptr;
 
 	short pw;  // 图像宽度
 	short ph;  // 图像高度
@@ -290,8 +290,8 @@ Image* GetGIFImage(const std::string& theFileName)
 		*/
 		global_colors = 1 << ((flag & 0x07) + 1);  // 压缩字节的最低 3 位表示全局颜色列表的大小，设其二进制数值为 N，则列表大小 = 2 ^ (N + 1)
 		global_colormap = new unsigned char[3 * global_colors];  // 每个颜色占 3 个字节，按 RGB 排列
-		if (global_colormap == (unsigned char*)NULL)
-			return NULL;
+		if (global_colormap == (unsigned char*)nullptr)
+			return nullptr;
 
 		p_fread(global_colormap, sizeof(char), 3 * global_colors, fp);  // 读取全局颜色列表
 	}
@@ -340,23 +340,23 @@ Image* GetGIFImage(const std::string& theFileName)
 				/*
 				Read Comment extension.
 				*/
-				comments = (char*)NULL;
+				comments = (char*)nullptr;
 				for (; ; )
 				{
 					length = ReadBlobBlock(fp, (char*)header);
 					if (length <= 0)
 						break;
-					if (comments == NULL)
+					if (comments == nullptr)
 					{
 						comments = new char[length + 1];
-						if (comments != (char*)NULL)
+						if (comments != (char*)nullptr)
 							*comments = '\0';
 					}
 
 					header[length] = '\0';
 					strcat(comments, (char*)header);
 				}
-				if (comments == (char*)NULL)
+				if (comments == (char*)nullptr)
 					break;
 
 				delete comments;
@@ -396,10 +396,10 @@ Image* GetGIFImage(const std::string& theFileName)
 			*/
 
 			/*AllocateNextImage(image_info,image);
-			if (image->next == (Image *) NULL)
+			if (image->next == (Image *) nullptr)
 			{
 			DestroyImages(image);
-			return((Image *) NULL);
+			return((Image *) nullptr);
 			}
 			image=image->next;
 			MagickMonitor(LoadImagesText,TellBlob(image),image->filesize);*/
@@ -438,7 +438,7 @@ Image* GetGIFImage(const std::string& theFileName)
 		return(image);
 		}*/
 		if ((width == 0) || (height == 0))
-			return NULL;
+			return nullptr;
 		/*
 		Inititialize colormap.
 		*/
@@ -505,15 +505,15 @@ Image* GetGIFImage(const std::string& theFileName)
 		*/
 		//status=DecodeImage(image,opacity,exception);
 
-		//if (global_colormap != (unsigned char *) NULL)
+		//if (global_colormap != (unsigned char *) nullptr)
 		// LiberateMemory((void **) &global_colormap);
-		if (global_colormap != NULL)
+		if (global_colormap != nullptr)
 		{
 			delete[] global_colormap;
-			global_colormap = NULL;
+			global_colormap = nullptr;
 		}
 
-		//while (image->previous != (Image *) NULL)
+		//while (image->previous != (Image *) nullptr)
 		//    image=image->previous;
 
 #define MaxStackSize  4096
@@ -589,12 +589,12 @@ Image* GetGIFImage(const std::string& theFileName)
 
 		uint32_t* aBits = new uint32_t[width * height];
 
-		unsigned char* c = NULL;
+		unsigned char* c = nullptr;
 
 		for (y = 0; y < (int)height; y++)
 		{
 			//q=SetImagePixels(image,0,offset,width,1);
-			//if (q == (PixelPacket *) NULL)
+			//if (q == (PixelPacket *) nullptr)
 			//break;
 			//indexes=GetIndexes(image);
 
@@ -751,7 +751,7 @@ Image* GetGIFImage(const std::string& theFileName)
 			if (x < width)
 				break;
 
-			/*if (image->previous == (Image *) NULL)
+			/*if (image->previous == (Image *) nullptr)
 			if (QuantumTick(y,image->rows))
 			MagickMonitor(LoadImageText,y,image->rows);*/
 		}
@@ -778,7 +778,7 @@ Image* GetGIFImage(const std::string& theFileName)
 
 	p_fclose(fp);
 
-	return NULL;
+	return nullptr;
 }
 
 typedef struct my_error_mgr * my_error_ptr;
@@ -809,7 +809,7 @@ bool ImageLib::WriteJPEGImage(const std::string& theFileName, Image* theImage)
 {
 	FILE *fp;
 
-	if ((fp = fopen(theFileName.c_str(), "wb")) == NULL)
+	if ((fp = fopen(theFileName.c_str(), "wb")) == nullptr)
 		return false;
 
 	struct jpeg_compress_struct cinfo;
@@ -881,13 +881,13 @@ bool ImageLib::WritePNGImage(const std::string& theFileName, Image* theImage)
 
 	FILE *fp;
 
-	if ((fp = fopen(theFileName.c_str(), "wb")) == NULL)
+	if ((fp = fopen(theFileName.c_str(), "wb")) == nullptr)
 		return false;
 
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-	  NULL, NULL, NULL);
+	  nullptr, nullptr, nullptr);
 
-	if (png_ptr == NULL)
+	if (png_ptr == nullptr)
 	{
 		fclose(fp);
 		return false;
@@ -895,10 +895,10 @@ bool ImageLib::WritePNGImage(const std::string& theFileName, Image* theImage)
 
 	// Allocate/initialize the memory for image information.  REQUIRED.
 	info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL)
+	if (info_ptr == nullptr)
 	{
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+		png_destroy_write_struct(&png_ptr, (png_infopp)nullptr);
 		return false;
 	}
 
@@ -912,7 +912,7 @@ bool ImageLib::WritePNGImage(const std::string& theFileName, Image* theImage)
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fclose(fp);
 		// If we get here, we had a problem writeing the file
-		return NULL;
+		return false;
 	}
 
 	png_init_io(png_ptr, fp);
@@ -959,7 +959,7 @@ bool ImageLib::WritePNGImage(const std::string& theFileName, Image* theImage)
 bool ImageLib::WriteTGAImage(const std::string& theFileName, Image* theImage)
 {
 	FILE* aTGAFile = fopen(theFileName.c_str(), "wb");
-	if (aTGAFile == NULL)
+	if (aTGAFile == nullptr)
 		return false;
 
 	BYTE aHeaderIDLen = 0;
@@ -1044,7 +1044,7 @@ using Compression = enum {
 bool ImageLib::WriteBMPImage(const std::string& theFileName, Image* theImage)
 {
 	FILE* aFile = fopen(theFileName.c_str(), "wb");
-	if (aFile == NULL)
+	if (aFile == nullptr)
 		return false;
 
 	BITMAPFILEHEADER aFileHeader;
@@ -1154,7 +1154,7 @@ void jpeg_pak_src (j_decompress_ptr cinfo, PFILE* infile)
 	* This makes it unsafe to use this manager and a different source
 	* manager serially with the same JPEG object.  Caveat programmer.
 	*/
-	if (cinfo->src == NULL) {	/* first time for this JPEG object? */
+	if (cinfo->src == nullptr) {	/* first time for this JPEG object? */
 		cinfo->src = (struct jpeg_source_mgr *)
 			(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
 			sizeof(pak_source_mgr));
@@ -1172,7 +1172,7 @@ void jpeg_pak_src (j_decompress_ptr cinfo, PFILE* infile)
 	src->pub.term_source = term_source;
 	src->infile = infile;
 	src->pub.bytes_in_buffer = 0; /* forces fill_input_buffer on first read */
-	src->pub.next_input_byte = NULL; /* until buffer loaded */
+	src->pub.next_input_byte = nullptr; /* until buffer loaded */
 }
 
 
@@ -1180,8 +1180,8 @@ Image* GetJPEGImage(const std::string& theFileName)
 {
 	PFILE *fp;
 
-	if ((fp = p_fopen(theFileName.c_str(), "rb")) == NULL)
-		return NULL;
+	if ((fp = p_fopen(theFileName.c_str(), "rb")) == nullptr)
+		return nullptr;
 
 	struct jpeg_decompress_struct cinfo;
 	struct my_error_mgr jerr;
@@ -1312,24 +1312,24 @@ Image* ImageLib::GetImage(const std::string& theFilename, bool lookForAlphaImage
 	else
 		aFilename = theFilename;
 
-	Image* anImage = NULL;
+	Image* anImage = nullptr;
 
-	if ((anImage == NULL) && ((strcasecmp(anExt.c_str(), ".tga") == 0) || (anExt.length() == 0)))
+	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".tga") == 0) || (anExt.length() == 0)))
 		anImage = GetTGAImage(aFilename + ".tga");
 
-	if ((anImage == NULL) && ((strcasecmp(anExt.c_str(), ".jpg") == 0) || (anExt.length() == 0)))
+	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".jpg") == 0) || (anExt.length() == 0)))
 		anImage = GetJPEGImage(aFilename + ".jpg");
 
-	if ((anImage == NULL) && ((strcasecmp(anExt.c_str(), ".png") == 0) || (anExt.length() == 0)))
+	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".png") == 0) || (anExt.length() == 0)))
 		anImage = GetPNGImage(aFilename + ".png");
 
-	if ((anImage == NULL) && ((strcasecmp(anExt.c_str(), ".gif") == 0) || (anExt.length() == 0)))
+	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".gif") == 0) || (anExt.length() == 0)))
 		anImage = GetGIFImage(aFilename + ".gif");
 
-	if ((anImage == NULL) && (strcasecmp(anExt.c_str(), ".j2k") == 0))
+	if ((anImage == nullptr) && (strcasecmp(anExt.c_str(), ".j2k") == 0))
 		unreachable(); // There are no JPEG2000 files in the project
 		//anImage = GetJPEG2000Image(aFilename + ".j2k");
-	if ((anImage == NULL) && (strcasecmp(anExt.c_str(), ".jp2") == 0))
+	if ((anImage == nullptr) && (strcasecmp(anExt.c_str(), ".jp2") == 0))
 		unreachable(); // There are no JPEG2000 files in the project
 		//anImage = GetJPEG2000Image(aFilename + ".jp2");
 
@@ -1349,7 +1349,7 @@ Image* ImageLib::GetImage(const std::string& theFilename, bool lookForAlphaImage
 	}
 
 	// Check for alpha images
-	Image* anAlphaImage = NULL;
+	Image* anAlphaImage = nullptr;
 	if(lookForAlphaImage)
 	{
 		// Check _ImageName
@@ -1357,16 +1357,16 @@ Image* ImageLib::GetImage(const std::string& theFilename, bool lookForAlphaImage
 			theFilename.substr(aLastSlashPos+1, theFilename.length() - aLastSlashPos - 1), false);
 
 		// Check ImageName_
-		if(anAlphaImage==NULL)
+		if(anAlphaImage==nullptr)
 			anAlphaImage = GetImage(theFilename + "_", false);
 	}
 
 
 
 	// Compose alpha channel with image
-	if (anAlphaImage != NULL) 
+	if (anAlphaImage != nullptr) 
 	{
-		if (anImage != NULL)
+		if (anImage != nullptr)
 		{
 			if ((anImage->mWidth == anAlphaImage->mWidth) &&
 				(anImage->mHeight == anAlphaImage->mHeight))

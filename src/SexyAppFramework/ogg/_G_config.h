@@ -81,7 +81,7 @@ typedef void * _G_va_list;
 #define _G_HAVE_BOOL 1
 #define _G_HAVE_PRINTF_FP 0
 #define _G_HAVE_LONG_DOUBLE_IO 0
-#undef NULL
+#undef nullptr
 #define __need_NULL
 #include <stddef.h>
 #endif /* !_G_config_h */

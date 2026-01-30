@@ -5,7 +5,7 @@ using namespace Sexy;
 
 FModSoundInstance::FModSoundInstance()
 {
-    mStream = NULL;
+    mStream = nullptr;
     mChannelNum = 0;
 }
 
@@ -24,7 +24,7 @@ void FModSoundInstance::SetPan(int){}
 bool FModSoundInstance::Play(bool looping, bool autoRelease)
 {
     (void)looping;(void)autoRelease;
-    if (mStream == NULL)
+    if (mStream == nullptr)
         return false;
 
     gFMod->FSOUND_Stream_Play(FSOUND_FREE, mStream);

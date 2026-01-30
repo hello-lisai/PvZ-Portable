@@ -4,13 +4,13 @@
 PopDRMComm::PopDRMComm()
 {
 #ifdef _ENABLE_DRM_FOR_DEBUGGING
-	mEventThreadHwnd = NULL;
-	mEventThreadID = NULL;
-	mEventHwnd = NULL;
-	mDrmGameWnd = NULL;
-	mHWnd = NULL;
-	mUNKNOWN__FileMapping = NULL;
-	mUNKNOWN__MapViewPtr = NULL;
+	mEventThreadHwnd = nullptr;
+	mEventThreadID = nullptr;
+	mEventHwnd = nullptr;
+	mDrmGameWnd = nullptr;
+	mHWnd = nullptr;
+	mUNKNOWN__FileMapping = nullptr;
+	mUNKNOWN__MapViewPtr = nullptr;
 	mCurrentThreadID = GetCurrentThreadId();
 
 	mWindowMessage[PopDRMComm::PopCapDRM_EnableLocking] = RegisterClipboardFormat("PopCapDRM_EnableLocking");
@@ -35,7 +35,7 @@ PopDRMComm::~PopDRMComm()
 #ifdef _ENABLE_DRM_FOR_DEBUGGING
 	if (mEventThreadHwnd)
 	{
-		PostThreadMessage(mEventThreadID, WM_QUIT, NULL, NULL);
+		PostThreadMessage(mEventThreadID, WM_QUIT, nullptr, nullptr);
 		WaitForSingleObject(mEventThreadHwnd, -1);
 		CloseHandle(mEventThreadHwnd);
 	}
@@ -57,7 +57,7 @@ PopDRMComm::~PopDRMComm()
 //0x5D5BC0
 void PopDRMComm::Start()
 {
-	//mEventHwnd = CreateEvent(NULL, NULL, NULL, NULL);
+	//mEventHwnd = CreateEvent(nullptr, nullptr, nullptr, nullptr);
 
 
 
@@ -70,7 +70,7 @@ void PopDRMComm::EnableLocking()
 #ifdef _ENABLE_DRM_FOR_DEBUGGING
 	if (IsWindow(mHWnd))
 	{
-		SendMessage(mHWnd, mWindowMessage[PopDRMComm::PopCapDRM_EnableLocking], NULL, NULL);
+		SendMessage(mHWnd, mWindowMessage[PopDRMComm::PopCapDRM_EnableLocking], nullptr, nullptr);
 	}
 	else
 	{
@@ -86,7 +86,7 @@ bool PopDRMComm::QueryData()
 #ifdef _ENABLE_DRM_FOR_DEBUGGING
 	if (IsWindow(mHWnd))
 	{
-		return SendMessage(mHWnd, mWindowMessage[PopDRMComm::PopCapDRM_QueryData], 4, NULL) != NULL;
+		return SendMessage(mHWnd, mWindowMessage[PopDRMComm::PopCapDRM_QueryData], 4, nullptr) != nullptr;
 	}
 	else
 	{
@@ -124,7 +124,7 @@ bool PopDRMComm::DoIPC()
 #ifdef _ENABLE_DRM_FOR_DEBUGGING
 	if (!mIsWindow)
 	{
-		mEventHwnd = CreateEvent(NULL, NULL, NULL, NULL);
+		mEventHwnd = CreateEvent(nullptr, nullptr, nullptr, nullptr);
 		PostMessage((HWND)0xFFFF, mWindowMessage[PopDRMComm::PopCapDRM_IPC], GetCurrentProcessId(), (LPARAM)mDrmGameWnd);
 		WaitForSingleObject(mEventHwnd, 100);
 		CloseHandle(mEventHwnd);

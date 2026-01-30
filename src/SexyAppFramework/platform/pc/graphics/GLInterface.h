@@ -160,7 +160,7 @@ public:
 	GLuint& GetTextureF(float x, float y, float &width, float &height, float &u1, float &v1, float &u2, float &v2);
 
 	void Blt(float theX, float theY, const Rect& theSrcRect, const Color& theColor);
-	void BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrcRect, const Color& theColor, const Rect *theClipRect = NULL, float theX = 0, float theY = 0, bool center = false);	
+	void BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrcRect, const Color& theColor, const Rect *theClipRect = nullptr, float theX = 0, float theY = 0, bool center = false);	
 	void BltTriangles(const TriVertex theVertices[][3], int theNumTriangles, unsigned int theColor, float tx = 0, float ty = 0);
 };
 
@@ -207,7 +207,7 @@ public:
 	GLImage*				GetScreenImage();
 	void					UpdateViewport();
 	int						Init(bool IsWindowed);
-	bool					Redraw(Rect* theClipRect = NULL);
+	bool					Redraw(Rect* theClipRect = nullptr);
 	void					SetVideoOnlyDraw(bool videoOnly);
 
 	void					SetCursorPos(int theCursorX, int theCursorY);

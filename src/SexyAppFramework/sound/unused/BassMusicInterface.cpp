@@ -58,7 +58,7 @@ BassMusicInterface::BassMusicInterface()
 
 	BOOL success;(void)success;
 
-	success = gBass->BASS_Init(1, 44100, 0, 0, NULL);
+	success = gBass->BASS_Init(1, 44100, 0, 0, nullptr);
 	gBass->BASS_SetConfig(BASS_CONFIG_BUFFER, 2000);	
 
 	//mixerSetControlDetails(phmx, &mcd, 0L);
@@ -95,7 +95,7 @@ bool BassMusicInterface::LoadMusic(int theSongId, const std::string& theFileName
 	else
 	{
 		PFILE* aFP = p_fopen(theFileName.c_str(), "rb");
-		if (aFP == NULL)
+		if (aFP == nullptr)
 			return false;
 
 		p_fseek(aFP, 0, SEEK_END);

@@ -285,7 +285,7 @@ static void CopyImageToTexture8888(C3D_Tex *theTex, MemoryImage *theImage, int o
 {
 	uint32_t *aDest = new uint32_t[theDestPitch * theDestHeight];
 
-	if (theImage->mColorTable == NULL)
+	if (theImage->mColorTable == nullptr)
 	{
 		uint32_t *srcRow = (uint32_t*)theImage->GetBits() + offy * theImage->GetWidth() + offx;
 		uint32_t *dstRow = aDest;
@@ -343,7 +343,7 @@ static void CopyImageToTexture4444(C3D_Tex *theTex, MemoryImage *theImage, int o
 {
 	uint16_t *aDest = new uint16_t[theDestPitch * theDestHeight];
 
-	if (theImage->mColorTable == NULL)
+	if (theImage->mColorTable == nullptr)
 	{
 		uint32_t *srcRow = (uint32_t*)theImage->GetBits() + offy * theImage->GetWidth() + offx;
 		uint16_t *dstRow = aDest;
@@ -407,7 +407,7 @@ static void CopyImageToTexture565(C3D_Tex *theTex, MemoryImage *theImage, int of
 {
 	uint16_t *aDest = new uint16_t[theDestPitch * theDestHeight];
 
-	if (theImage->mColorTable == NULL)
+	if (theImage->mColorTable == nullptr)
 	{
 		uint32_t *srcRow = (uint32_t*)theImage->GetBits() + offy * theImage->GetWidth() + offx;
 		uint16_t *dstRow = aDest;
@@ -639,7 +639,7 @@ TextureData::TextureData()
 	mTexPieceWidth = 64;
 	mTexPieceHeight = 64;
 
-	//mPalette = NULL;
+	//mPalette = nullptr;
 	mPixelFormat = PixelFormat_Unknown;
 	mImageFlags = 0;
 }
@@ -666,10 +666,10 @@ void TextureData::ReleaseTextures()
 	mTexMemSize = 0;
 
 	/*
-	if (mPalette!=NULL)
+	if (mPalette!=nullptr)
 	{
 		mPalette->Release();
-		mPalette = NULL;
+		mPalette = nullptr;
 	}
 	*/
 }
@@ -764,7 +764,7 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 			aFormat = PixelFormat_R5G6B5;
 	}
 
-	if (theImage->mColorIndices != NULL && (gSupportedPixelFormats & PixelFormat_Palette8))
+	if (theImage->mColorIndices != nullptr && (gSupportedPixelFormats & PixelFormat_Palette8))
 	{
 		/*
 		palEntry aPalette[256];
@@ -773,7 +773,7 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 			uint32_t aPixel = theImage->mColorTable[i];
 			*(uint32_t*)(aPalette+i) = (aPixel&0xFF00FF00) | ((aPixel>>16)&0xFF) | ((aPixel<<16)&0xFF0000);
 		}
-		HRESULT aResult = theDraw->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALPHA | DDPCAPS_ALLOW256,aPalette, &aDDPalette, NULL);
+		HRESULT aResult = theDraw->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALPHA | DDPCAPS_ALLOW256,aPalette, &aDDPalette, nullptr);
 		if (SUCCEEDED(aResult))
 			aFormat = PixelFormat_Palette8;
 		else
@@ -1158,7 +1158,7 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 			}
 
 			bool clipped = false;
-			if (theClipRect != NULL)
+			if (theClipRect != nullptr)
 			{
 				int left = theClipRect->mX;
 				int right = left + theClipRect->mWidth;
@@ -1347,7 +1347,7 @@ GLInterface::~GLInterface()
 	{
 		MemoryImage *anImage = *anItr;
 		delete (TextureData*)anImage->mD3DData;
-		anImage->mD3DData = NULL;
+		anImage->mD3DData = nullptr;
 	}
 
 	delete[] gVertices;
@@ -1383,10 +1383,10 @@ void GLInterface::RemoveGLImage(GLImage* theGLImage)
 
 void GLInterface::Remove3DData(MemoryImage* theImage)
 {
-	if (theImage->mD3DData != NULL)
+	if (theImage->mD3DData != nullptr)
 	{
 		delete (TextureData*)theImage->mD3DData;
-		theImage->mD3DData = NULL;
+		theImage->mD3DData = nullptr;
 
 		AutoCrit aCrit(mCritSect); // Make images thread safe
 		mImageSet.erase(theImage);
@@ -1544,7 +1544,7 @@ bool GLInterface::CreateImageTexture(MemoryImage *theImage)
 {
 	bool wantPurge = false;
 
-	if(theImage->mD3DData==NULL)
+	if(theImage->mD3DData==nullptr)
 	{
 		theImage->mD3DData = new TextureData();
 		
@@ -1577,7 +1577,7 @@ bool GLInterface::CreateImageTexture(MemoryImage *theImage)
 
 bool GLInterface::RecoverBits(MemoryImage* theImage)
 {
-	if (theImage->mD3DData == NULL)
+	if (theImage->mD3DData == nullptr)
 		return false;
 
 	TextureData* aData = (TextureData*) theImage->mD3DData;
@@ -1613,7 +1613,7 @@ bool GLInterface::RecoverBits(MemoryImage* theImage)
 			case PixelFormat_Unknown: break;
 			}
 
-			D3DInterface::CheckDXError(aPiece->mTexture->Unlock(NULL),"Texture Unlock");
+			D3DInterface::CheckDXError(aPiece->mTexture->Unlock(nullptr),"Texture Unlock");
 			*/
 		}
 	}
@@ -1642,7 +1642,7 @@ void GLInterface::Blt(Image* theImage, float theX, float theY, const Rect& theSr
 {
 	if (!mTransformStack.empty())
 	{
-		BltClipF(theImage,theX,theY,theSrcRect,NULL,theColor,theDrawMode);
+		BltClipF(theImage,theX,theY,theSrcRect,nullptr,theColor,theDrawMode);
 		return;
 	}
 
@@ -1678,7 +1678,7 @@ void GLInterface::BltMirror(Image* theImage, float theX, float theY, const Rect&
 	aTransform.Scale(-1, 1);
 	aTransform.Translate(theX, theY);
 
-	BltTransformed(theImage,NULL,theColor,theDrawMode,theSrcRect,aTransform,linearFilter);
+	BltTransformed(theImage,nullptr,theColor,theDrawMode,theSrcRect,aTransform,linearFilter);
 }
 
 void GLInterface::StretchBlt(Image* theImage,  const Rect& theDestRect, const Rect& theSrcRect, const Rect* theClipRect, const Color &theColor, int theDrawMode, bool fastStretch, bool mirror)
@@ -1931,7 +1931,7 @@ void GLInterface::FillPoly(const Point theVertices[], int theNumVertices, const 
 		aList.push_back(vert);
 	}
 
-	if (theClipRect != NULL)
+	if (theClipRect != nullptr)
 		DrawPolyClipped(theClipRect,aList);
 	else
 	{

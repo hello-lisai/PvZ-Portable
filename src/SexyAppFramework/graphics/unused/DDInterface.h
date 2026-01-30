@@ -122,7 +122,7 @@ public:
 
 	DDImage*				GetScreenImage();
 	int						Init(HWND theWindow, bool IsWindowed);	
-	bool					Redraw(Rect* theClipRect = NULL);	
+	bool					Redraw(Rect* theClipRect = nullptr);	
 	void					SetVideoOnlyDraw(bool videoOnly);
 	void					RemapMouse(int& theX, int& theY);
 

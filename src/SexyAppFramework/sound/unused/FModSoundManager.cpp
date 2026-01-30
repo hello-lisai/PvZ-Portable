@@ -13,17 +13,17 @@ FModSoundManager::FModSoundManager(HWND theHWnd)
 	mMasterVolume = 1.0;
 
 	for (int i = 0; i < MAX_SOURCE_SOUNDS; i++)
-		mSourceStreams[i] = NULL;
+		mSourceStreams[i] = nullptr;
 }
 
 FModSoundManager::~FModSoundManager()
 {
 	for (int i = 0; i < MAX_SOURCE_SOUNDS; i++)
 	{
-		if (mSourceStreams[i] != NULL)
+		if (mSourceStreams[i] != nullptr)
 		{
 			gFMod->FSOUND_Stream_Close(mSourceStreams[i]);
-			mSourceStreams[i] = NULL;
+			mSourceStreams[i] = nullptr;
 		}
 	}
 }
@@ -54,7 +54,7 @@ bool FModSoundManager::LoadSound(unsigned int theSfxID, const std::string& theFi
 	}
 
 	FSOUND_STREAM* aStream = gFMod->FSOUND_Stream_OpenFile(theFilename.c_str(), FSOUND_2D, 0);
-	if (aStream == NULL)
+	if (aStream == nullptr)
 		return false;
 
 	mSourceStreams[theSfxID] = aStream;
@@ -65,7 +65,7 @@ int FModSoundManager::LoadSound(const std::string& theFilename)
 {
 	for (int i = MAX_SOURCE_SOUNDS-1; i >= 0; i--)
 	{
-		if (mSourceStreams[i] == NULL)
+		if (mSourceStreams[i] == nullptr)
 		{
 			if (!LoadSound(i, theFilename))
 				return -1;

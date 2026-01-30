@@ -137,8 +137,8 @@ static void *CloneMemory(void *destination, const void *source,
   register long
     i;
 
-  assert(destination != (void *) NULL);
-  assert(source != (const void *) NULL);
+  assert(destination != (void *) nullptr);
+  assert(source != (const void *) nullptr);
   p=(const unsigned char *) source;
   q=(unsigned char *) destination;
   if ((p <= q) || ((p+size) >= q))
@@ -155,11 +155,11 @@ static void *CloneMemory(void *destination, const void *source,
 
 static void LiberateMemory(void **memory)
 {
-  assert(memory != (void **) NULL);
-  if (*memory == (void *) NULL)
+  assert(memory != (void **) nullptr);
+  if (*memory == (void *) nullptr)
     return;
   free(*memory);
-  *memory=(void *) NULL;
+  *memory=(void *) nullptr;
 }
 
 static void ReacquireMemory(void **memory,const size_t size)
@@ -167,14 +167,14 @@ static void ReacquireMemory(void **memory,const size_t size)
   void
     *allocation;
 
-  assert(memory != (void **) NULL);
-  if (*memory == (void *) NULL)
+  assert(memory != (void **) nullptr);
+  if (*memory == (void *) nullptr)
     {
       *memory=AcquireMemory(size);
       return;
     }
   allocation=realloc(*memory,size);
-  if (allocation == (void *) NULL)
+  if (allocation == (void *) nullptr)
     LiberateMemory((void **) memory);
   *memory=allocation;
 }
@@ -189,8 +189,8 @@ static NodeInfo* GetNodeInfo(CubeInfo* cube_info, const unsigned int id, const u
 
 		// Allocate a new nodes of nodes.      
 		nodes = (Nodes*) AcquireMemory(sizeof(Nodes));
-		if (nodes == (Nodes *) NULL)
-			return((NodeInfo *) NULL);
+		if (nodes == (Nodes *) nullptr)
+			return((NodeInfo *) nullptr);
 
 		nodes->next = cube_info->node_queue;
 		cube_info->node_queue = nodes;
@@ -216,8 +216,8 @@ static CubeInfo* GetCubeInfo(QuantizeInfo* theQuantizeInfo, unsigned int depth)
 	// Initialize tree to describe color cube_info.	
 	cube_info = (CubeInfo*) AcquireMemory(sizeof(CubeInfo));
 	
-	if (cube_info == (CubeInfo *) NULL)
-		return((CubeInfo *) NULL);
+	if (cube_info == (CubeInfo *) nullptr)
+		return((CubeInfo *) nullptr);
 	
 	memset(cube_info,0,sizeof(CubeInfo));
 	
@@ -229,10 +229,10 @@ static CubeInfo* GetCubeInfo(QuantizeInfo* theQuantizeInfo, unsigned int depth)
 	cube_info->depth = depth;
 	
 	// Initialize root node.	
-	cube_info->root = GetNodeInfo(cube_info,0,0,(NodeInfo *) NULL);
+	cube_info->root = GetNodeInfo(cube_info,0,0,(NodeInfo *) nullptr);
 
-	if (cube_info->root == (NodeInfo *) NULL)
-		return((CubeInfo *) NULL);
+	if (cube_info->root == (NodeInfo *) nullptr)
+		return((CubeInfo *) nullptr);
 
 	cube_info->root->parent=cube_info->root;
 
@@ -251,7 +251,7 @@ static void DestroyCubeInfo(CubeInfo *cube_info)
 		nodes = cube_info->node_queue->next;
 		LiberateMemory((void **) &cube_info->node_queue);
 		cube_info->node_queue = nodes;
-	} while (cube_info->node_queue != (Nodes *) NULL);  
+	} while (cube_info->node_queue != (Nodes *) nullptr);  
 
 	LiberateMemory((void **) &cube_info->cache);
 	LiberateMemory((void **) &cube_info);
@@ -349,13 +349,13 @@ static bool Classification(CubeInfo *cube_info, PixelPacket* thePixelPackets, in
 				mid_green += id & 2 ? bisect : -bisect;
 				mid_blue += id & 1 ? bisect : -bisect;
 
-				if (node_info->child[id] == (NodeInfo *) NULL)
+				if (node_info->child[id] == (NodeInfo *) nullptr)
 				{				
 					// Set colors of new node to contain pixel.					
 					node_info->census |= (1 << id);
 					node_info->child[id] = GetNodeInfo(cube_info,id,level,node_info);
 					            
-					if (node_info->child[id] == (NodeInfo *) NULL)
+					if (node_info->child[id] == (NodeInfo *) nullptr)
 					{
 						//TODO: Exception
 					}
@@ -610,7 +610,7 @@ void Sexy::Quantize8Bit(const ulong* theSrcBits, int theWidth, int theHeight, uc
 	
 	cube_info = GetCubeInfo(&aQuantizeInfo, depth);	
 
-	if (cube_info == (CubeInfo *) NULL)
+	if (cube_info == (CubeInfo *) nullptr)
 		return;
 
 	ulong aThing = timeGetTime();
@@ -663,7 +663,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 		gSignedPowerTable[i] = (i-256) * (i-256);
 
 	for (i = 0; i < HASH_TABLE_SIZE; i++)
-		gColorRecordsHashTable[i] = NULL;
+		gColorRecordsHashTable[i] = nullptr;
 
 	int aSize = 0;
 
@@ -684,7 +684,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 				 ((src & 0x000000FF) >> (0*8 - 0*4)));
 
 			ColorRecord* aColorRecord = gColorRecordsHashTable[aHashIndex];
-			if (aColorRecord == NULL)
+			if (aColorRecord == nullptr)
 			{
 				if (aPoolSize < MAX_COLOR_RECORDS)
 				{
@@ -692,7 +692,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 					aColorRecord->mColor = src;
 					aColorRecord->mIndex = 0;
 					aColorRecord->mPriority = 1;					
-					aColorRecord->mNext = NULL;
+					aColorRecord->mNext = nullptr;
 
 					gColorRecordsHashTable[aHashIndex] = aColorRecord;
 				}
@@ -707,7 +707,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 						break;
 					}
 
-					if (aColorRecord->mNext == NULL)
+					if (aColorRecord->mNext == nullptr)
 					{
 						if (aPoolSize < MAX_COLOR_RECORDS)
 						{
@@ -715,7 +715,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 							aNextRecord->mColor = src;
 							aNextRecord->mIndex = 0;
 							aNextRecord->mPriority = 1;
-							aNextRecord->mNext = NULL;
+							aNextRecord->mNext = nullptr;
 
 							aColorRecord->mNext = aNextRecord;
 						}
@@ -734,7 +734,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 	while (aColorTableSize < 256)	
 	{
 		double aBestPriority = 0;
-		ColorRecord* aBestColorRecord = NULL;
+		ColorRecord* aBestColorRecord = nullptr;
 
 		// Find record to use
 		for (int aPoolIdx = 0; aPoolIdx < aPoolSize; aPoolIdx++)
@@ -748,7 +748,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 		}
 
 		// Is the color table already completed?
-		if (aBestColorRecord == NULL)
+		if (aBestColorRecord == nullptr)
 			break;
 
 		ulong aBestColor = aBestColorRecord->mColor;
@@ -825,7 +825,7 @@ void Sexy::Quantize8Bit2(const ulong* theSrcBits, int theWidth, int theHeight, u
 
 			ColorRecord* aColorRecord = gColorRecordsHashTable[aHashIndex];
 			
-			while (aColorRecord != NULL)
+			while (aColorRecord != nullptr)
 			{
 				ulong aColor = aColorRecord->mColor;
 														

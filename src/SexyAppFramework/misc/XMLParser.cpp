@@ -6,7 +6,7 @@ using namespace Sexy;
 
 XMLParser::XMLParser()
 {
-	mFile = NULL;
+	mFile = nullptr;
 	mLineNum = 0;
 	mAllowComments = false;
 	mGetCharFunc = &XMLParser::GetUTF8Char;
@@ -15,7 +15,7 @@ XMLParser::XMLParser()
 
 XMLParser::~XMLParser()
 {
-	if (mFile != NULL)
+	if (mFile != nullptr)
 		p_fclose(mFile);
 }
 
@@ -255,7 +255,7 @@ bool XMLParser::OpenFile(const std::string& theFileName)
 {		
 	mFile = p_fopen(theFileName.c_str(), "r");
 
-	if (mFile == NULL)
+	if (mFile == nullptr)
 	{
 		mLineNum = 0;
 		Fail(StringToSexyString("Unable to open file " + theFileName));
@@ -355,7 +355,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 			}
 			else
 			{
-				if (mFile != NULL)
+				if (mFile != nullptr)
 				{
 					bool error = false;
 					if ((this->*mGetCharFunc)(&c, &error))
@@ -637,7 +637,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 								hasSpace = false;
 							}
 
-							std::wstring* aStrPtr = NULL;
+							std::wstring* aStrPtr = nullptr;
 
 							if (!doingAttribute)
 							{
@@ -659,7 +659,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 								}
 							}
 
-							if (aStrPtr != NULL)
+							if (aStrPtr != nullptr)
 							{								
 								*aStrPtr += c;						
 							}

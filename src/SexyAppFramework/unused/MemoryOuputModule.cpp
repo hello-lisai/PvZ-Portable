@@ -5,7 +5,7 @@ int memory_output_module_probe(const char *name)
 {
 	ByteVector* aByteVector = (ByteVector*) atoi(name);
 
-	if (aByteVector == NULL)
+	if (aByteVector == nullptr)
 		return XA_ERROR_INVALID_PARAMETERS;
 
 	return XA_SUCCESS;
@@ -70,12 +70,12 @@ int memory_output_module_register(XA_OutputModule *module)
 	module->output_open = memory_output_open;
 	module->output_close = memory_output_close;
 	module->output_write = memory_output_write;
-	module->output_get_buffer = NULL;
-	module->output_set_control = NULL;
-	module->output_get_control = NULL;
-	module->output_get_status = NULL;
-	module->output_get_caps = NULL;	
-	module->output_send_message = NULL;	
+	module->output_get_buffer = nullptr;
+	module->output_set_control = nullptr;
+	module->output_get_control = nullptr;
+	module->output_get_status = nullptr;
+	module->output_get_caps = nullptr;	
+	module->output_send_message = nullptr;	
 
 	return XA_SUCCESS;
 }

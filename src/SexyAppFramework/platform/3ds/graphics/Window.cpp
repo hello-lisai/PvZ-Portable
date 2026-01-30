@@ -9,12 +9,12 @@ using namespace Sexy;
 
 void SexyAppBase::MakeWindow()
 {
-	if (mGLInterface == NULL)
+	if (mGLInterface == nullptr)
 	{
 		gfxInitDefault();
 		C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 
-		consoleInit(GFX_TOP, NULL);
+		consoleInit(GFX_TOP, nullptr);
 
 		mGLInterface = new GLInterface(this);
 		InitGLInterface();

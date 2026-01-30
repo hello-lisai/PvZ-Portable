@@ -6,8 +6,8 @@ using namespace Sexy;
 
 FModMusicInfo::FModMusicInfo()
 {
-	mHSample = NULL;
-	mHMusic = NULL;
+	mHSample = nullptr;
+	mHMusic = nullptr;
 	mVolume = 0.0;
 	mVolumeAdd = 0.0;
 	mVolumeCap = 1.0;
@@ -43,15 +43,15 @@ FSOUND_SAMPLE* FModMusicInterface::LoadFMODSample(const std::string& theFileName
 
 	FSOUND_SAMPLE* aSample = gFMod->FSOUND_Sample_Load(FSOUND_FREE, aCachedName.c_str(), 0, 0);
 
-	if (aSample == NULL)			
+	if (aSample == nullptr)			
 	{
 		aSample = gFMod->FSOUND_Sample_Load(FSOUND_FREE, (theFileName + ".ogg").c_str(), 0, 0);
 	
-		if (aSample != NULL)
+		if (aSample != nullptr)
 		{
 			int aMode = gFMod->FSOUND_Sample_GetMode(aSample);	
 			int aFreq = 0;
-			gFMod->FSOUND_Sample_GetDefaults(aSample, &aFreq, NULL, NULL, NULL);
+			gFMod->FSOUND_Sample_GetDefaults(aSample, &aFreq, nullptr, nullptr, nullptr);
 									
 			ushort aFormatTag = 1;
 			ushort aChannelCount = ((aMode & FSOUND_MONO) != 0) ? 1 : 2;
@@ -72,7 +72,7 @@ FSOUND_SAMPLE* FModMusicInterface::LoadFMODSample(const std::string& theFileName
 			{
 				FILE* fp = fopen(aCachedName.c_str(), "wb");
 
-				if (fp != NULL)
+				if (fp != nullptr)
 				{
 					fwrite("RIFF", 1, 4, fp);	
 					fwrite(&aChunkSize, 4, 1, fp);
@@ -106,7 +106,7 @@ bool FModMusicInterface::LoadSample(int theSongId, const std::string& theFileNam
 {
 	FSOUND_SAMPLE* aSample = LoadFMODSample(theFileName.c_str());
 
-	if (aSample == NULL)
+	if (aSample == nullptr)
 		return false;		
 
 	FModMusicInfo aMusicInfo;
@@ -122,18 +122,18 @@ bool FModMusicInterface::LoadSample(int theSongId, const std::string& theIntroFi
 	FSOUND_SAMPLE* anIntroSample = LoadFMODSample(theIntroFileName.c_str());
 	FSOUND_SAMPLE* aLoopSample = LoadFMODSample(theRepeatFileName.c_str());
 
-	if ((anIntroSample == NULL) || (aLoopSample == NULL))
+	if ((anIntroSample == nullptr) || (aLoopSample == nullptr))
 		return false;
 	
 	// Get info for intro
 	int anIntroFreq;
-	gFMod->FSOUND_Sample_GetDefaults(anIntroSample, &anIntroFreq, NULL, NULL, NULL);
+	gFMod->FSOUND_Sample_GetDefaults(anIntroSample, &anIntroFreq, nullptr, nullptr, nullptr);
 	int anIntroMode = gFMod->FSOUND_Sample_GetMode(anIntroSample);	
 	int anIntroLen = gFMod->FSOUND_Sample_GetLength(anIntroSample);
 
 	// Get intro for loop
 	int aLoopFreq;
-	gFMod->FSOUND_Sample_GetDefaults(aLoopSample, &aLoopFreq, NULL, NULL, NULL);
+	gFMod->FSOUND_Sample_GetDefaults(aLoopSample, &aLoopFreq, nullptr, nullptr, nullptr);
 	int aLoopMode = gFMod->FSOUND_Sample_GetMode(aLoopSample);	
 	int aLoopLen = gFMod->FSOUND_Sample_GetLength(aLoopSample);
 	
@@ -190,7 +190,7 @@ bool FModMusicInterface::LoadMusic(int theSongId, const std::string& theFileName
 {
 	FMUSIC_MODULE* aHMusic = gFMod->FMUSIC_LoadSong(theFileName.c_str());
 
-	if (aHMusic == NULL)
+	if (aHMusic == nullptr)
 		return false;	
 	
 	FModMusicInfo aMusicInfo;
@@ -209,7 +209,7 @@ void FModMusicInterface::PlayMusic(int theSongId, int theOffset, bool noLoop)
 		aMusicInfo->mVolume = aMusicInfo->mVolumeCap;
 		aMusicInfo->mVolumeAdd = 0.0;
 
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{
 			gFMod->FMUSIC_SetMasterVolume(aMusicInfo->mHMusic, (int) (mMasterVolume * aMusicInfo->mVolume * mMaxMusicVolume));
 			gFMod->FMUSIC_SetLooping(aMusicInfo->mHMusic, noLoop ? FSOUND_LOOP_OFF : FSOUND_LOOP_NORMAL);
@@ -232,7 +232,7 @@ void FModMusicInterface::PauseMusic(int theSongId)
 	{
 		FModMusicInfo* aMusicInfo = &anItr->second;
 		
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{
 			gFMod->FMUSIC_SetPaused(aMusicInfo->mHMusic, TRUE);
 		}
@@ -250,7 +250,7 @@ void FModMusicInterface::ResumeMusic(int theSongId)
 	{
 		FModMusicInfo* aMusicInfo = &anItr->second;
 		
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{
 			gFMod->FMUSIC_SetPaused(aMusicInfo->mHMusic, FALSE);
 		}
@@ -269,7 +269,7 @@ void FModMusicInterface::StopMusic(int theSongId)
 		FModMusicInfo* aMusicInfo = &anItr->second;
 		aMusicInfo->mVolume = 0.0;
 
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{
 			gFMod->FMUSIC_StopSong(aMusicInfo->mHMusic);
 		}
@@ -288,7 +288,7 @@ void FModMusicInterface::StopAllMusic()
 		FModMusicInfo* aMusicInfo = &anItr->second;
 		aMusicInfo->mVolume = 0.0;
 		
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{
 			gFMod->FMUSIC_StopSong(aMusicInfo->mHMusic);
 		}
@@ -310,7 +310,7 @@ void FModMusicInterface::FadeIn(int theSongId, int theOffset, double theSpeed, b
 		
 		aMusicInfo->mVolumeAdd = theSpeed;
 				
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{	
 			gFMod->FMUSIC_SetMasterVolume(aMusicInfo->mHMusic, (int) (mMasterVolume * aMusicInfo->mVolume * mMaxMusicVolume));
 
@@ -370,7 +370,7 @@ void FModMusicInterface::SetVolume(double theVolume)
 	{
 		FModMusicInfo* aMusicInfo = &anItr->second;						
 
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{
 			gFMod->FMUSIC_SetMasterVolume(aMusicInfo->mHMusic, (int) (mMasterVolume * aMusicInfo->mVolume * mMaxMusicVolume));
 		}
@@ -392,7 +392,7 @@ void FModMusicInterface::SetSongVolume(int theSongId, double theVolume)
 
 		aMusicInfo->mVolume = theVolume;
 		
-		if (aMusicInfo->mHMusic != NULL)
+		if (aMusicInfo->mHMusic != nullptr)
 		{
 			gFMod->FMUSIC_SetMasterVolume(aMusicInfo->mHMusic, (int) (mMasterVolume * aMusicInfo->mVolume * mMaxMusicVolume));
 		}
@@ -439,7 +439,7 @@ void FModMusicInterface::Update()
 
 				if (aMusicInfo->mStopOnFade)
 				{
-					if (aMusicInfo->mHMusic != NULL)
+					if (aMusicInfo->mHMusic != nullptr)
 					{
 						gFMod->FMUSIC_StopSong(aMusicInfo->mHMusic);
 					}
@@ -450,7 +450,7 @@ void FModMusicInterface::Update()
 				}
 			}
 
-			if (aMusicInfo->mHMusic != NULL)
+			if (aMusicInfo->mHMusic != nullptr)
 			{
 				gFMod->FMUSIC_SetMasterVolume(aMusicInfo->mHMusic, (int) (mMasterVolume * aMusicInfo->mVolume * mMaxMusicVolume));
 			}

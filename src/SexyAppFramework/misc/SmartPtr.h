@@ -57,14 +57,14 @@ protected:
 	T *p;
 
 public:
-	ConstSmartPtr() : p(NULL) {}
+	ConstSmartPtr() : p(nullptr) {}
 
 	// Copy constructor.  Assign and add reference to underlying object.
-	ConstSmartPtr(const T* theObject) : p((T*)(theObject?theObject->CreateRef():NULL)) {} 
-	ConstSmartPtr(const ConstSmartPtr& theCopy) : p((T*)(theCopy?theCopy.p->CreateRef():NULL)){}
+	ConstSmartPtr(const T* theObject) : p((T*)(theObject?theObject->CreateRef():nullptr)) {} 
+	ConstSmartPtr(const ConstSmartPtr& theCopy) : p((T*)(theCopy?theCopy.p->CreateRef():nullptr)){}
 
 	// Destructor.  Remove reference to underlying object.
-	~ConstSmartPtr() { if(p!=NULL) p->Release(); }
+	~ConstSmartPtr() { if(p!=nullptr) p->Release(); }
 
 	// Arrow operator allows ConstSmartPtr to be treated like actual pointer.
 	const T* operator->() const { return p; }
@@ -77,8 +77,8 @@ public:
 	{ 
 		if(p!=thePtr) // prevent self-assignment
 		{
-			if(p!=NULL) p->Release(); 
-			p = (T*)(thePtr?thePtr->CreateRef():NULL); 
+			if(p!=nullptr) p->Release(); 
+			p = (T*)(thePtr?thePtr->CreateRef():nullptr); 
 		}
 
 		return thePtr; 

@@ -48,7 +48,7 @@ public:
     ReanimatorTransformArray        mTransforms;                    //+0x4：每一帧的动画变换的数组
     
 public:
-    ReanimatorTrack() : mName(""), mTransforms({NULL,0}) { }
+    ReanimatorTrack() : mName(""), mTransforms({nullptr,0}) { }
 };
 
 struct ReanimatorTrackArray {

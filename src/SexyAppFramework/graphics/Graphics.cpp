@@ -50,7 +50,7 @@ Graphics::Graphics(Image* theDestImage)
 	mScaleY = 1;
 	mScaleOrigX = 0;
 	mScaleOrigY = 0;
-	mFont = NULL;
+	mFont = nullptr;
 	mDestImage = theDestImage;
 	mDrawMode = DRAWMODE_NORMAL;
 	mColorizeImages = false;
@@ -58,7 +58,7 @@ Graphics::Graphics(Image* theDestImage)
 	mWriteColoredString = true;
 	mLinearBlend = false;
 
-	if (mDestImage == NULL)
+	if (mDestImage == nullptr)
 	{
 		mDestImage = &mStaticImage;
 		mIs3D = false;
@@ -642,7 +642,7 @@ void Graphics::DrawLineAA(int theStartX, int theStartY, int theEndX, int theEndY
 
 void Graphics::DrawString(const SexyString& theString, int theX, int theY)
 {
-	if (mFont != NULL)
+	if (mFont != nullptr)
 		mFont->DrawString(this, theX, theY, theString, mColor, mClipRect);
 }
 
@@ -776,7 +776,7 @@ void Graphics::DrawImageF(Image* theImage, float theX, float theY, const Rect& t
 
 void Graphics::DrawImageRotated(Image* theImage, int theX, int theY, double theRot, const Rect *theSrcRect)
 {	
-	if (theSrcRect == NULL)
+	if (theSrcRect == nullptr)
 	{
 		int aRotCenterX = theImage->GetWidth() / 2;
 		int aRotCenterY = theImage->GetHeight() / 2;
@@ -794,7 +794,7 @@ void Graphics::DrawImageRotated(Image* theImage, int theX, int theY, double theR
 
 void Graphics::DrawImageRotatedF(Image* theImage, float theX, float theY, double theRot, const Rect *theSrcRect)
 {	
-	if (theSrcRect == NULL)
+	if (theSrcRect == nullptr)
 	{
 		float aRotCenterX = theImage->GetWidth() / 2.0f;
 		float aRotCenterY = theImage->GetHeight() / 2.0f;
@@ -820,7 +820,7 @@ void Graphics::DrawImageRotatedF(Image* theImage, float theX, float theY, double
 	theX += mTransX;
 	theY += mTransY;	
 
-	if (theSrcRect==NULL)
+	if (theSrcRect==nullptr)
 	{
 		Rect aSrcRect(0,0,theImage->mWidth,theImage->mHeight);
 		mDestImage->BltRotated(theImage, theX, theY, aSrcRect, mClipRect, mColorizeImages ? mColor : Color::White, mDrawMode, theRot, theRotCenterX, theRotCenterY);
@@ -1210,7 +1210,7 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const SexyString& theLine, i
 	int aMaxWidth = 0;
 	int anIndentX = 0;
 
-	if (theLastWidth != NULL)
+	if (theLastWidth != nullptr)
 	{
 		anIndentX = *theLastWidth;
 		aCurWidth = anIndentX;
@@ -1286,9 +1286,9 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const SexyString& theLine, i
 				if (aWrittenWidth<0)
 					break;
 
-				if (theMaxWidth!=NULL && aWrittenWidth>*theMaxWidth)
+				if (theMaxWidth!=nullptr && aWrittenWidth>*theMaxWidth)
 					*theMaxWidth = aWrittenWidth;
-				if (theLastWidth!=NULL)
+				if (theLastWidth!=nullptr)
 					*theLastWidth = aWrittenWidth;
 			}
 
@@ -1316,9 +1316,9 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const SexyString& theLine, i
 			if (aWrittenWidth > aMaxWidth)
 				aMaxWidth = aWrittenWidth;
 
-			if (theMaxWidth!=NULL && aWrittenWidth>*theMaxWidth)
+			if (theMaxWidth!=nullptr && aWrittenWidth>*theMaxWidth)
 				*theMaxWidth = aWrittenWidth;
-			if (theLastWidth!=NULL)
+			if (theLastWidth!=nullptr)
 				*theLastWidth = aWrittenWidth;
 
 			aYOffset += theLineSpacing;
@@ -1327,13 +1327,13 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const SexyString& theLine, i
 	else if (aCurChar == '\n')
 	{
 		aYOffset += theLineSpacing;
-		if (theLastWidth != NULL)
+		if (theLastWidth != nullptr)
 			*theLastWidth = 0;
 	}
 
 	SetColor(anOrigColor);
 
-	if (theMaxWidth!=NULL)
+	if (theMaxWidth!=nullptr)
 		*theMaxWidth = aMaxWidth;
 
 	//返回时，aYOffset 增量为 (行数 + 1) * 行距。以 aYOffset 减去末行多算的一次行距，再加上字体下沉部分的高度，得到文本底部的纵向偏移值，即文本区域高度。

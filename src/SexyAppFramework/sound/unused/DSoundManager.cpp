@@ -23,31 +23,31 @@ DSoundManager::DSoundManager(HWND theHWnd, bool haveFMod)
 {
 	mHaveFMod = haveFMod;
 	mLastReleaseTick = 0;
-	mPrimaryBuffer = NULL;
+	mPrimaryBuffer = nullptr;
 
 	int i;
 
 	for (i = 0; i < MAX_SOURCE_SOUNDS; i++)
 	{
-		mSourceSounds[i] = NULL;
+		mSourceSounds[i] = nullptr;
 		mBaseVolumes[i] = 1;
 		mBasePans[i] = 0;
 	}
 
 	for (i = 0; i < MAX_CHANNELS; i++)
-		mPlayingSounds[i] = NULL;
+		mPlayingSounds[i] = nullptr;
 
-	mDirectSound = NULL;
+	mDirectSound = nullptr;
 
 	mMasterVolume = 1.0;
 
-	if (theHWnd != NULL)
+	if (theHWnd != nullptr)
 	{
 		//extern HMODULE gDSoundDLL;
 		typedef HRESULT (WINAPI *DirectSoundCreateFunc)(LPCGUID lpcGuid, LPDIRECTSOUND * ppDS, LPUNKNOWN  pUnkOuter);
 		DirectSoundCreateFunc aDirectSoundCreateFunc = (DirectSoundCreateFunc)GetProcAddress(gDSoundDLL,"DirectSoundCreate");
 
-		if (aDirectSoundCreateFunc != NULL && aDirectSoundCreateFunc(NULL, &mDirectSound, NULL) == DS_OK)
+		if (aDirectSoundCreateFunc != nullptr && aDirectSoundCreateFunc(nullptr, &mDirectSound, nullptr) == DS_OK)
 		{
 			//FSOUND_SetOutput(FSOUND_OUTPUT_WINMM);
 			if (mHaveFMod)
@@ -87,9 +87,9 @@ DSoundManager::DSoundManager(HWND theHWnd, bool haveFMod)
 				aBufferDesc.dwSize = sizeof(DSBUFFERDESC1);
 				aBufferDesc.dwFlags = DSBCAPS_PRIMARYBUFFER;//| DSBCAPS_CTRL3D; // Need default controls (pan, volume, frequency).
 				aBufferDesc.dwBufferBytes = 0;
-				aBufferDesc.lpwfxFormat =NULL;//(LPWAVEFORMATEX)&aWaveFormat;
+				aBufferDesc.lpwfxFormat =nullptr;//(LPWAVEFORMATEX)&aWaveFormat;
 
-				HRESULT aResult = mDirectSound->CreateSoundBuffer(&aBufferDesc, &mPrimaryBuffer, NULL);
+				HRESULT aResult = mDirectSound->CreateSoundBuffer(&aBufferDesc, &mPrimaryBuffer, nullptr);
 				if (aResult == DS_OK)
 				{
 					aResult = mPrimaryBuffer->SetFormat(&aWaveFormat);
@@ -111,7 +111,7 @@ DSoundManager::~DSoundManager()
 	if (mPrimaryBuffer)
 		mPrimaryBuffer->Release();
 
-	if (mDirectSound != NULL)
+	if (mDirectSound != nullptr)
 	{
 		if (mHaveFMod)
 			gFMod->FSOUND_Close();
@@ -134,13 +134,13 @@ int	DSoundManager::FindFreeChannel()
 
 	for (int i = 0; i < MAX_CHANNELS; i++)
 	{		
-		if (mPlayingSounds[i] == NULL)
+		if (mPlayingSounds[i] == nullptr)
 			return i;
 		
 		if (mPlayingSounds[i]->IsReleased())
 		{
 			delete mPlayingSounds[i];
-			mPlayingSounds[i] = NULL;
+			mPlayingSounds[i] = nullptr;
 			return i;
 		}
 	}
@@ -151,13 +151,13 @@ int	DSoundManager::FindFreeChannel()
 bool DSoundManager::Initialized()
 {
 /*
-	if (mDirectSound!=NULL)
+	if (mDirectSound!=nullptr)
 	{
 		mDirectSound->SetCooperativeLevel(theHWnd,DSSCL_NORMAL);
 	}
 */
 
-	return (mDirectSound != NULL);
+	return (mDirectSound != nullptr);
 }
 
 int DSoundManager::VolumeToDB(double theVolume)
@@ -174,7 +174,7 @@ void DSoundManager::SetVolume(double theVolume)
 	mMasterVolume = theVolume;
 
 	for (int i = 0; i < MAX_CHANNELS; i++)
-		if (mPlayingSounds[i] != NULL)
+		if (mPlayingSounds[i] != nullptr)
 			mPlayingSounds[i]->RehupVolume();
 }
 
@@ -186,7 +186,7 @@ bool DSoundManager::LoadWAVSound(unsigned int theSfxID, const std::string& theFi
 
 	fp = p_fopen(theFilename.c_str(), "rb");
 
-	if (fp == NULL)
+	if (fp == nullptr)
 		return false;	
 
 	char aChunkType[5];	
@@ -286,7 +286,7 @@ bool DSoundManager::LoadWAVSound(unsigned int theSfxID, const std::string& theFi
 			aBufferDesc.dwBufferBytes = aDataSize;                                                             
 			aBufferDesc.lpwfxFormat = (LPWAVEFORMATEX)&aWaveFormat;
 
-			if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], NULL) != DS_OK)
+			if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], nullptr) != DS_OK)
 			{				
 				p_fclose(fp);
 				return false;
@@ -295,7 +295,7 @@ bool DSoundManager::LoadWAVSound(unsigned int theSfxID, const std::string& theFi
 
 			void* lpvPtr;
 			DWORD dwBytes;
-			if (mSourceSounds[theSfxID]->Lock(0, aDataSize, &lpvPtr, &dwBytes, NULL, NULL, 0) != DS_OK)
+			if (mSourceSounds[theSfxID]->Lock(0, aDataSize, &lpvPtr, &dwBytes, nullptr, nullptr, 0) != DS_OK)
 			{
 				p_fclose(fp);
 				return false;
@@ -307,7 +307,7 @@ bool DSoundManager::LoadWAVSound(unsigned int theSfxID, const std::string& theFi
 			for (int i = 0; i < aDataSize; i++)
 				((uchar*) lpvPtr)[i] ^= anXor;
 
-			if (mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, NULL, 0) != DS_OK)
+			if (mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, nullptr, 0) != DS_OK)
 				return false;
 
 			if (aReadSize != aDataSize)
@@ -330,14 +330,14 @@ bool DSoundManager::LoadFModSound(unsigned int theSfxID, const std::string& theF
 
 	FSOUND_SAMPLE* aSample = gFMod->FSOUND_Sample_Load(FSOUND_FREE, theFilename.c_str(), 0, 0);
 
-	if (aSample == NULL) 
+	if (aSample == nullptr) 
 	{
 		return false;	
 	}
 	
 	int aMode = gFMod->FSOUND_Sample_GetMode(aSample);	
 	int aFreq;
-	gFMod->FSOUND_Sample_GetDefaults(aSample, &aFreq, NULL, NULL, NULL);
+	gFMod->FSOUND_Sample_GetDefaults(aSample, &aFreq, nullptr, nullptr, nullptr);
 
 	PCMWAVEFORMAT aWaveFormat;
 	DSBUFFERDESC aBufferDesc;    			
@@ -376,7 +376,7 @@ bool DSoundManager::LoadFModSound(unsigned int theSfxID, const std::string& theF
 	aBufferDesc.dwBufferBytes = aLenBytes;
 	aBufferDesc.lpwfxFormat =(LPWAVEFORMATEX)&aWaveFormat;	
 
-	if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], NULL) != DS_OK)
+	if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], nullptr) != DS_OK)
 	{
 /*
 char xmsg[100];
@@ -398,7 +398,7 @@ sprintf(xmsg,	"WAV STUFF: (%s)\n"
 
 MessageBox(0,xmsg,xmsg,MB_OK);
 
-HRESULT error=mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], NULL);
+HRESULT error=mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], nullptr);
 switch (error)
 {
 case DSERR_ALLOCATED:MessageBox(0,"DSERR_ALLOCATED","Ugh",MB_OK);break;
@@ -420,7 +420,7 @@ exit(0);
 
 	void* lpvPtr;
 	DWORD dwBytes;
-	if (mSourceSounds[theSfxID]->Lock(0, aLenBytes, &lpvPtr, &dwBytes, NULL, NULL, 0) == DS_OK)
+	if (mSourceSounds[theSfxID]->Lock(0, aLenBytes, &lpvPtr, &dwBytes, nullptr, nullptr, 0) == DS_OK)
 	{		
 
 		void* aPtr1;
@@ -432,7 +432,7 @@ exit(0);
 		{			
 			memcpy(lpvPtr, aPtr1, aLen1);
 
-			mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, NULL, 0);
+			mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, nullptr, 0);
 			gFMod->FSOUND_Sample_Unlock(aSample, aPtr1, aPtr2, aLen1, aLen2);
 		}
 	}
@@ -440,7 +440,7 @@ exit(0);
 	{
 	}
 
-	mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, NULL, 0);
+	mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, nullptr, 0);
 
 	gFMod->FSOUND_Sample_Free(aSample);
 
@@ -450,7 +450,7 @@ exit(0);
 #ifdef USE_OGG_LIB
 
 static int p_fseek64_wrap(PFILE *f,ogg_int64_t off,int whence){
-	if(f==NULL)return(-1);
+	if(f==nullptr)return(-1);
 	return p_fseek(f,(long)off,whence);
 }
 
@@ -471,10 +471,10 @@ bool DSoundManager::LoadOGGSound(unsigned int theSfxID, const std::string& theFi
 	int current_section;
 
 	PFILE *aFile = p_fopen(theFilename.c_str(),"rb");
-	if (aFile==NULL)
+	if (aFile==nullptr)
 		return false;
 
-	if(ov_pak_open(aFile, &vf, NULL, 0) < 0) 
+	if(ov_pak_open(aFile, &vf, nullptr, 0) < 0) 
 	{
 		p_fclose(aFile);
 		return false;
@@ -505,7 +505,7 @@ bool DSoundManager::LoadOGGSound(unsigned int theSfxID, const std::string& theFi
 	aBufferDesc.dwBufferBytes = aLenBytes;
 	aBufferDesc.lpwfxFormat =(LPWAVEFORMATEX)&aWaveFormat;	
 
-	if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], NULL) != DS_OK)
+	if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], nullptr) != DS_OK)
 	{
 		ov_clear(&vf);
 		return false;
@@ -513,7 +513,7 @@ bool DSoundManager::LoadOGGSound(unsigned int theSfxID, const std::string& theFi
 
 	char* aBuf;
 	DWORD dwBytes;
-	if (mSourceSounds[theSfxID]->Lock(0, aLenBytes, (LPVOID*)&aBuf, &dwBytes, NULL, NULL, 0) != DS_OK)
+	if (mSourceSounds[theSfxID]->Lock(0, aLenBytes, (LPVOID*)&aBuf, &dwBytes, nullptr, nullptr, 0) != DS_OK)
 	{
 		ov_clear(&vf);
 		return false;
@@ -535,7 +535,7 @@ bool DSoundManager::LoadOGGSound(unsigned int theSfxID, const std::string& theFi
 		}
 	}
 
-	mSourceSounds[theSfxID]->Unlock(aBuf, dwBytes, NULL, 0);
+	mSourceSounds[theSfxID]->Unlock(aBuf, dwBytes, nullptr, 0);
 	ov_clear(&vf);
 	return aNumBytes==0;  
 }
@@ -553,7 +553,7 @@ bool DSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theFil
 
 	fp = p_fopen(theFilename.c_str(), "rb");	
 
-	if (fp == NULL)
+	if (fp == nullptr)
 		return false;	
 
 	char aHeaderId[5];	
@@ -641,7 +641,7 @@ bool DSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theFil
 	aBufferDesc.dwBufferBytes = aDestSize;
 	aBufferDesc.lpwfxFormat = (LPWAVEFORMATEX)&aWaveFormat;
 
-	if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], NULL) != DS_OK)
+	if (mDirectSound->CreateSoundBuffer(&aBufferDesc, &mSourceSounds[theSfxID], nullptr) != DS_OK)
 	{
 		p_fclose(fp);
 		return false;
@@ -649,7 +649,7 @@ bool DSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theFil
 
 	void* lpvPtr;
 	DWORD dwBytes;
-	if (mSourceSounds[theSfxID]->Lock(0, aDestSize, &lpvPtr, &dwBytes, NULL, NULL, 0) != DS_OK)
+	if (mSourceSounds[theSfxID]->Lock(0, aDestSize, &lpvPtr, &dwBytes, nullptr, nullptr, 0) != DS_OK)
 	{
 		p_fclose(fp);
 		return false;
@@ -697,7 +697,7 @@ bool DSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theFil
 
 	delete [] aSrcBuffer;		
 
-	if (mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, NULL, 0) != DS_OK)
+	if (mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, nullptr, 0) != DS_OK)
 		return false;
 
 	if (aReadSize != aDataSize)
@@ -776,7 +776,7 @@ int DSoundManager::LoadSound(const std::string& theFilename)
 
 	for (i = MAX_SOURCE_SOUNDS-1; i >= 0; i--)
 	{		
-		if (mSourceSounds[i] == NULL)
+		if (mSourceSounds[i] == nullptr)
 		{
 			if (!LoadSound(i, theFilename))
 				return -1;
@@ -790,10 +790,10 @@ int DSoundManager::LoadSound(const std::string& theFilename)
 
 void DSoundManager::ReleaseSound(unsigned int theSfxID)
 {
-	if (mSourceSounds[theSfxID] != NULL)
+	if (mSourceSounds[theSfxID] != nullptr)
 	{
 		mSourceSounds[theSfxID]->Release();
-		mSourceSounds[theSfxID] = NULL;
+		mSourceSounds[theSfxID] = nullptr;
 		mSourceFileNames[theSfxID] = "";
 	}
 }
@@ -802,7 +802,7 @@ int DSoundManager::GetFreeSoundId()
 {
 	for (int i=0; i<MAX_SOURCE_SOUNDS; i++)
 	{
-		if (mSourceSounds[i]==NULL)
+		if (mSourceSounds[i]==nullptr)
 			return i;
 	}
 
@@ -814,7 +814,7 @@ int DSoundManager::GetNumSounds()
 	int aCount = 0;
 	for (int i=0; i<MAX_SOURCE_SOUNDS; i++)
 	{
-		if (mSourceSounds[i]!=NULL)
+		if (mSourceSounds[i]!=nullptr)
 			aCount++;
 	}
 
@@ -842,11 +842,11 @@ bool DSoundManager::SetBasePan(unsigned int theSfxID, int theBasePan)
 bool DSoundManager::GetTheFileTime(const std::string& theDepFile, FILETIME* theFileTime)
 {	
 	memset(theFileTime, 0, sizeof(FILETIME));
-	HANDLE aDepFileHandle = CreateFile(theDepFile.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE aDepFileHandle = CreateFile(theDepFile.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (aDepFileHandle == INVALID_HANDLE_VALUE)
 		return false;
 	
-	GetFileTime(aDepFileHandle, NULL, NULL, theFileTime);	
+	GetFileTime(aDepFileHandle, nullptr, nullptr, theFileTime);	
 	CloseHandle(aDepFileHandle);
 	return true;
 }
@@ -860,15 +860,15 @@ bool DSoundManager::WriteWAV(unsigned int theSfxID, const std::string& theFilena
 
 	void* lpvPtr;
 	DWORD dwBytes;
-	if (mSourceSounds[theSfxID]->Lock(0, aDataSize, &lpvPtr, &dwBytes, NULL, NULL, 0) != DS_OK)
+	if (mSourceSounds[theSfxID]->Lock(0, aDataSize, &lpvPtr, &dwBytes, nullptr, nullptr, 0) != DS_OK)
 		return false;
 
 	FILE* fp;
 	fp = fopen(theFilename.c_str(), "wb");
 
-	if (fp == NULL)
+	if (fp == nullptr)
 	{
-		mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, NULL, 0);
+		mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, nullptr, 0);
 		return false;
 	}	
 
@@ -881,11 +881,11 @@ bool DSoundManager::WriteWAV(unsigned int theSfxID, const std::string& theFilena
 	fwrite("WAVE", 1, 4, fp);
 
 	ulong aBufferSize;
-	mSourceSounds[theSfxID]->GetFormat(NULL, 0, &aBufferSize);
+	mSourceSounds[theSfxID]->GetFormat(nullptr, 0, &aBufferSize);
 
 	WAVEFORMATEX* aWaveFormat = (WAVEFORMATEX*) new char[aBufferSize];
 	memset(aWaveFormat, 0, sizeof(WAVEFORMATEX));	
-	mSourceSounds[theSfxID]->GetFormat(aWaveFormat, aBufferSize, NULL);
+	mSourceSounds[theSfxID]->GetFormat(aWaveFormat, aBufferSize, nullptr);
 
 	ushort aFormatTag = 1;
 	ushort aChannelCount = aWaveFormat->nChannels;
@@ -935,7 +935,7 @@ bool DSoundManager::WriteWAV(unsigned int theSfxID, const std::string& theFilena
 	for (DWORD i = 0; i < dwBytes; i++)
 		((uchar*) lpvPtr)[i] ^= anXor;
 
-	if (mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, NULL, 0) != DS_OK)
+	if (mSourceSounds[theSfxID]->Unlock(lpvPtr, dwBytes, nullptr, 0) != DS_OK)
 		return false;
 
 	return true;
@@ -944,20 +944,20 @@ bool DSoundManager::WriteWAV(unsigned int theSfxID, const std::string& theFilena
 SoundInstance* DSoundManager::GetSoundInstance(unsigned int theSfxID)
 {
 	if (theSfxID > MAX_SOURCE_SOUNDS)
-		return NULL;
+		return nullptr;
 
 	int aFreeChannel = FindFreeChannel();
 	if (aFreeChannel < 0)
-		return NULL;
+		return nullptr;
 
-	if (mDirectSound==NULL)
+	if (mDirectSound==nullptr)
 	{
-		mPlayingSounds[aFreeChannel] = new DSoundInstance(this, NULL);
+		mPlayingSounds[aFreeChannel] = new DSoundInstance(this, nullptr);
 	}
 	else
 	{
-		if (mSourceSounds[theSfxID] == NULL)
-			return NULL;
+		if (mSourceSounds[theSfxID] == nullptr)
+			return nullptr;
 
 		mPlayingSounds[aFreeChannel] = new DSoundInstance(this, mSourceSounds[theSfxID]);
 	}
@@ -971,37 +971,37 @@ SoundInstance* DSoundManager::GetSoundInstance(unsigned int theSfxID)
 void DSoundManager::ReleaseSounds()
 {
 	for (int i = 0; i < MAX_SOURCE_SOUNDS; i++)
-		if (mSourceSounds[i] != NULL)
+		if (mSourceSounds[i] != nullptr)
 		{
 			mSourceSounds[i]->Release();
-			mSourceSounds[i] = NULL;
+			mSourceSounds[i] = nullptr;
 		}
 }
 
 void DSoundManager::ReleaseChannels()
 {
 	for (int i = 0; i < MAX_CHANNELS; i++)
-		if (mPlayingSounds[i] != NULL)
+		if (mPlayingSounds[i] != nullptr)
 		{
 			delete mPlayingSounds[i];
-			mPlayingSounds[i] = NULL;
+			mPlayingSounds[i] = nullptr;
 		}
 }
 
 void DSoundManager::ReleaseFreeChannels()
 {
 	for (int i = 0; i < MAX_CHANNELS; i++)
-		if (mPlayingSounds[i] != NULL && mPlayingSounds[i]->IsReleased())
+		if (mPlayingSounds[i] != nullptr && mPlayingSounds[i]->IsReleased())
 		{
 			delete mPlayingSounds[i];
-			mPlayingSounds[i] = NULL;
+			mPlayingSounds[i] = nullptr;
 		}
 }
 
 void DSoundManager::StopAllSounds()
 {
 	for (int i = 0; i < MAX_CHANNELS; i++)
-		if (mPlayingSounds[i] != NULL)
+		if (mPlayingSounds[i] != nullptr)
 		{
 			bool isAutoRelease = mPlayingSounds[i]->mAutoRelease;
 			mPlayingSounds[i]->Stop();
@@ -1089,7 +1089,7 @@ void DSoundManager::Flush()
 
 void DSoundManager::SetCooperativeWindow(HWND theHWnd)
 {
-	if (mDirectSound != NULL)
+	if (mDirectSound != nullptr)
 		mDirectSound->SetCooperativeLevel(theHWnd,DSSCL_NORMAL);
 	/*
 	if (isWindowed==true) mDirectSound->SetCooperativeLevel(theHWnd,DSSCL_NORMAL);

@@ -123,9 +123,9 @@ bool SexyAppBase::ProcessDeferredMessages(bool singleMessage)
 					ClearKeysDown();
 					break;
 				}
-				else if ((wParam == 'D') && (mWidgetManager != NULL) && (mWidgetManager->mKeyDown[KEYCODE_CONTROL]) && (mWidgetManager->mKeyDown[KEYCODE_MENU]))
+				else if ((wParam == 'D') && (mWidgetManager != nullptr) && (mWidgetManager->mKeyDown[KEYCODE_CONTROL]) && (mWidgetManager->mKeyDown[KEYCODE_MENU]))
 				{
-					PlaySoundA("c:\\windows\\media\\Windows XP Menu Command.wav", NULL, SND_ASYNC);
+					PlaySoundA("c:\\windows\\media\\Windows XP Menu Command.wav", nullptr, SND_ASYNC);
 					mDebugKeysEnabled = !mDebugKeysEnabled;
 				}
 

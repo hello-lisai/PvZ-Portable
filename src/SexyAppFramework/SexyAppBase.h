@@ -454,7 +454,7 @@ public:
 	void					EnableCustomCursors(bool enabled);	
 	virtual GLImage*		GetImage(const std::string& theFileName, bool commitBits = true);	
 	virtual SharedImageRef	SetSharedImage(const std::string& theFileName, const std::string& theVariant, GLImage* theImage, bool* isNew);
-	virtual SharedImageRef	GetSharedImage(const std::string& theFileName, const std::string& theVariant = "", bool* isNew = NULL);
+	virtual SharedImageRef	GetSharedImage(const std::string& theFileName, const std::string& theVariant = "", bool* isNew = nullptr);
 
 	void					CleanSharedImages();
 	void					PrecacheAdditive(MemoryImage* theImage);

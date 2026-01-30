@@ -19,7 +19,7 @@ EditWidget::EditWidget(int theId, EditListener* theEditListener)
 {		
 	mId = theId;
 	mEditListener = theEditListener;	
-	mFont = NULL;
+	mFont = nullptr;
 
 	mHadDoubleClick = false;
 	mHilitePos = -1;
@@ -110,13 +110,13 @@ void EditWidget::SetFont(_Font* theFont, _Font* theWidthCheckFont)
 	mFont = theFont->Duplicate();
 
 	ClearWidthCheckFonts();
-	if (theWidthCheckFont != NULL)
+	if (theWidthCheckFont != nullptr)
 		AddWidthCheckFont(theWidthCheckFont);
 }
 
 void EditWidget::Draw(Graphics* g) // Already translated
 {	
-	if (mFont == NULL)
+	if (mFont == nullptr)
 		mFont = FONT_PICO129->Duplicate();
 		//mFont = new SysFont(mWidgetManager->mApp, "Arial Unicode MS", 10, false);
 
@@ -190,7 +190,7 @@ void EditWidget::GotFocus()
 	{
 		SexyAppBase *anApp = mWidgetManager->mApp;
 
-		CreateCaret(anApp->mHWnd,NULL,0,0);
+		CreateCaret(anApp->mHWnd,nullptr,0,0);
 		UpdateCaretPos();
 		ShowCaret(anApp->mHWnd);
 	}
@@ -596,7 +596,7 @@ void EditWidget::FocusCursor(bool bigJump)
 		MarkDirty();
 	}				
 					
-	if (mFont != NULL)
+	if (mFont != nullptr)
 	{
 		SexyString &aString = GetDisplayString();
 		while ((mWidth-8 > 0) && (mFont->StringWidth(aString.substr(0, mCursorPos)) - mFont->StringWidth(aString.substr(0, mLeftPos)) >= mWidth-8))

@@ -37,7 +37,7 @@ bool SDLMusicInterface::LoadMusic(int theSongId, const std::string& theFileName)
 	else
 	{
 		PFILE* aFP = p_fopen(theFileName.c_str(), "rb");
-		if (aFP == NULL)
+		if (aFP == nullptr)
 			return false;
 
 		p_fseek(aFP, 0, SEEK_END);

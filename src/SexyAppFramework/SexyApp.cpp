@@ -13,7 +13,7 @@
 
 using namespace Sexy;
 
-SexyApp* Sexy::gSexyApp = NULL;
+SexyApp* Sexy::gSexyApp = nullptr;
 
 // Groups of 80-byte data
 const char DYNAMIC_DATA_BLOCK[400] = 
@@ -45,7 +45,7 @@ SexyApp::SexyApp()
 	mCompanyName = "PopCap";
 
 	mInternetManager = nullptr;//new InternetManager();
-	mBetaSupport = NULL;
+	mBetaSupport = nullptr;
 	mBetaValidate = false;	
 
 	SetString("UPDATE_CHECK_BODY", L"Contacting PopCap.com to determine if there are any updates available for this product ...");
@@ -125,7 +125,7 @@ void SexyApp::ReadFromRegistry()
 		std::string aFileName = GetAppDataFolder() + "popcinfo.dat";
 
 		FILE* fp = fopen(aFileName.c_str(), "rb");
-		if (fp != NULL)
+		if (fp != nullptr)
 		{
 			for (;;)
 			{
@@ -232,7 +232,7 @@ void SexyApp::WriteToRegistry()
 		std::string aFileName = GetAppDataFolder() + "popcinfo.dat";
 
 		FILE* fp = fopen(aFileName.c_str(), "r+b");
-		if (fp != NULL)
+		if (fp != nullptr)
 		{
 			for (;;)
 			{
@@ -259,7 +259,7 @@ void SexyApp::WriteToRegistry()
 		else
 			fp = fopen(aFileName.c_str(), "wb");
 			
-		if (fp != NULL)
+		if (fp != nullptr)
 		{
 			ushort aLen = mProdName.length();
 			fwrite(&aLen, 1, sizeof(short), fp);
@@ -303,7 +303,7 @@ bool SexyApp::OpenHTMLTemplate(const std::string& theTemplateFile, const Defines
 
 	WIN32_FIND_DATA aFindData;
 	HANDLE aHandle = FindFirstFile("temp/tpl*.html", &aFindData);
-	if (aHandle != NULL)
+	if (aHandle != nullptr)
 	{
 		do
 		{
@@ -442,7 +442,7 @@ bool SexyApp::CheckSignature(const Buffer& theBuffer, const std::string& theFile
 	char aSigStr[25];
 
 	FILE* aFP = fopen((theFileName + ".sig").c_str(), "rb");
-	if (aFP == NULL)
+	if (aFP == nullptr)
 		return false;
 
 	fread(aSigStr, 1, 24, aFP);
@@ -520,7 +520,7 @@ void SexyApp::HandleCmdLineParam(const std::string& theParamName, const std::str
 			"Build Num: " + StrFormat("%d", mBuildNum) + "\r\n" +
 			"Build Date: " + mBuildDate;
 
-		//MessageBox(NULL, aVersionString.c_str(), "Version Info", MB_ICONINFORMATION | MB_OK);
+		//MessageBox(nullptr, aVersionString.c_str(), "Version Info", MB_ICONINFORMATION | MB_OK);
 		printf("%s\n", aVersionString.c_str());
 		DoExit(0);
 	}

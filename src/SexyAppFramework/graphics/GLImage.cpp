@@ -28,7 +28,7 @@ void GLImage::Create(int theWidth, int theHeight)
 {
 	delete [] mBits;
 
-	mBits = NULL;
+	mBits = nullptr;
 
 	BitsChanged();	
 }

@@ -19,12 +19,12 @@ static int gButtonWidgetColors[][3] = {
 ButtonWidget::ButtonWidget(int theId, ButtonListener* theButtonListener)	
 {
 	mId = theId;
-	mFont = NULL;
+	mFont = nullptr;
 	mLabelJustify = BUTTON_LABEL_CENTER;
-	mButtonImage = NULL;
-	mOverImage = NULL;
-	mDownImage = NULL;
-	mDisabledImage = NULL;
+	mButtonImage = nullptr;
+	mOverImage = nullptr;
+	mDownImage = nullptr;
+	mDisabledImage = nullptr;
 	mInverted = false;
 	mBtnNoDraw = false;
 	mFrameNoDraw = false;
@@ -56,7 +56,7 @@ bool ButtonWidget::IsButtonDown()
 
 bool ButtonWidget::HaveButtonImage(Image *theImage, const Rect &theRect)
 {
-	return (theImage!=NULL || theRect.mWidth!=0);
+	return (theImage!=nullptr || theRect.mWidth!=0);
 }
 	
 void ButtonWidget::DrawButtonImage(Graphics *g, Image *theImage, const Rect &theRect, int x, int y)
@@ -72,7 +72,7 @@ void ButtonWidget::Draw(Graphics* g)
 	if (mBtnNoDraw)
 		return;
 
-	if ((mFont == NULL) && (mLabel.length() > 0))
+	if ((mFont == nullptr) && (mLabel.length() > 0))
 		mFont = FONT_PICO129->Duplicate();
 		//mFont = new SysFont(mWidgetManager->mApp, "Arial Unicode MS", 10);
 
@@ -82,7 +82,7 @@ void ButtonWidget::Draw(Graphics* g)
 	int aFontX = 0; // BUTTON_LABEL_LEFT
 	int aFontY = 0;
 	
-	if (mFont != NULL)
+	if (mFont != nullptr)
 	{
 		if (mLabelJustify == BUTTON_LABEL_CENTER)
 			aFontX = (mWidth - mFont->StringWidth(mLabel))/2;
@@ -96,7 +96,7 @@ void ButtonWidget::Draw(Graphics* g)
 
 	g->SetFont(mFont);
 	
-	if ((mButtonImage == NULL) && (mDownImage == NULL))
+	if ((mButtonImage == nullptr) && (mDownImage == nullptr))
 	{
 		if (!mFrameNoDraw)
 		{

@@ -17,13 +17,13 @@ SDLSoundManager::SDLSoundManager()
 
 	for (i = 0; i < MAX_SOURCE_SOUNDS; i++)
 	{
-		mSourceSounds[i] = NULL;
+		mSourceSounds[i] = nullptr;
 		mBaseVolumes[i] = 1;
 		mBasePans[i] = 0;
 	}
 
 	for (i = 0; i < MAX_CHANNELS; i++)
-		mPlayingSounds[i] = NULL;
+		mPlayingSounds[i] = nullptr;
 
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO))
     {
@@ -61,7 +61,7 @@ bool SDLSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theF
 
 	fp = p_fopen(theFilename.c_str(), "rb");
 
-	if (fp == NULL)
+	if (fp == nullptr)
 		return false;	
 
 	char aHeaderId[5];	
@@ -197,7 +197,7 @@ bool SDLSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theF
 	uint32_t samplesize = ((srcfreq & 0xFF)/8)*srcchannels;
 	wavecvt.len = aDestSize & ~(samplesize - 1);
 	wavecvt.buf = (uint8_t*)SDL_calloc(1, wavecvt.len*wavecvt.len_mult);
-	if (wavecvt.buf == NULL)
+	if (wavecvt.buf == nullptr)
 	{
 		Mix_OutOfMemory();
 		SDL_free(aMixChunk);
@@ -215,7 +215,7 @@ bool SDLSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theF
 	}
 
 	aDest = (uint8_t*)SDL_realloc(wavecvt.buf, wavecvt.len_cvt);
-	if (aDest == NULL) {
+	if (aDest == nullptr) {
 		aMixChunk->abuf = wavecvt.buf;
 	} else {
 		aMixChunk->abuf = aDest;
@@ -276,7 +276,7 @@ int SDLSoundManager::LoadSound(const std::string& theFilename)
 
 	for (i = MAX_SOURCE_SOUNDS-1; i >= 0; i--)
 	{		
-		if (mSourceSounds[i] == NULL)
+		if (mSourceSounds[i] == nullptr)
 		{
 			if (!LoadSound(i, theFilename))
 				return -1;
@@ -290,10 +290,10 @@ int SDLSoundManager::LoadSound(const std::string& theFilename)
 
 void SDLSoundManager::ReleaseSound(unsigned int theSfxID)
 {
-	if (mSourceSounds[theSfxID] != NULL)
+	if (mSourceSounds[theSfxID] != nullptr)
 	{
 		Mix_FreeChunk(mSourceSounds[theSfxID]);
-		mSourceSounds[theSfxID] = NULL;
+		mSourceSounds[theSfxID] = nullptr;
 		mSourceFileNames[theSfxID] = "";
 	}
 }
@@ -303,7 +303,7 @@ void SDLSoundManager::SetVolume(double theVolume)
 	mMasterVolume = theVolume;
 
 	for (int i = 0; i < MAX_CHANNELS; i++)
-		if (mPlayingSounds[i] != NULL)
+		if (mPlayingSounds[i] != nullptr)
 			mPlayingSounds[i]->RehupVolume();
 }
 
@@ -328,14 +328,14 @@ bool SDLSoundManager::SetBasePan(unsigned int theSfxID, int theBasePan)
 SoundInstance* SDLSoundManager::GetSoundInstance(unsigned int theSfxID)
 {
 	if (theSfxID > MAX_SOURCE_SOUNDS)
-		return NULL;
+		return nullptr;
 
 	int aFreeChannel = FindFreeChannel();
 	if (aFreeChannel < 0)
-		return NULL;
+		return nullptr;
 
-	if (mSourceSounds[theSfxID] == NULL)
-		return NULL;
+	if (mSourceSounds[theSfxID] == nullptr)
+		return nullptr;
 
 	mPlayingSounds[aFreeChannel] = new SDLSoundInstance(this, mSourceSounds[theSfxID]);
 
@@ -349,10 +349,10 @@ void SDLSoundManager::ReleaseSounds()
 {
 	for (int i = 0; i < MAX_SOURCE_SOUNDS; i++)
 	{
-		if (mSourceSounds[i] != NULL)
+		if (mSourceSounds[i] != nullptr)
 		{
 			Mix_FreeChunk(mSourceSounds[i]);
-			mSourceSounds[i] = NULL;
+			mSourceSounds[i] = nullptr;
 		}
 	}
 }
@@ -361,10 +361,10 @@ void SDLSoundManager::ReleaseChannels()
 {
 	for (int i = 0; i < MAX_CHANNELS; i++)
 	{
-		if (mPlayingSounds[i] != NULL)
+		if (mPlayingSounds[i] != nullptr)
 		{
 			delete mPlayingSounds[i];
-			mPlayingSounds[i] = NULL;
+			mPlayingSounds[i] = nullptr;
 		}
 	}
 }
@@ -393,7 +393,7 @@ void SDLSoundManager::StopAllSounds()
 {
 	for (int i = 0; i < MAX_CHANNELS; i++)
 	{
-		if (mPlayingSounds[i] != NULL)
+		if (mPlayingSounds[i] != nullptr)
 		{
 			bool isAutoRelease = mPlayingSounds[i]->mAutoRelease;
 			mPlayingSounds[i]->Stop();
@@ -406,7 +406,7 @@ int SDLSoundManager::GetFreeSoundId()
 {
 	for (int i=0; i<MAX_SOURCE_SOUNDS; i++)
 	{
-		if (mSourceSounds[i]==NULL)
+		if (mSourceSounds[i]==nullptr)
 			return i;
 	}
 
@@ -418,7 +418,7 @@ int SDLSoundManager::GetNumSounds()
 	int aCount = 0;
 	for (int i=0; i<MAX_SOURCE_SOUNDS; i++)
 	{
-		if (mSourceSounds[i]!=NULL)
+		if (mSourceSounds[i]!=nullptr)
 			aCount++;
 	}
 
@@ -436,13 +436,13 @@ int SDLSoundManager::FindFreeChannel()
 
 	for (int i = 0; i < MAX_CHANNELS; i++)
 	{		
-		if (mPlayingSounds[i] == NULL)
+		if (mPlayingSounds[i] == nullptr)
 			return i;
 		
 		if (mPlayingSounds[i]->IsReleased())
 		{
 			delete mPlayingSounds[i];
-			mPlayingSounds[i] = NULL;
+			mPlayingSounds[i] = nullptr;
 			return i;
 		}
 	}
@@ -454,10 +454,10 @@ void SDLSoundManager::ReleaseFreeChannels()
 {
 	for (int i = 0; i < MAX_CHANNELS; i++)
 	{
-		if (mPlayingSounds[i] != NULL && mPlayingSounds[i]->IsReleased())
+		if (mPlayingSounds[i] != nullptr && mPlayingSounds[i]->IsReleased())
 		{
 			delete mPlayingSounds[i];
-			mPlayingSounds[i] = NULL;
+			mPlayingSounds[i] = nullptr;
 		}
 	}
 }

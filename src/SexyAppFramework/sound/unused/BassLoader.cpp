@@ -3,7 +3,7 @@
 
 using namespace Sexy;
 
-BASS_INSTANCE* Sexy::gBass = NULL;
+BASS_INSTANCE* Sexy::gBass = nullptr;
 static long gBassLoadCount = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,9 +67,9 @@ BASS_INSTANCE::BASS_INSTANCE(const char *dllName)
 	GETPROC(BASS_SetVolume);
 
 	/*
-	if (BASS_SetVolume == NULL)
+	if (BASS_SetVolume == nullptr)
 	{
-		MessageBoxA(NULL,"Whoops! You forgot to put the CD in your computer.","Error",MB_OK | MB_ICONERROR);
+		MessageBoxA(nullptr,"Whoops! You forgot to put the CD in your computer.","Error",MB_OK | MB_ICONERROR);
 		exit(0);
 	}
 	*/
@@ -133,15 +133,15 @@ BASS_INSTANCE::BASS_INSTANCE(const char *dllName)
 	//*((uintptr_t*) &BASS_ChannelGetLength) = (uintptr_t) GetProcAddress(mModule, "BASS_ChannelGetLength");
 
 	/*
-	mVersion2 = BASS_SetConfig != NULL;
+	mVersion2 = BASS_SetConfig != nullptr;
 	if (mVersion2)
 	{
 		// Version 2 has different BASS_Init params
 		*((uintptr_t*) &BASS_Init2) = (uintptr_t) BASS_Init;
-		BASS_Init = NULL;
+		BASS_Init = nullptr;
 
 		*((uintptr_t*) &BASS_MusicLoad2) = (uintptr_t) BASS_MusicLoad;
-		BASS_MusicLoad = NULL;
+		BASS_MusicLoad = nullptr;
 
 		
 
@@ -150,8 +150,8 @@ BASS_INSTANCE::BASS_INSTANCE(const char *dllName)
 	}
 	else
 	{
-		BASS_PluginLoad = NULL;
-		BASS_ChannelPreBuf = NULL;
+		BASS_PluginLoad = nullptr;
+		BASS_ChannelPreBuf = nullptr;
 	}
 	*/
 
@@ -210,11 +210,11 @@ BOOL BASS_INSTANCE::BASS_StreamPlay(HSTREAM handle, BOOL flush, DWORD flags)
 void Sexy::LoadBassDLL()
 {
 	//InterlockedIncrement(&gBassLoadCount);
-	if (gBass!=NULL)
+	if (gBass!=nullptr)
 		return;
 
 	gBass = new BASS_INSTANCE(libName);
-	if (gBass->mModule==NULL)
+	if (gBass->mModule==nullptr)
 	{
 		printf("Can't find %s.\n", libName);
 		exit(1);
@@ -225,12 +225,12 @@ void Sexy::LoadBassDLL()
 ///////////////////////////////////////////////////////////////////////////////
 void Sexy::FreeBassDLL()
 {
-	if (gBass!=NULL)
+	if (gBass!=nullptr)
 	{
 		//if (InterlockedDecrement(&gBassLoadCount) <= 0)
 		{
 			delete gBass;
-			gBass = NULL;
+			gBass = nullptr;
 		}
 	}
 }
