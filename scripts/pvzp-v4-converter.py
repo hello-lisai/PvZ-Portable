@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PvZ-Portable Save Game Converter for v4 Format
+PvZ-Portable Mid-Level Save File Converter for v4 Format
 
 Converts portable v4 save files (.v4) to human-readable YAML format and back.
 This is a LOSSLESS bidirectional converter - you can edit the YAML and convert
@@ -244,9 +244,10 @@ class MowerType(IntEnum):
 
 
 class MowerState(IntEnum):
-    MOWER_READY = 0
-    MOWER_TRIGGERED = 1
-    MOWER_SQUISHED = 2
+    MOWER_ROLLING_IN = 0
+    MOWER_READY = 1
+    MOWER_TRIGGERED = 2
+    MOWER_SQUISHED = 3
 
 
 class ScaryPotType(IntEnum):
@@ -1778,7 +1779,7 @@ def export_to_text(save: SaveFile) -> str:
     """Export save file to human-readable text format (summary only)."""
     lines = []
     lines.append("=" * 60)
-    lines.append("PvZ-Portable Save File (v4 Format)")
+    lines.append("PvZ-Portable Mid-Level Save File (v4 Format)")
     lines.append("=" * 60)
     lines.append("")
     
@@ -1794,16 +1795,26 @@ def export_to_text(save: SaveFile) -> str:
     
     # Seed packets
     lines.append("[Seed Slots]")
-    active_packets = [p for p in save.seedpackets if p.get("active")]
-    if active_packets:
-        for i, packet in enumerate(active_packets):
+    num_slots = save.seedbank.get("num_packets", 0)
+    if num_slots > 0 and save.seedpackets:
+        # Display all seed packets up to num_packets count
+        for i, packet in enumerate(save.seedpackets[:num_slots]):
             seed_type = packet.get("packet_type", "UNKNOWN")
             try:
                 st = SeedType[seed_type]
                 name = PLANT_NAMES.get(st, seed_type)
             except (KeyError, ValueError):
                 name = seed_type
-            status = "Recharging" if packet.get("refreshing") else "Ready"
+            # Determine status: active=False means still in initial cooldown
+            if packet.get("refreshing") or not packet.get("active"):
+                refresh_counter = packet.get("refresh_counter", 0)
+                refresh_time = packet.get("refresh_time", 1)
+                # Convert from centiseconds to seconds for display
+                counter_sec = refresh_counter / 100.0
+                time_sec = refresh_time / 100.0
+                status = f"Recharging {counter_sec:.2f}s/{time_sec:.2f}s"
+            else:
+                status = "Ready"
             lines.append(f"  [{i+1}] {name} ({status})")
     else:
         lines.append("  (None)")
@@ -1947,7 +1958,7 @@ def main():
     global EXPAND_ZOMBIES_IN_WAVE
     
     parser = argparse.ArgumentParser(
-        description="PvZ-Portable Save Game Converter (Lossless)",
+        description="PvZ-Portable Mid-Level Save File Converter for v4 Format",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
