@@ -742,9 +742,9 @@ static void SyncMusicTailPortable(PortableSaveContext& theContext, Music& theMus
 	if (theContext.mReading)
 	{
 		bool aSavedMusicDisabled = false;
-		theContext.SyncBool(aSavedMusicDisabled);
-		if (!theMusic.mMusicDisabled)
-			theMusic.mMusicDisabled = aSavedMusicDisabled;
+		theContext.SyncBool(aSavedMusicDisabled); // Just read and discard
+		// Completely ignore the saved value. mMusicDisabled is a runtime capability flag
+		// (set when audio assets fail to load). It should never be transferred from a save.
 	}
 	else
 	{
