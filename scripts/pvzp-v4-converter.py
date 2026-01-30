@@ -1006,6 +1006,26 @@ def write_zombie_tail(zombie: dict) -> bytes:
 # Plant Parsing
 # ============================================================================
 
+MAX_MAGNET_ITEMS = 5
+
+def parse_magnet_item(reader: BinaryReader) -> dict:
+    """Parse a single MagnetItem."""
+    return {
+        "pos_x": reader.read_f32(),
+        "pos_y": reader.read_f32(),
+        "dest_offset_x": reader.read_f32(),
+        "dest_offset_y": reader.read_f32(),
+        "item_type": reader.read_i32(),
+    }
+
+def write_magnet_item(writer: BinaryWriter, item: dict):
+    """Write a single MagnetItem."""
+    writer.write_f32(item.get("pos_x", 0.0))
+    writer.write_f32(item.get("pos_y", 0.0))
+    writer.write_f32(item.get("dest_offset_x", 0.0))
+    writer.write_f32(item.get("dest_offset_y", 0.0))
+    writer.write_i32(item.get("item_type", 0))
+
 def parse_plant_tail(data: bytes) -> dict:
     """Parse Plant tail fields (field 100)."""
     reader = BinaryReader(data)
@@ -1030,8 +1050,35 @@ def parse_plant_tail(data: bytes) -> dict:
         "target_x": reader.read_i32(),
         "target_y": reader.read_i32(),
         "start_row": reader.read_i32(),
+        "particle_id": reader.read_u32(),
+        "shooting_counter": reader.read_i32(),
+        "body_reanim_id": reader.read_u32(),
+        "head_reanim_id": reader.read_u32(),
+        "head_reanim_id2": reader.read_u32(),
+        "head_reanim_id3": reader.read_u32(),
+        "blink_reanim_id": reader.read_u32(),
+        "light_reanim_id": reader.read_u32(),
+        "sleeping_reanim_id": reader.read_u32(),
+        "blink_countdown": reader.read_i32(),
+        "recently_eaten_countdown": reader.read_i32(),
+        "eaten_flash_countdown": reader.read_i32(),
+        "beghouled_flash_countdown": reader.read_i32(),
+        "shake_offset_x": reader.read_f32(),
+        "shake_offset_y": reader.read_f32(),
+        "magnet_items": [parse_magnet_item(reader) for _ in range(MAX_MAGNET_ITEMS)],
+        "target_zombie_id": reader.read_u32(),
+        "wake_up_counter": reader.read_i32(),
+        "on_bungee_state": reader.read_i32(),
+        "imitater_type": enum_name(SeedType, reader.read_i32()),
+        "potted_plant_index": reader.read_i32(),
+        "anim_ping": reader.read_bool(),
+        "dead": reader.read_bool(),
+        "squished": reader.read_bool(),
+        "is_asleep": reader.read_bool(),
+        "is_on_board": reader.read_bool(),
+        "highlighted": reader.read_bool(),
     }
-    # Remaining bytes as base64
+    # Remaining bytes as base64 (should be none for current format)
     if reader.remaining > 0:
         plant["_extra"] = base64.b64encode(reader.read_bytes(reader.remaining)).decode('ascii')
     return plant
@@ -1060,10 +1107,42 @@ def write_plant_tail(plant: dict) -> bytes:
     writer.write_i32(plant.get("target_x", 0))
     writer.write_i32(plant.get("target_y", 0))
     writer.write_i32(plant.get("start_row", 0))
-    # Write extra bytes
+    writer.write_u32(plant.get("particle_id", 0))
+    writer.write_i32(plant.get("shooting_counter", 0))
+    writer.write_u32(plant.get("body_reanim_id", 0))
+    writer.write_u32(plant.get("head_reanim_id", 0))
+    writer.write_u32(plant.get("head_reanim_id2", 0))
+    writer.write_u32(plant.get("head_reanim_id3", 0))
+    writer.write_u32(plant.get("blink_reanim_id", 0))
+    writer.write_u32(plant.get("light_reanim_id", 0))
+    writer.write_u32(plant.get("sleeping_reanim_id", 0))
+    writer.write_i32(plant.get("blink_countdown", 0))
+    writer.write_i32(plant.get("recently_eaten_countdown", 0))
+    writer.write_i32(plant.get("eaten_flash_countdown", 0))
+    writer.write_i32(plant.get("beghouled_flash_countdown", 0))
+    writer.write_f32(plant.get("shake_offset_x", 0.0))
+    writer.write_f32(plant.get("shake_offset_y", 0.0))
+    # Write magnet items
+    magnet_items = plant.get("magnet_items") or [{} for _ in range(MAX_MAGNET_ITEMS)]
+    for i in range(MAX_MAGNET_ITEMS):
+        item = magnet_items[i] if i < len(magnet_items) else {}
+        write_magnet_item(writer, item)
+    writer.write_u32(plant.get("target_zombie_id", 0))
+    writer.write_i32(plant.get("wake_up_counter", 0))
+    writer.write_i32(plant.get("on_bungee_state", 0))
+    writer.write_i32(enum_value(SeedType, plant.get("imitater_type", "SEED_NONE")))
+    writer.write_i32(plant.get("potted_plant_index", -1))
+    writer.write_bool(plant.get("anim_ping", False))
+    writer.write_bool(plant.get("dead", False))
+    writer.write_bool(plant.get("squished", False))
+    writer.write_bool(plant.get("is_asleep", False))
+    writer.write_bool(plant.get("is_on_board", True))
+    writer.write_bool(plant.get("highlighted", False))
+    # Write extra bytes if any
     if "_extra" in plant:
         writer.write_bytes(base64.b64decode(plant["_extra"]))
     return writer.get_bytes()
+
 
 
 # ============================================================================
@@ -1838,7 +1917,8 @@ def export_to_text(save: SaveFile) -> str:
             col = plant.get("plant_col", -1)
             health = plant.get("plant_health", 0)
             max_health = plant.get("plant_max_health", 0)
-            lines.append(f"  [{row}, {col}] {name} (HP: {health}/{max_health})")
+            asleep_label = " (Asleep)" if plant.get("is_asleep") else ""
+            lines.append(f"  [{row}, {col}] {name}{asleep_label} (HP: {health}/{max_health})")
     else:
         lines.append("  (None)")
     lines.append("")
