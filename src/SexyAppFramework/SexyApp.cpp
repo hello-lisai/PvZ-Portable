@@ -122,7 +122,7 @@ void SexyApp::ReadFromRegistry()
 		mTimesPlayed = 0;
 		mTimesExecuted = 0;
 
-		std::string aFileName = GetAppDataFolder() + "popcinfo.dat";
+		std::string aFileName = GetAppDataPath("pvzpinfo.dat");
 
 		FILE* fp = fopen(aFileName.c_str(), "rb");
 		if (fp != nullptr)
@@ -137,15 +137,18 @@ void SexyApp::ReadFromRegistry()
 				{
 					char aProdName[256];
 					aProdName[aLen] = '\0';
-					fread(aProdName, aLen, sizeof(char), fp);
+					if (fread(aProdName, aLen, sizeof(char), fp) != sizeof(char))
+						break;
 
 					if (strcmp(aProdName, mProdName.c_str()) == 0)
 					{
 						short aShort;
-						fread(&aShort, 1, sizeof(short), fp);
+						if (fread(&aShort, 1, sizeof(short), fp) != sizeof(short))
+							break;
 						mTimesPlayed = aShort;
 
-						fread(&aShort, 1, sizeof(short), fp);
+						if (fread(&aShort, 1, sizeof(short), fp) != sizeof(short))
+							break;
 						mTimesExecuted = aShort;
 
 						break;
@@ -229,7 +232,7 @@ void SexyApp::WriteToRegistry()
 
 	if (!mPlayingDemoBuffer)
 	{
-		std::string aFileName = GetAppDataFolder() + "popcinfo.dat";
+		std::string aFileName = GetAppDataPath("pvzpinfo.dat");
 
 		FILE* fp = fopen(aFileName.c_str(), "r+b");
 		if (fp != nullptr)
@@ -244,7 +247,8 @@ void SexyApp::WriteToRegistry()
 				{
 					char aProdName[256];
 					aProdName[aLen] = '\0';
-					fread(aProdName, aLen, sizeof(char), fp);
+					if (fread(aProdName, aLen, sizeof(char), fp) != sizeof(char))
+						break;
 
 					if (strcmp(aProdName, mProdName.c_str()) == 0)
 					{
@@ -530,15 +534,12 @@ void SexyApp::HandleCmdLineParam(const std::string& theParamName, const std::str
 
 std::string SexyApp::GetGameSEHInfo()
 {
-	char aGamesPlayedStr[16];
-	sprintf(aGamesPlayedStr, "%d", mTimesPlayed);
-
 	std::string anInfoString = SexyAppBase::GetGameSEHInfo() + 
-		"Times Played: " + std::string(aGamesPlayedStr) + "\r\n" +
+		"Times Played: " + std::to_string(mTimesPlayed) + "\r\n" +
 		"Build Num: " + StrFormat("%d", mBuildNum) + "\r\n" +
 		"Build Date: " + mBuildDate + "\r\n";
 
-	if (mReferId.length() != 0)
+	if (!mReferId.empty())
 	{
 		anInfoString +=
 			"ReferId: " + mReferId + "\r\n";

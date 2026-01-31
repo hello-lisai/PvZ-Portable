@@ -577,7 +577,7 @@ SexyString DefinitionGetCompiledFilePathFromXMLFilePath(const SexyString& theXML
 static SexyString DefinitionGetCompiledCacheFullPath(const SexyString& theCompiledFilePath)
 {
     const SexyString aCacheRoot = (sizeof(void*) == 8) ? __S("cache64/") : __S("cache32/");
-    return GetAppDataFolder() + aCacheRoot + theCompiledFilePath;
+    return GetAppDataPath(aCacheRoot + theCompiledFilePath);
 }
 
 //0x444560 : (void* def, *defMap, eax = string& compiledFilePath)  //esp -= 8

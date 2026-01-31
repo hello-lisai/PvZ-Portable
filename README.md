@@ -60,7 +60,7 @@ Note about writable data and caches:
   - `userdata/` — player save files
   - `cache64/` if you use the 64-bit version or `cache32/` if you use the 32-bit version — compiled binary caches (reanimation / compiled definitions)
   - `registry.regemu` — settings/registry emulation
-  - `popcinfo.dat` — basic runtime stats
+  - `pvzpinfo.dat` — basic runtime stats
   - `_screenshots/` — screenshots created by the game
 
 Examples:
@@ -69,7 +69,9 @@ Examples:
 - Windows: `%APPDATA%\io.github.wszqkzqk\PvZPortable\`
 - macOS: `~/Library/Application Support/io.github.wszqkzqk/PvZPortable/`
 
-If you prefer to keep everything in the same folder as the executable, you can still configure a custom data directory via the `-changedir` command-line parameter when launching the game.
+You can customize these paths via command-line parameters:
+- `-resdir <path>`: Set the **resource directory** (where `main.pak` and `properties/` are located). This only affects where the game looks for resources, not where it saves data. (The legacy `-changedir` is also accepted for backward compatibility.)
+- `-savedir <path>`: Set the **save data directory** (where settings, savegames, caches, and screenshots are stored). This overrides the default OS-recommended application data path.
 
 ## Dependencies
 

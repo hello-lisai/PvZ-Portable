@@ -2,6 +2,7 @@
 
 #if defined(_WIN32)
 #include <direct.h> // chdir on Windows
+#include <malloc.h> // alloca on Windows (MSYS2/UCRT)
 #else
 #include <unistd.h> // fix "implicit declaration of function chdir"
 #include <stdlib.h>
@@ -110,6 +111,91 @@ static int casepath(char const *path, char *r)
     if (d) closedir(d);
     return 1;
 }
+
+// r must have strlen(base) + strlen(path) + 3 bytes
+static int casepathat(char const *base, char const *path, char *r)
+{
+    if (!base || base[0] == '\0')
+        base = ".";
+
+    // Copy base directly - it's already case-correct
+    strcpy(r, base);
+    size_t rl = strlen(r);
+    if (rl == 0)
+    {
+        r[0] = '.';
+        r[1] = 0;
+        rl = 1;
+    }
+
+    // Ensure trailing separator
+    if (r[rl - 1] != '/' && r[rl - 1] != '\\')
+    {
+        r[rl++] = '/';
+        r[rl] = 0;
+    }
+
+    // Open base directory directly (no case correction needed)
+    DIR *d = opendir(base);
+    if (!d)
+        return 0;
+
+    // Prepare to parse the relative path
+    char *p = alloca(strlen(path) + 1);
+    strcpy(p, path);
+
+    int last = 0;
+    char *c = strsep(&p, "/\\");
+    while (c)
+    {
+        if (!d)
+            return 0;
+
+        if (last)
+        {
+            closedir(d);
+            return 0;
+        }
+
+        // Skip empty components (e.g., from leading or double slashes)
+        if (c[0] == 0)
+        {
+            c = strsep(&p, "/\\");
+            continue;
+        }
+
+        r[rl] = '/';
+        rl += 1;
+        r[rl] = 0;
+
+        struct dirent *e = readdir(d);
+        while (e)
+        {
+            if (strcasecmp(c, e->d_name) == 0)
+            {
+                strcpy(r + rl, e->d_name);
+                rl += strlen(e->d_name);
+
+                closedir(d);
+                d = opendir(r);
+                break;
+            }
+            e = readdir(d);
+        }
+
+        if (!e)
+        {
+            strcpy(r + rl, c);
+            rl += strlen(c);
+            last = 1;
+        }
+
+        c = strsep(&p, "/\\");
+    }
+
+    if (d) closedir(d);
+    return 1;
+}
 #endif
 
 FILE *fcaseopen(char const *path, char const *mode)
@@ -128,19 +214,68 @@ FILE *fcaseopen(char const *path, char const *mode)
     return f;
 }
 
-void casechdir(char const *path)
+int casechdir(char const *path)
 {
 #if !defined(_WIN32)
     char *r = alloca(strlen(path) + 3);
     if (casepath(path, r))
     {
-        chdir(r);
+        return chdir(r);
     }
     else
     {
         errno = ENOENT;
+        return -1;
     }
 #else
-    chdir(path);
+    return chdir(path);
+#endif
+}
+
+FILE *fcaseopenat(char const *base, char const *path, char const *mode)
+{
+#if !defined(_WIN32)
+    if (!base || base[0] == '\0')
+        base = ".";
+
+    size_t baseLen = strlen(base);
+    size_t pathLen = strlen(path);
+    char *full = alloca(baseLen + pathLen + 3);
+
+    strcpy(full, base);
+    size_t fl = strlen(full);
+    if (fl > 0 && full[fl - 1] != '/' && full[fl - 1] != '\\')
+    {
+        full[fl++] = '/';
+        full[fl] = 0;
+    }
+    strcpy(full + fl, path);
+
+    FILE *f = fopen(full, mode);
+    if (!f)
+    {
+        char *r = alloca(baseLen + pathLen + 3);
+        if (casepathat(base, path, r))
+        {
+            f = fopen(r, mode);
+        }
+    }
+    return f;
+#else
+    if (!base || base[0] == '\0')
+        return fopen(path, mode);
+
+    size_t baseLen = strlen(base);
+    size_t pathLen = strlen(path);
+    char *full = alloca(baseLen + pathLen + 3);
+    strcpy(full, base);
+    size_t fl = strlen(full);
+    if (fl > 0 && full[fl - 1] != '/' && full[fl - 1] != '\\')
+    {
+        full[fl++] = '/';
+        full[fl] = 0;
+    }
+    strcpy(full + fl, path);
+    return fopen(full, mode);
 #endif
 }

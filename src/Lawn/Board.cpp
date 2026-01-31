@@ -335,7 +335,7 @@ void Board::TryToSaveGame()
 			return;
 		}
 
-		MkDir(GetAppDataFolder() + "userdata");
+		MkDir(GetAppDataPath("userdata"));
 		mApp->mMusic->GameMusicPause(true);
 		LawnSaveGame(this, aFileName);
 		LawnSaveGameLegacy(this, GetLegacySavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId));

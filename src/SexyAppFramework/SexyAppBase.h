@@ -143,6 +143,7 @@ public:
 	SexyString				mTitle;	
 	std::string				mRegKey;
 	std::string				mChangeDirTo;
+	std::string				mCustomSaveDir;
 	
 	int						mRelaxUpdateBacklogCount; // app doesn't try to catch up for this many frames
 	int						mPreferredX;

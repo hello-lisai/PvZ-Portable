@@ -189,7 +189,7 @@ SexyAppBase::SexyAppBase()
 	}
 	else
 	{
-		mChangeDirTo = "./";
+		mChangeDirTo = "";
 	}
 #endif
 
@@ -1209,7 +1209,7 @@ void SexyAppBase::TakeScreenshot()
 
 	/*
 	// Get free image name
-	std::string anImageDir = GetAppDataFolder() + "_screenshots";
+	std::string anImageDir = GetAppDataPath("_screenshots");
 	MkDir(anImageDir);
 	anImageDir += "/";
 
@@ -1301,16 +1301,16 @@ void SexyAppBase::TakeScreenshot()
 void SexyAppBase::DumpProgramInfo()
 {
 	/*
-	Deltree(GetAppDataFolder() + "_dump");
+	Deltree(GetAppDataPath("_dump"));
 
 	for (;;)
 	{
-		if (mkdir((GetAppDataFolder() + "_dump").c_str()))
+		if (mkdir(GetAppDataPath("_dump").c_str()))
 			break;
 		Sleep(100);
 	}
 
-	std::fstream aDumpStream((GetAppDataFolder() + "_dump/imagelist.html").c_str(), std::ios::out);
+	std::fstream aDumpStream(GetAppDataPath("_dump/imagelist.html").c_str(), std::ios::out);
 
 	time_t aTime;
 	time(&aTime);
@@ -1503,7 +1503,7 @@ void SexyAppBase::DumpProgramInfo()
 				*(aThumbBitsPtr++) = aBits[aSrcX + (aSrcY*aCopiedImage.mWidth)];
 			}
 
-		ImageLib::WriteJPEGImage((GetAppDataFolder() + std::string("_dump/") + aThumbName).c_str(), &anImageLibImage);
+		ImageLib::WriteJPEGImage(GetAppDataPath(std::string("_dump/") + aThumbName).c_str(), &anImageLibImage);
 
 		// Write high resolution image
 
@@ -1512,7 +1512,7 @@ void SexyAppBase::DumpProgramInfo()
 		anFullImage.mWidth = aCopiedImage.GetWidth();
 		anFullImage.mHeight = aCopiedImage.GetHeight();
 
-		ImageLib::WritePNGImage((GetAppDataFolder() + std::string("_dump/") + anImageName).c_str(), &anFullImage);
+		ImageLib::WritePNGImage(GetAppDataPath(std::string("_dump/") + anImageName).c_str(), &anFullImage);
 
 		anFullImage.mBits = nullptr;
 
@@ -2011,7 +2011,7 @@ void SexyAppBase::ReadFromRegistry()
 	if (mRegKey.length() == 0)
 		return;
 
-	regemu::SetRegFile(GetAppDataFolder() + "registry.regemu");
+	regemu::SetRegFile(GetAppDataPath("registry.regemu"));
 
 	int anInt;
 	if (RegistryReadInteger("MusicVolume", &anInt))
@@ -4962,7 +4962,7 @@ void SexyAppBase::HandleCmdLineParam(const std::string& theParamName, const std:
 		mDemoFileName = SexyStringToString(StrFormat(StringToSexyString(mDemoPrefix + "%d.dmo").c_str(),aDemoFileNum));
 		if (mDemoFileName.length() < 2)
 		{
-			mDemoFileName = GetAppDataFolder() + mDemoFileName;
+			mDemoFileName = GetAppDataPath(mDemoFileName);
 		}
 		mRecordingDemoBuffer = true;
 		mPlayingDemoBuffer = false;
@@ -4988,7 +4988,7 @@ void SexyAppBase::HandleCmdLineParam(const std::string& theParamName, const std:
 		mDemoFileName = theParamValue;
 		if (mDemoFileName.length() < 2)
 		{
-			mDemoFileName = GetAppDataFolder() + mDemoFileName;
+			mDemoFileName = GetAppDataPath(mDemoFileName);
 		}
 	}	
 	else if (theParamName == "-crash")
@@ -5001,9 +5001,13 @@ void SexyAppBase::HandleCmdLineParam(const std::string& theParamName, const std:
 	{
 		mIsScreenSaver = true;
 	}
-	else if (theParamName == "-changedir")
+	else if (theParamName == "-resdir" || theParamName == "-changedir")  // -changedir kept for backward compatibility
 	{
 		mChangeDirTo = theParamValue;
+	}
+	else if (theParamName == "-savedir")
+	{
+		mCustomSaveDir = theParamValue;
 	}
 	else
 	{
@@ -5098,7 +5102,7 @@ void SexyAppBase::Init()
 			//AllowAllAccess(aDataPath);
 			if (mDemoFileName.length() < 2)
 			{
-				mDemoFileName = GetAppDataFolder() + mDemoFileName;
+				mDemoFileName = GetAppDataPath(mDemoFileName);
 			}
 
 			FreeLibrary(aMod);
@@ -5116,24 +5120,23 @@ void SexyAppBase::Init()
 	//if(gHInstance==nullptr)
 		//gHInstance = (HINSTANCE)GetModuleHandle(nullptr);
 
-	// Change directory
+	// Set resource directory (for main.pak, properties/, etc.)
 	if (!ChangeDirHook(mChangeDirTo.c_str()))
 	{
-		int res = chdir(mChangeDirTo.c_str());
-		(void)res;
+		SetResourceFolder(mChangeDirTo);
 	}
 
-	if (GetAppDataFolder().empty())
+	// Handle custom save directory from -savedir parameter
+	if (!mCustomSaveDir.empty())
 	{
-		char aPath[512];
-		if (getcwd(aPath, 512))
-		{
-			strcat(aPath, "/savedata/");
-			SetAppDataFolder(aPath);
-		}
+		SetAppDataFolder(mCustomSaveDir);
+	}
+	else if (GetAppDataFolder().empty())
+	{
+		SetAppDataFolder(GetResourcePath("savedata"));
 	}
 
-	gPakInterface->AddPakFile("main.pak");
+	gPakInterface->AddPakFile(GetResourcePath("main.pak"));
 
 	// Create a message we can use to talk to ourselves inter-process
 	//mNotifyGameMessage = RegisterWindowMessage((__S("Notify") + StringToSexyString(mProdName)).c_str());

@@ -1089,7 +1089,10 @@ bool FontData::LoadLegacy(Image* theFontImage, const std::string& theFontDescFil
 	aFontLayer->mAscent = aFontLayer->mImage->GetHeight();
 
 	int aCharPos = 0;
-	FILE* aStream = fcaseopen(theFontDescFileName.c_str(), "r");
+	
+	// Use GetResourcePath to handle resource folder prefix
+	std::string aFilePath = GetResourcePath(theFontDescFileName);
+	FILE* aStream = fcaseopen(aFilePath.c_str(), "r");
 
 	if (aStream == nullptr)
 		return false;
