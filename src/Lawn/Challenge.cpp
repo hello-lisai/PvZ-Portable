@@ -456,7 +456,7 @@ void Challenge::StartLevel()
 	}
 	if (mApp->IsSurvivalMode() && mSurvivalStage == 0)
 	{
-		SexyString aMessage =
+		std::string aMessage =
 			mApp->IsSurvivalNormal(aGameMode) ? TodReplaceNumberString(__S("[ADVICE_SURVIVE_FLAGS]"), __S("{FLAGS}"), SURVIVAL_NORMAL_FLAGS) :
 			mApp->IsSurvivalHard(aGameMode) ? TodReplaceNumberString(__S("[ADVICE_SURVIVE_FLAGS]"), __S("{FLAGS}"), SURVIVAL_HARD_FLAGS) : 
 			__S("[ADVICE_SURVIVE_ENDLESS]");
@@ -871,7 +871,7 @@ void Challenge::BeghouledScore(int theGridX, int theGridY, int theNumPlants, int
 	{
 		if (!mBoard->mAdvice->IsBeingDisplayed())
 		{
-			SexyString aMsg = TodReplaceNumberString(__S("[ADVICE_BEGHOULED_MATCH_3]"), __S("{SCORE}"), BEGHOULED_WINNING_SCORE);
+			std::string aMsg = TodReplaceNumberString(__S("[ADVICE_BEGHOULED_MATCH_3]"), __S("{SCORE}"), BEGHOULED_WINNING_SCORE);
 			mBoard->DisplayAdvice(aMsg, MESSAGE_STYLE_HINT_FAST, ADVICE_BEGHOULED_MATCH_3);
 		}
 		if (mChallengeScore >= BEGHOULED_WINNING_SCORE - 5)
@@ -988,7 +988,7 @@ SeedType Challenge::BeghouledPickSeed(int theGridX, int theGridY, BeghouledBoard
 		case 3:		aSeedType = SeedType::SEED_SNOWPEA;			break;
 		case 4:		aSeedType = SeedType::SEED_WALLNUT;			break;
 		case 5:		aSeedType = SeedType::SEED_PEASHOOTER;		break;
-		default:	TOD_ASSERT();								break;
+		default:	TOD_ASSERT(false);								break;
 		}
 
 		if (mBeghouledPurcasedUpgrade[(int)BeghouledUpgrade::BEGHOULED_UPGRADE_REPEATER] && aSeedType == SeedType::SEED_PEASHOOTER)
@@ -1861,7 +1861,7 @@ void Challenge::UpdateConveyorBelt()
 		aSeedPickArray[5].mItem = SEED_ICESHROOM;
 		aSeedPickArray[5].mWeight = 10;
 	}
-	else TOD_ASSERT();
+	else TOD_ASSERT(false);
 
 	for (int i = 0; i < aSeedPickCount; i++)
 	{
@@ -2031,7 +2031,7 @@ void Challenge::UpdateSlotMachine()
 
 	if (!mBoard->mAdvice->IsBeingDisplayed())
 	{
-		SexyString aMsg = TodReplaceNumberString(__S("[ADVICE_SLOT_MACHINE_COLLECT_SUN]"), __S("{SCORE}"), SLOT_MACHINE_WINNING_SCORE);
+		std::string aMsg = TodReplaceNumberString(__S("[ADVICE_SLOT_MACHINE_COLLECT_SUN]"), __S("{SCORE}"), SLOT_MACHINE_WINNING_SCORE);
 		mBoard->DisplayAdvice(aMsg, MESSAGE_STYLE_SLOT_MACHINE, ADVICE_SLOT_MACHINE_COLLECT_SUN);
 	}
 
@@ -3689,7 +3689,7 @@ void Challenge::ZombiquariumUpdate()
 	}
 	if (!mBoard->mAdvice->IsBeingDisplayed() && !mBoard->mHelpDisplayed[ADVICE_ZOMBIQUARIUM_COLLECT_SUN])
 	{
-		SexyString aMsg = TodReplaceNumberString(__S("[ADVICE_ZOMBIQUARIUM_COLLECT_SUN]"), __S("{SCORE}"), ZOMBIQUARIUM_WINNING_SCORE);
+		std::string aMsg = TodReplaceNumberString(__S("[ADVICE_ZOMBIQUARIUM_COLLECT_SUN]"), __S("{SCORE}"), ZOMBIQUARIUM_WINNING_SCORE);
 		mBoard->DisplayAdvice(aMsg, MESSAGE_STYLE_HINT_TALL_FAST, ADVICE_ZOMBIQUARIUM_COLLECT_SUN);
 	}
 
@@ -4056,7 +4056,7 @@ void Challenge::ScaryPotterPopulate()
 			break;
 		}
 		default:
-			TOD_ASSERT();
+			TOD_ASSERT(false);
 			break;
 		}
 	}
@@ -4208,7 +4208,7 @@ void Challenge::ScaryPotterOpenPot(GridItem* theScaryPot)
 		break;
 	}
 	default:
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 		break;
 	}
 
@@ -4332,7 +4332,7 @@ ZombieType Challenge::IZombieSeedTypeToZombieType(SeedType theSeedType)
 	case SEED_ZOMBIE_DANCER:		return ZOMBIE_DANCER;
 	case SEED_ZOMBIE_GARGANTUAR:	return ZOMBIE_GARGANTUAR;
 	case SEED_ZOMBIE_IMP:			return ZOMBIE_IMP;
-	default:						TOD_ASSERT();
+	default:						TOD_ASSERT(false);
 	}
 
 	unreachable();
@@ -4721,7 +4721,7 @@ void Challenge::IZombieInitLevel()
 		break;
 	}
 	default:
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 	}
 
 	mBoard->mBonusLawnMowersRemaining = 0;
@@ -5101,7 +5101,7 @@ void Challenge::SquirrelFound(GridItem* theSquirrel)
 			int aSquirrelsRemaining = SquirrelCountUncaught();
 			if (aSquirrelsRemaining)
 			{
-				SexyString aMessage = mApp->Pluralize(aSquirrelsRemaining, __S("[ADVICE_SQUIRRELS_ONE_LEFT]"), __S("[ADVICE_SQUIRRELS_LEFT]"));
+				std::string aMessage = mApp->Pluralize(aSquirrelsRemaining, __S("[ADVICE_SQUIRRELS_ONE_LEFT]"), __S("[ADVICE_SQUIRRELS_LEFT]"));
 				mBoard->DisplayAdvice(aMessage, MESSAGE_STYLE_HINT_FAST, ADVICE_NONE);
 			}
 			else
@@ -5243,8 +5243,8 @@ void Challenge::LastStandCompletedStage()
 		}
 	}
 
-	SexyString aFlagStr = mApp->Pluralize(mBoard->GetSurvivalFlagsCompleted(), __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
-	SexyString aMsg = TodReplaceString(__S("[SUCCESSFULLY_DEFENDED]"), __S("{FLAGS}"), aFlagStr);
+	std::string aFlagStr = mApp->Pluralize(mBoard->GetSurvivalFlagsCompleted(), __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
+	std::string aMsg = TodReplaceString(__S("[SUCCESSFULLY_DEFENDED]"), __S("{FLAGS}"), aFlagStr);
 	mBoard->DisplayAdvice(aMsg, MESSAGE_STYLE_BIG_MIDDLE_FAST, ADVICE_NONE);
 
 	mSurvivalStage++;
@@ -5342,7 +5342,7 @@ void Challenge::TreeOfWisdomDraw(Graphics* g)
 		}
 
 		g->DrawImage(Sexy::IMAGE_STORE_SPEECHBUBBLE2, aPosX, aPosY);
-		SexyString aText = StrFormat(__S("[TREE_OF_WISDOM_%d]"), mTreeOfWisdomTalkIndex);
+		std::string aText = StrFormat(__S("[TREE_OF_WISDOM_%d]"), mTreeOfWisdomTalkIndex);
 		TodDrawStringWrapped(g, aText, Rect(aPosX + 25, aPosY + 6, 233, 144), Sexy::FONT_BRIANNETOD16, Color::Black, DS_ALIGN_CENTER_VERTICAL_MIDDLE);
 	}
 
@@ -5358,7 +5358,7 @@ void Challenge::TreeOfWisdomDraw(Graphics* g)
 	}
 	if (aCurSize >= 50)
 	{
-		SexyString aSizeStr = TodReplaceNumberString(__S("[TREE_OF_WISDOM_HIEGHT]"), __S("{HEIGHT}"), aCurSize);
+		std::string aSizeStr = TodReplaceNumberString(__S("[TREE_OF_WISDOM_HIEGHT]"), __S("{HEIGHT}"), aCurSize);
 		float aStrWidth = Sexy::FONT_HOUSEOFTERROR16->StringWidth(aSizeStr) * aScale;
 		float aStrHeight = Sexy::FONT_HOUSEOFTERROR16->mAscent * aScale;
 

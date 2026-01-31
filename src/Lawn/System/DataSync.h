@@ -27,7 +27,7 @@ public:
 	bool					ReadBool();
 	float					ReadFloat();
 	double					ReadDouble();
-	void					ReadString(SexyString& theStr);
+	void					ReadString(std::string& theStr);
 };
 class DataReaderException : public std::exception
 {
@@ -59,7 +59,7 @@ public:
 	void					WriteBool(bool theBool);
 	void					WriteFloat(float theFloat);
 	void					WriteDouble(double theDouble);
-	void					WriteString(const SexyString& theStr);
+	void					WriteString(const std::string& theStr);
 	inline uint32_t	GetPos();
 	inline void				SetLong(uint32_t, uint32_t) { /* 未找到 */ }
 	inline void				SetShort(unsigned int, uint32_t) { /* 未找到 */ }
@@ -142,7 +142,7 @@ public:
 	void					SyncBool(bool& theBool);
 	void					SyncFloat(float& theFloat);
 	void					SyncDouble(double& theDouble);
-	void					SyncString(SexyString& theStr);
+	void					SyncString(std::string& theStr);
 	inline void				SyncPointer(void**) { /* 未找到 */ }
 	inline void				RegisterPointer(void*) { /* 未找到 */ }
 	inline void				SetVersion(int theVersion) { mVersion = theVersion; }

@@ -151,7 +151,7 @@ StoreItem StoreScreen::GetStoreItemType(int theSpotIndex)
         return gStoreItemSpots[mPage][theSpotIndex];
     }
 
-    TOD_ASSERT();
+    TOD_ASSERT(false);
     return STORE_ITEM_INVALID;
 }
 
@@ -303,7 +303,7 @@ void StoreScreen::DrawItemIcon(Graphics* g, int theItemPosition, StoreItem theIt
             g->SetColorizeImages(false);
         }
 
-        SexyString aSlotText = TodReplaceNumberString(__S("[STORE_UPGRADE_SLOTS]"), __S("{SLOTS}"), mApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE] + 7);
+        std::string aSlotText = TodReplaceNumberString(__S("[STORE_UPGRADE_SLOTS]"), __S("{SLOTS}"), mApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE] + 7);
         Rect aRect(aPosX, aPosY + 6, 55, 70);
         TodDrawStringWrapped(g, aSlotText, aRect, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_CENTER_VERTICAL_MIDDLE);
     }
@@ -403,7 +403,7 @@ void StoreScreen::DrawItem(Graphics* g, int theItemPosition, StoreItem theItemTy
     if (theItemType != STORE_ITEM_PVZ)
     {
         g->DrawImage(Sexy::IMAGE_STORE_PRICETAG, aPosX - 3, aPosY + 70);
-        SexyString aCostString = LawnApp::GetMoneyString(GetItemCost(theItemType));
+        std::string aCostString = LawnApp::GetMoneyString(GetItemCost(theItemType));
         TodDrawString(g, aCostString, aPosX + 23, aPosY + 85, Sexy::FONT_BRIANNETOD12, Color::Black, DS_ALIGN_CENTER);
     }
     if (IsComingSoon(theItemType))
@@ -489,7 +489,7 @@ void StoreScreen::Draw(Graphics* g)
     g->DrawImage(Sexy::IMAGE_COINBANK, STORESCREEN_COINBANK_X, STORESCREEN_COINBANK_Y);
     g->SetColor(Color(180, 255, 90));
     g->SetFont(Sexy::FONT_CONTINUUMBOLD14);
-    SexyString aCoinLabel = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
+    std::string aCoinLabel = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
     g->DrawString(aCoinLabel, STORESCREEN_COINBANK_X + 111 - Sexy::FONT_CONTINUUMBOLD14->StringWidth(aCoinLabel), STORESCREEN_COINBANK_Y + 24);
 
     if (!mPrevButton->mDisabled)
@@ -503,7 +503,7 @@ void StoreScreen::Draw(Graphics* g)
             }
         }
 
-        SexyString aPageString = TodReplaceNumberString(TodReplaceNumberString(__S("[STORE_PAGE]"), __S("{PAGE}"), mPage), __S("{NUM_PAGES}"), aNumPages);
+        std::string aPageString = TodReplaceNumberString(TodReplaceNumberString(__S("[STORE_PAGE]"), __S("{PAGE}"), mPage), __S("{NUM_PAGES}"), aNumPages);
         TodDrawString(g, aPageString, STORESCREEN_PAGESTRING_X, STORESCREEN_COINBANK_Y, Sexy::FONT_BRIANNETOD12, Color(80, 80, 80), DS_ALIGN_CENTER);
     }
 }
@@ -582,7 +582,7 @@ void StoreScreen::UpdateMouse()
                 case STORE_ITEM_TREE_FOOD:              aMessageIndex = 2031;                           break;
                 case STORE_ITEM_FIRSTAID:               aMessageIndex = 2033;                           break;
                 case STORE_ITEM_PVZ:                    aMessageIndex = 2034;                           break;
-                default:                                TOD_ASSERT();                                   break;
+                default:                                TOD_ASSERT(false);                                   break;
                 }
                 if (mApp->mCrazyDaveMessageIndex != aMessageIndex)
                     SetBubbleText(aMessageIndex, 100, false);
@@ -899,7 +899,7 @@ int StoreScreen::GetItemCost(StoreItem theStoreItem)
     case STORE_ITEM_TREE_OF_WISDOM:                     return 1000;
     case STORE_ITEM_TREE_FOOD:                          return 250;
     case STORE_ITEM_FIRSTAID:                           return 200;
-    default: TOD_ASSERT();                              return 0;
+    default: TOD_ASSERT(false);                              return 0;
     }
 }
 
@@ -949,7 +949,7 @@ void StoreScreen::PurchaseItem(StoreItem theStoreItem)
             if (theStoreItem == STORE_ITEM_PACKET_UPGRADE)
             {
                 ++mApp->mPlayerInfo->mPurchases[theStoreItem];
-                SexyString aDialogLines = StrFormat(__S("Now you can choose to take %d seeds with you per level!"), 6 + mApp->mPlayerInfo->mPurchases[theStoreItem]);
+                std::string aDialogLines = StrFormat(__S("Now you can choose to take %d seeds with you per level!"), 6 + mApp->mPlayerInfo->mPurchases[theStoreItem]);
                 Dialog* aDialog = mApp->DoDialog(DIALOG_UPGRADED, true, __S("More slots!"), aDialogLines, __S("[DIALOG_BUTTON_OK]"), BUTTONS_FOOTER);
 
                 mWaitForDialog = true;

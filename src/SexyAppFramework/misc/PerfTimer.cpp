@@ -1,5 +1,6 @@
 #include "PerfTimer.h"
 #include <map>
+#include <set>
 #include <SDL.h>
 
 using namespace Sexy;

@@ -890,7 +890,7 @@ void CutScene::StartLevelIntro()
 		PlaceLawnItems();
 	}
 
-	SexyString aHouseMessage;
+	std::string aHouseMessage;
 	if (mCrazyDaveTime <= 0 && mApp->mGameMode != GameMode::GAMEMODE_INTRO)
 	{
 		if (mApp->IsSurvivalMode())
@@ -913,7 +913,7 @@ void CutScene::StartLevelIntro()
 			}
 			else
 			{
-				TOD_ASSERT();
+				TOD_ASSERT(false);
 			}
 		}
 		else
@@ -1563,8 +1563,8 @@ void CutScene::UpdateZombiesWon()
 		if (mApp->IsSurvivalMode())
 		{
 			int aFlagsCompleted = mBoard->GetSurvivalFlagsCompleted();
-			SexyString aFlagsStr = mApp->Pluralize(aFlagsCompleted, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
-			SexyString aStr = TodReplaceString(__S("[SURVIVAL_DEATH_MESSAGE]"), __S("{FLAGS}"), aFlagsStr);
+			std::string aFlagsStr = mApp->Pluralize(aFlagsCompleted, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
+			std::string aStr = TodReplaceString(__S("[SURVIVAL_DEATH_MESSAGE]"), __S("{FLAGS}"), aFlagsStr);
 			GameOverDialog* aDialog = new GameOverDialog(aStr, true);
 			mApp->AddDialog(Dialogs::DIALOG_GAME_OVER, aDialog);
 		}
@@ -1662,8 +1662,8 @@ void CutScene::AdvanceCrazyDaveDialog(bool theJustSkipping)
 	{
 		int aCost = StoreScreen::GetItemCost(StoreItem::STORE_ITEM_PACKET_UPGRADE);
 		int aNumPackets = mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_PACKET_UPGRADE];
-		SexyString aBodyString = TodReplaceNumberString(__S("[UPGRADE_DIALOG_BODY]"), __S("{SLOTS}"), aNumPackets + 1);
-		SexyString aAmountString = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
+		std::string aBodyString = TodReplaceNumberString(__S("[UPGRADE_DIALOG_BODY]"), __S("{SLOTS}"), aNumPackets + 1);
+		std::string aAmountString = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
 		// 创建询问是否升级卡槽格数的对话
 		Dialog* aDialog = mApp->DoDialog(Dialogs::DIALOG_PURCHASE_PACKET_SLOT, true, aAmountString, aBodyString, __S(""), Dialog::BUTTONS_YES_NO);
 		aDialog->mX += 120;
@@ -1781,11 +1781,11 @@ void CutScene::KeyDown(KeyCode theKey)
 //0x43D830
 int CutScene::ParseDelayTimeFromMessage()
 {
-	SexyString aCrazyDaveText = mApp->GetCrazyDaveText(mCrazyDaveLastTalkIndex);
+	std::string aCrazyDaveText = mApp->GetCrazyDaveText(mCrazyDaveLastTalkIndex);
 	size_t anIndex = aCrazyDaveText.find(__S("{DELAY_"));
-	if (anIndex != SexyString::npos)
+	if (anIndex != std::string::npos)
 	{
-		SexyString aDelayTimeStr = aCrazyDaveText.substr(anIndex + 7, aCrazyDaveText.find(__S("}")) - anIndex - 7);
+		std::string aDelayTimeStr = aCrazyDaveText.substr(anIndex + 7, aCrazyDaveText.find(__S("}")) - anIndex - 7);
 		mCrazyDaveCountDown = sexyatoi(aDelayTimeStr.c_str());
 		return mCrazyDaveCountDown;
 	}
@@ -1795,11 +1795,11 @@ int CutScene::ParseDelayTimeFromMessage()
 //0x43D940
 int CutScene::ParseTalkTimeFromMessage()
 {
-	SexyString aCrazyDaveText = mApp->GetCrazyDaveText(mCrazyDaveLastTalkIndex);
+	std::string aCrazyDaveText = mApp->GetCrazyDaveText(mCrazyDaveLastTalkIndex);
 	int anIndex = aCrazyDaveText.find(__S("{TIME_"));
 	if (anIndex != -1)
 	{
-		SexyString aTalkTimeStr = aCrazyDaveText.substr(anIndex + 6, aCrazyDaveText.find(__S("}")) - anIndex - 6);
+		std::string aTalkTimeStr = aCrazyDaveText.substr(anIndex + 6, aCrazyDaveText.find(__S("}")) - anIndex - 6);
 		mCrazyDaveCountDown = sexyatoi(aTalkTimeStr.c_str());
 		return mCrazyDaveCountDown;
 	}

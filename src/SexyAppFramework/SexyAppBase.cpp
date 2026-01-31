@@ -10,6 +10,7 @@
 #include <time.h>
 #include <math.h>
 #include <vector>
+#include <algorithm>
 
 #include <SDL.h>
 
@@ -328,7 +329,7 @@ SexyAppBase::SexyAppBase()
 	int i;
 
 	for (i = 0; i < NUM_CURSORS; i++)
-		mCursorImages[i] = nullptr;	
+		mCursorImages[i] = nullptr;
 
 	for (i = 0; i < 256; i++)
 		mAdd8BitMaxTable[i] = i;
@@ -337,16 +338,16 @@ SexyAppBase::SexyAppBase()
 		mAdd8BitMaxTable[i] = 255;
 	
 	// Set default strings.  Init could read in overrides from partner.xml
-	SetString("DIALOG_BUTTON_OK",		L"OK");
-	SetString("DIALOG_BUTTON_CANCEL",	L"CANCEL");
+	SetString("DIALOG_BUTTON_OK",		"OK");
+	SetString("DIALOG_BUTTON_CANCEL","CANCEL");
 
-	SetString("UPDATE_CHECK_TITLE",		L"Update Check");
-	SetString("UPDATE_CHECK_BODY",		L"Checking if there are any updates available for this product ...");
+	SetString("UPDATE_CHECK_TITLE",		"Update Check");
+	SetString("UPDATE_CHECK_BODY",		"Checking if there are any updates available for this product ...");
 
-	SetString("UP_TO_DATE_TITLE",		L"Up to Date");	
-	SetString("UP_TO_DATE_BODY",		L"There are no updates available for this product at this time.");
-	SetString("NEW_VERSION_TITLE",		L"New Version");
-	SetString("NEW_VERSION_BODY",		L"There is an update available for this product.  Would you like to visit the web site to download it?");
+	SetString("UP_TO_DATE_TITLE",		"Up to Date");
+	SetString("UP_TO_DATE_BODY",		"There are no updates available for this product at this time.");
+	SetString("NEW_VERSION_TITLE",		"New Version");
+	SetString("NEW_VERSION_BODY",		"There is an update available for this product.  Would you like to visit the web site to download it?");
 
 	mDemoPrefix = "sexyapp";
 	mDemoFileName = mDemoPrefix + ".dmo";
@@ -428,7 +429,7 @@ SexyAppBase::~SexyAppBase()
 															__S("Hardware Acceleration was switched on during this session.\r\n")
 															__S("If this resulted in slower performance, it should be switched off.\r\n")
 															__S("Would you like to keep Hardware Acceleration switched on?")).c_str(),
-									(StringToSexyString(mCompanyName) + __S(" ") +
+									(mCompanyName + __S(" ") +
 									 GetString("HARDWARE_ACCEL_CONFIRMATION", __S("Hardware Acceleration Confirmation"))).c_str(),
 									MB_YESNO | MB_ICONQUESTION);
 
@@ -452,7 +453,7 @@ SexyAppBase::~SexyAppBase()
 									__S("Hardware Acceleration may not have been working correctly during this session.\r\n")
 									__S("If you noticed graphics problems, you may want to turn off Hardware Acceleration.\r\n")
 									__S("Would you like to keep Hardware Acceleration switched on?")).c_str(),
-						(StringToSexyString(mCompanyName) + __S(" ") +
+						(mCompanyName + __S(" ") +
 						 GetString("HARDWARE_ACCEL_CONFIRMATION", __S("Hardware Acceleration Confirmation"))).c_str(),
 						MB_YESNO | MB_ICONQUESTION);
 
@@ -952,13 +953,13 @@ void SexyAppBase::DemoAssertIntEqual(int theInt)
 	}
 }
 
-Dialog* SexyAppBase::NewDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode)
+Dialog* SexyAppBase::NewDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode)
 {	
 	Dialog* aDialog = new Dialog(nullptr, nullptr, theDialogId, isModal, theDialogHeader,	theDialogLines, theDialogFooter, theButtonMode);		
 	return aDialog;
 }
 
-Dialog* SexyAppBase::DoDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode)
+Dialog* SexyAppBase::DoDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode)
 {
 	KillDialog(theDialogId);
 
@@ -1000,7 +1001,9 @@ bool SexyAppBase::KillDialog(int theDialogId, bool removeWidget, bool deleteWidg
 		mDialogMap.erase(anItr);
 
 		if (removeWidget || deleteWidget)
-		mWidgetManager->RemoveWidget(aDialog);
+		{
+			mWidgetManager->RemoveWidget(aDialog);
+		}
 
 		if (aDialog->IsModal())
 		{			
@@ -1009,7 +1012,9 @@ bool SexyAppBase::KillDialog(int theDialogId, bool removeWidget, bool deleteWidg
 		}				
 
 		if (deleteWidget)
-		SafeDeleteWidget(aDialog);
+		{
+			SafeDeleteWidget(aDialog);
+		}
 		
 		return true;
 	}
@@ -1412,18 +1417,18 @@ void SexyAppBase::DumpProgramInfo()
 		sprintf(aStr, "%d x %d<BR>%s bytes", aMemoryImage->mWidth, aMemoryImage->mHeight, CommaSeperate(aMemorySize).c_str());
 		aDumpStream << "<TD ALIGN=RIGHT>" << aStr << "</TD>" << std::endl;
 
-		aDumpStream << "<TD>" << SexyStringToString(((aBitsMemory != 0) ? __S("mBits<BR>") + CommaSeperate(aBitsMemory) : __S("&nbsp;"))) << "</TD>" << std::endl;	
-		aDumpStream << "<TD>" << SexyStringToString(((aPalletizedMemory != 0) ? __S("Palletized<BR>") + CommaSeperate(aPalletizedMemory) : __S("&nbsp;"))) << "</TD>" << std::endl;				
-		aDumpStream << "<TD>" << SexyStringToString(((aSurfaceMemory != 0) ? __S("DDSurface<BR>") + CommaSeperate(aSurfaceMemory) : __S("&nbsp;"))) << "</TD>" << std::endl;		
-		aDumpStream << "<TD>" << SexyStringToString(((aMemoryImage->mD3DData!=nullptr) ? __S("Texture<BR>") + StringToSexyString(aTextureFormatName) + __S("<BR>") + CommaSeperate(aTextureMemory) : __S("&nbsp;"))) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aBitsMemory != 0) ? std::string("mBits<BR>") + CommaSeperate(aBitsMemory) : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aPalletizedMemory != 0) ? std::string("Palletized<BR>") + CommaSeperate(aPalletizedMemory) : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aSurfaceMemory != 0) ? std::string("DDSurface<BR>") + CommaSeperate(aSurfaceMemory) : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aMemoryImage->mD3DData!=nullptr) ? std::string("Texture<BR>") + aTextureFormatName + std::string("<BR>") + CommaSeperate(aTextureMemory) : std::string("&nbsp;")) << "</TD>" << std::endl;
 
-		aDumpStream << "<TD>" << SexyStringToString(((aMemoryImage->mIsVolatile) ? __S("Volatile") : __S("&nbsp;"))) << "</TD>" << std::endl;
-		aDumpStream << "<TD>" << SexyStringToString(((aMemoryImage->mForcedMode) ? __S("Forced") : __S("&nbsp;"))) << "</TD>" << std::endl;		
-		aDumpStream << "<TD>" << SexyStringToString(((aMemoryImage->mHasAlpha) ? __S("HasAlpha") : __S("&nbsp;"))) << "</TD>" << std::endl;
-		aDumpStream << "<TD>" << SexyStringToString(((aMemoryImage->mHasTrans) ? __S("HasTrans") : __S("&nbsp;"))) << "</TD>" << std::endl;
-		aDumpStream << "<TD>" << SexyStringToString(((aNativeAlphaMemory != 0) ? __S("NativeAlpha<BR>") + CommaSeperate(aNativeAlphaMemory) : __S("&nbsp;"))) << "</TD>" << std::endl;
-		aDumpStream << "<TD>" << SexyStringToString(((aRLAlphaMemory != 0) ? __S("RLAlpha<BR>") + CommaSeperate(aRLAlphaMemory) : __S("&nbsp;"))) << "</TD>" << std::endl;
-		aDumpStream << "<TD>" << SexyStringToString(((aRLAdditiveMemory != 0) ? __S("RLAdditive<BR>") + CommaSeperate(aRLAdditiveMemory) : __S("&nbsp;"))) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aMemoryImage->mIsVolatile) ? std::string("Volatile") : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aMemoryImage->mForcedMode) ? std::string("Forced") : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aMemoryImage->mHasAlpha) ? std::string("HasAlpha") : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aMemoryImage->mHasTrans) ? std::string("HasTrans") : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aNativeAlphaMemory != 0) ? std::string("NativeAlpha<BR>") + CommaSeperate(aNativeAlphaMemory) : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aRLAlphaMemory != 0) ? std::string("RLAlpha<BR>") + CommaSeperate(aRLAlphaMemory) : std::string("&nbsp;")) << "</TD>" << std::endl;
+		aDumpStream << "<TD>" << ((aRLAdditiveMemory != 0) ? std::string("RLAdditive<BR>") + CommaSeperate(aRLAdditiveMemory) : std::string("&nbsp;")) << "</TD>" << std::endl;
 		aDumpStream << "<TD>" << (aMemoryImage->mFilePath.empty()? "&nbsp;":aMemoryImage->mFilePath) << "</TD>" << std::endl;
 
 		aDumpStream << "</TR>" << std::endl;
@@ -1464,18 +1469,18 @@ void SexyAppBase::DumpProgramInfo()
 	}
 
 	aDumpStream << "<TD>Totals</TD>" << std::endl;
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalMemorySize)) << "</TD>" << std::endl;	
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalBitsMemory)) << "</TD>" << std::endl;	
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalPalletizedMemory)) << "</TD>" << std::endl;				
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalSurfaceMemory)) << "</TD>" << std::endl;		
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalTextureMemory)) << "</TD>" << std::endl;		
+	aDumpStream << "<TD>" << CommaSeperate(aTotalMemorySize) << "</TD>" << std::endl;
+	aDumpStream << "<TD>" << CommaSeperate(aTotalBitsMemory) << "</TD>" << std::endl;
+	aDumpStream << "<TD>" << CommaSeperate(aTotalPalletizedMemory) << "</TD>" << std::endl;
+	aDumpStream << "<TD>" << CommaSeperate(aTotalSurfaceMemory) << "</TD>" << std::endl;
+	aDumpStream << "<TD>" << CommaSeperate(aTotalTextureMemory) << "</TD>" << std::endl;
 	aDumpStream << "<TD>&nbsp;</TD>" << std::endl;
 	aDumpStream << "<TD>&nbsp;</TD>" << std::endl;
 	aDumpStream << "<TD>&nbsp;</TD>" << std::endl;
 	aDumpStream << "<TD>&nbsp;</TD>" << std::endl;
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalNativeAlphaMemory)) << "</TD>" << std::endl;
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalRLAlphaMemory)) << "</TD>" << std::endl;
-	aDumpStream << "<TD>" << SexyStringToString(CommaSeperate(aTotalRLAdditiveMemory)) << "</TD>" << std::endl;
+	aDumpStream << "<TD>" << CommaSeperate(aTotalNativeAlphaMemory) << "</TD>" << std::endl;
+	aDumpStream << "<TD>" << CommaSeperate(aTotalRLAlphaMemory) << "</TD>" << std::endl;
+	aDumpStream << "<TD>" << CommaSeperate(aTotalRLAdditiveMemory) << "</TD>" << std::endl;
 	aDumpStream << "<TD>&nbsp;</TD>" << std::endl;
 
 	aDumpStream << "</TABLE></CENTER></BODY></HTML>" << std::endl;
@@ -1586,7 +1591,7 @@ void SexyAppBase::WriteToRegistry()
 	RegistryWriteBoolean("WaitForVSync", mWaitForVSync);	
 }
 
-bool SexyAppBase::RegistryEraseKey(const SexyString& _theKeyName)
+bool SexyAppBase::RegistryEraseKey(const std::string& _theKeyName)
 {
 	std::string theKeyName = SexyStringToStringFast(_theKeyName);
 	if (mRegKey.length() == 0)
@@ -1632,7 +1637,7 @@ bool SexyAppBase::RegistryEraseKey(const SexyString& _theKeyName)
 	return true;
 }
 
-void SexyAppBase::RegistryEraseValue(const SexyString& _theValueName)
+void SexyAppBase::RegistryEraseValue(const std::string& _theValueName)
 {
 	std::string theValueName = SexyStringToStringFast(_theValueName);
 	if (mRegKey.length() == 0)
@@ -1801,7 +1806,7 @@ bool SexyAppBase::RegistryReadData(const std::string& theKey, uchar* theValue, u
 void SexyAppBase::ReadFromRegistry()
 {
 	mReadFromRegistry = true;
-	mRegKey = SexyStringToString(GetString("RegistryKey", StringToSexyString(mRegKey)));
+	mRegKey = GetString("RegistryKey", mRegKey);
 
 	if (mRegKey.length() == 0)
 		return;
@@ -2345,7 +2350,7 @@ static void CalculateFPS()
 
 		Graphics aDrawG(gFPSImage);
 		aDrawG.SetFont(&aFont);
-		SexyString aFPS = StrFormat(__S("FPS: %d"), gFPSDisplay);
+		std::string aFPS = StrFormat(__S("FPS: %d"), gFPSDisplay);
 		aDrawG.SetColor(0x000000);
 		aDrawG.FillRect(0,0,gFPSImage->GetWidth(),gFPSImage->GetHeight());
 		aDrawG.SetColor(0xFFFFFF);
@@ -2375,7 +2380,7 @@ static void FPSDrawCoords(int theX, int theY)
 
 	Graphics aDrawG(gFPSImage);
 	aDrawG.SetFont(&aFont);
-	SexyString aFPS = StrFormat(__S("%d,%d"),theX,theY);
+	std::string aFPS = StrFormat(__S("%d,%d"),theX,theY);
 	aDrawG.SetColor(0x000000);
 	aDrawG.FillRect(0,0,gFPSImage->GetWidth(),gFPSImage->GetHeight());
 	aDrawG.SetColor(0xFFFFFF);
@@ -2418,7 +2423,7 @@ static void CalculateDemoTimeLeft()
 	int aMinutes = (aTotalSeconds/60)%60;
 	int anHours = (aTotalSeconds/3600);
 
-	SexyString aFPS = StrFormat(__S("%02d:%02d:%02d"), anHours,aMinutes,aSeconds);
+	std::string aFPS = StrFormat(__S("%02d:%02d:%02d"), anHours,aMinutes,aSeconds);
 	aDrawG.SetColor(0x000000);
 	aDrawG.FillRect(0,0,gDemoTimeLeftImage->GetWidth(),gDemoTimeLeftImage->GetHeight());
 	aDrawG.SetColor(0xFFFFFF);
@@ -2708,34 +2713,6 @@ int SexyAppBase::MsgBox(const std::string& theText, const std::string& theTitle,
 	return 0;
 }
 
-int SexyAppBase::MsgBox(const std::wstring& theText, const std::wstring& theTitle, int theFlags)
-{
-//	if (mDDInterface && mDDInterface->mDD)
-//		mDDInterface->mDD->FlipToGDISurface();
-	/*
-	if (IsScreenSaver())
-	{
-		LogScreenSaverError(WStringToString(theText));
-		return IDOK;
-	}
-	*/
-
-	BeginPopup();
-	//int aResult = MessageBoxW(mHWnd, theText.c_str(), theTitle.c_str(), theFlags);
-	wprintf(L"%s\n===\n%s\n", theTitle.c_str(), theText.c_str());
-
-#ifdef __SWITCH__
-	std::wstring_convert<std::codecvt_utf8<wchar_t> > cv;
-	ErrorApplicationConfig c;
-	errorApplicationCreate(&c, cv.to_bytes(theTitle).c_str(), cv.to_bytes(theText).c_str());
-	errorApplicationShow(&c);
-#endif
-
-	EndPopup();
-
-	return 0;
-}
-
 void SexyAppBase::Popup(const std::string& theString)
 {
 	if (IsScreenSaver())
@@ -2757,27 +2734,6 @@ void SexyAppBase::Popup(const std::string& theString)
 	EndPopup();
 }
 
-void SexyAppBase::Popup(const std::wstring& theString)
-{
-	if (IsScreenSaver())
-	{
-		LogScreenSaverError(WStringToString(theString));
-		return;
-	}
-
-	BeginPopup();
-	if (!mShutdown)
-		wprintf(L"FATAL ERROR\n===\n%s\n", theString.c_str());
-
-#ifdef __SWITCH__
-	std::wstring_convert<std::codecvt_utf8<wchar_t> > cv;
-	ErrorApplicationConfig c;
-	errorApplicationCreate(&c, "Fatal error", cv.to_bytes(theString).c_str());
-	errorApplicationShow(&c);
-#endif
-
-	EndPopup();
-}
 
 void SexyAppBase::SafeDeleteWidget(Widget* theWidget)
 {
@@ -2854,7 +2810,7 @@ static INT_PTR CALLBACK MarkerListDialogProc(HWND hwnd, UINT msg, WPARAM wParam,
 				int aMinutes = (aTotalSeconds/60)%60;
 				int anHours = (aTotalSeconds/3600);
 
-				SexyString aStr = StrFormat(__S("%s (%02d:%02d:%02d)"), anItr->first.c_str(),anHours,aMinutes,aSeconds);				
+				std::string aStr = StrFormat(__S("%s (%02d:%02d:%02d)"), anItr->first.c_str(),anHours,aMinutes,aSeconds);
 				GetTextExtentPoint32(hDCListBox, aStr.c_str(), aStr.length(), &aSize);
 				dwExtent = std::max (aSize.cx + tm.tmAveCharWidth, (LONG)dwExtent);
 				SendMessage(aListBox, LB_SETHORIZONTALEXTENT, dwExtent, 0);
@@ -3376,7 +3332,7 @@ void SexyAppBase::ProcessDemo()
 					case DEMO_KEY_CHAR:
 						{
 							int sizeMult = (int)mDemoBuffer.ReadNumBits(1, false) + 1; // will be 1 for single, 2 for double
-							SexyChar aChar = (SexyChar) mDemoBuffer.ReadNumBits(8*sizeMult, false);
+							char aChar = (char) mDemoBuffer.ReadNumBits(8*sizeMult, false);
 							mWidgetManager->KeyChar(aChar);
 						}
 						break;
@@ -3463,17 +3419,17 @@ void SexyAppBase::ShowMemoryUsage()
 
 	aStr += StrFormat("Num Images: %d\r\n",(int)mMemoryImageSet.size());
 	aStr += StrFormat("Num Sounds: %d\r\n",mSoundManager->GetNumSounds());
-	aStr += StrFormat("Video Memory: %s/%s KB\r\n", SexyStringToString(CommaSeperate((aTotal-aFree)/1024)).c_str(), SexyStringToString(CommaSeperate(aTotal/1024)).c_str());
+	aStr += StrFormat("Video Memory: %s/%s KB\r\n", CommaSeperate((aTotal-aFree)/1024).c_str(), CommaSeperate(aTotal/1024).c_str());
 	aStr += StrFormat("Texture Memory: %s KB\r\n",CommaSeperate(aTextureMemory/1024).c_str());
 
 	FormatUsage aUsage = aFormatMap[PixelFormat_A8R8G8B8];
-	aStr += StrFormat("A8R8G8B8: %d - %s KB\r\n",aUsage.first,SexyStringToString(CommaSeperate(aUsage.second/1024)).c_str());
+	aStr += StrFormat("A8R8G8B8: %d - %s KB\r\n",aUsage.first,CommaSeperate(aUsage.second/1024).c_str());
 	aUsage = aFormatMap[PixelFormat_A4R4G4B4];
-	aStr += StrFormat("A4R4G4B4: %d - %s KB\r\n",aUsage.first,SexyStringToString(CommaSeperate(aUsage.second/1024)).c_str());
+	aStr += StrFormat("A4R4G4B4: %d - %s KB\r\n",aUsage.first,CommaSeperate(aUsage.second/1024).c_str());
 	aUsage = aFormatMap[PixelFormat_R5G6B5];
-	aStr += StrFormat("R5G6B5: %d - %s KB\r\n",aUsage.first,SexyStringToString(CommaSeperate(aUsage.second/1024)).c_str());
+	aStr += StrFormat("R5G6B5: %d - %s KB\r\n",aUsage.first,CommaSeperate(aUsage.second/1024).c_str());
 	aUsage = aFormatMap[PixelFormat_Palette8];
-	aStr += StrFormat("Palette8: %d - %s KB\r\n",aUsage.first,SexyStringToString(CommaSeperate(aUsage.second/1024)).c_str());
+	aStr += StrFormat("Palette8: %d - %s KB\r\n",aUsage.first,CommaSeperate(aUsage.second/1024).c_str());
 	
 	MsgBox(aStr,"Video Stats",MB_OK);
 	mLastTime = SDL_GetTicks();
@@ -4465,7 +4421,7 @@ bool SexyAppBase::LoadProperties(const std::string& theFileName, bool required, 
 			return true;
 		else
 		{
-			Popup(GetString("UNABLE_OPEN_PROPERTIES", __S("Unable to open properties file ")) + StringToSexyString(theFileName));
+			Popup(GetString("UNABLE_OPEN_PROPERTIES", __S("Unable to open properties file ")) + theFileName);
 			return false;
 		}
 	}
@@ -4473,7 +4429,7 @@ bool SexyAppBase::LoadProperties(const std::string& theFileName, bool required, 
 	{
 		//if (!CheckSignature(aBuffer, theFileName))
 		//{
-			//Popup(GetString("PROPERTIES_SIG_FAILED", __S("Signature check failed on ")) + StringToSexyString(theFileName + "'"));
+			//Popup(GetString("PROPERTIES_SIG_FAILED", __S("Signature check failed on ")) + (theFileName + "'"));
 			//return false;
 		//}
 	}
@@ -4556,7 +4512,7 @@ double SexyAppBase::GetDouble(const std::string& theId)
 	StringDoubleMap::iterator anItr = mDoubleProperties.find(theId);
 	DBG_ASSERTE(anItr != mDoubleProperties.end());
 	
-	if (anItr != mDoubleProperties.end())	
+	if (anItr != mDoubleProperties.end())
 		return anItr->second;
 	else
 		return false;
@@ -4569,26 +4525,26 @@ double SexyAppBase::GetDouble(const std::string& theId, double theDefault)
 	if (anItr != mDoubleProperties.end())	
 		return anItr->second;
 	else
-		return theDefault;	
+		return theDefault;
 }
 
-SexyString SexyAppBase::GetString(const std::string& theId)
+std::string SexyAppBase::GetString(const std::string& theId)
 {
-	StringWStringMap::iterator anItr = mStringProperties.find(theId);
+	StringSexyStringMap::iterator anItr = mStringProperties.find(theId);
 	DBG_ASSERTE(anItr != mStringProperties.end());
 	
 	if (anItr != mStringProperties.end())	
-		return WStringToSexyString(anItr->second);
+		return anItr->second;
 	else
 		return __S("");
 }
 
-SexyString SexyAppBase::GetString(const std::string& theId, const SexyString& theDefault)
+std::string SexyAppBase::GetString(const std::string& theId, const std::string& theDefault)
 {
-	StringWStringMap::iterator anItr = mStringProperties.find(theId);	
+	StringSexyStringMap::iterator anItr = mStringProperties.find(theId);
 	
 	if (anItr != mStringProperties.end())	
-		return WStringToSexyString(anItr->second);
+		return anItr->second;
 	else
 		return theDefault;	
 }
@@ -4604,9 +4560,9 @@ StringVector SexyAppBase::GetStringVector(const std::string& theId)
 		return StringVector();
 }
 
-void SexyAppBase::SetString(const std::string& theId, const std::wstring& theValue)
+void SexyAppBase::SetString(const std::string& theId, const std::string& theValue)
 {
-	std::pair<StringWStringMap::iterator, bool> aPair = mStringProperties.insert(StringWStringMap::value_type(theId, theValue));
+	std::pair<StringSexyStringMap::iterator, bool> aPair = mStringProperties.insert(StringSexyStringMap::value_type(theId, theValue));
 	if (!aPair.second) // Found it, change value
 		aPair.first->second = theValue;
 }
@@ -4754,7 +4710,7 @@ void SexyAppBase::HandleCmdLineParam(const std::string& theParamName, const std:
 			aNum=5;
 
 		int aDemoFileNum = GetMaxDemoFileNum(mDemoPrefix, aNum, true) + 1;
-		mDemoFileName = SexyStringToString(StrFormat(StringToSexyString(mDemoPrefix + "%d.dmo").c_str(),aDemoFileNum));
+		mDemoFileName = StrFormat((mDemoPrefix + "%d.dmo").c_str(), aDemoFileNum);
 		if (mDemoFileName.length() < 2)
 		{
 			mDemoFileName = GetAppDataPath(mDemoFileName);
@@ -4769,7 +4725,7 @@ void SexyAppBase::HandleCmdLineParam(const std::string& theParamName, const std:
 			aNum=0;
 
 		int aDemoFileNum = GetMaxDemoFileNum(mDemoPrefix, aNum, false)-aNum;
-		mDemoFileName = SexyStringToString(StrFormat(StringToSexyString(mDemoPrefix + "%d.dmo").c_str(),aDemoFileNum));
+		mDemoFileName = StrFormat((mDemoPrefix + "%d.dmo").c_str(), aDemoFileNum);
 		mRecordingDemoBuffer = false;
 		mPlayingDemoBuffer = true;
 	}
@@ -4806,7 +4762,7 @@ void SexyAppBase::HandleCmdLineParam(const std::string& theParamName, const std:
 	}
 	else
 	{
-		Popup(GetString("INVALID_COMMANDLINE_PARAM", __S("Invalid command line parameter: ")) + StringToSexyString(theParamName));
+		Popup(GetString("INVALID_COMMANDLINE_PARAM", __S("Invalid command line parameter: ")) + theParamName);
 		DoExit(0);
 	}
 }
@@ -4934,11 +4890,11 @@ void SexyAppBase::Init()
 	ReadFromRegistry();	
 
 	// Create a message we can use to talk to ourselves inter-process
-	//mNotifyGameMessage = RegisterWindowMessage((__S("Notify") + StringToSexyString(mProdName)).c_str());
+	//mNotifyGameMessage = RegisterWindowMessage((__S("Notify") + mProdName).c_str());
 
 	// Create a globally unique mutex
 	/*
-	mMutex = CreateMutex(nullptr, TRUE, (StringToSexyString(mProdName) + __S("Mutex")).c_str());
+	mMutex = CreateMutex(nullptr, TRUE, (mProdName + __S("Mutex")).c_str());
 	if (::GetLastError() == ERROR_ALREADY_EXISTS)
 		HandleGameAlreadyRunning();
 	*/
@@ -4960,7 +4916,7 @@ void SexyAppBase::Init()
 
 	srand(SDL_GetTicks());
 
-	mIsWideWindow = sizeof(SexyChar) == sizeof(wchar_t);
+	mIsWideWindow = sizeof(char) > 1;
 
 	/*
 	WNDCLASS wc;
@@ -5830,7 +5786,7 @@ void SexyAppBase::Set3DAcclerated(bool is3D, bool reinit)
 		}
 		else if (aResult != DDInterface::RESULT_OK)
 		{
-			Popup(GetString("FAILED_INIT_DIRECTDRAW", __S("Failed to initialize DirectDraw: ")) + StringToSexyString(DDInterface::ResultToString(aResult) + " " + mDDInterface->mErrorString));
+			Popup(GetString("FAILED_INIT_DIRECTDRAW", __S("Failed to initialize DirectDraw: ")) + (DDInterface::ResultToString(aResult) + " " + mDDInterface->mErrorString));
 			DoExit(1);
 		}
 

@@ -120,7 +120,7 @@ public:
 	bool					MouseDrag(int x, int y);
 	bool					MouseExit(int x, int y);
 	void					MouseWheel(int theDelta);
-	bool					KeyChar(SexyChar theChar);
+	bool					KeyChar(char theChar);
 	bool					KeyDown(KeyCode key);
 	bool					KeyUp(KeyCode key);
 

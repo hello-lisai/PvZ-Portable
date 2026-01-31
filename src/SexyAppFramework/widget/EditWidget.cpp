@@ -63,7 +63,7 @@ void EditWidget::AddWidthCheckFont(_Font *theFont, int theMaxPixels)
 	aCheck.mFont = theFont->Duplicate();
 }
 
-void EditWidget::SetText(const SexyString& theText, bool leftPosToZero)
+void EditWidget::SetText(const std::string& theText, bool leftPosToZero)
 {
 	mString = theText;
 	mCursorPos = mString.length();
@@ -76,14 +76,14 @@ void EditWidget::SetText(const SexyString& theText, bool leftPosToZero)
 	MarkDirty();
 }
 
-SexyString& EditWidget::GetDisplayString()
+std::string& EditWidget::GetDisplayString()
 {
 	if (mPasswordChar==0)
 		return mString;
 
 	if (mPasswordDisplayString.size()!=mString.size())
 	{
-		mPasswordDisplayString = SexyString(mString.size(), mPasswordChar);
+		mPasswordDisplayString = std::string(mString.size(), mPasswordChar);
 		//mPasswordDisplayString.resize(mString.size());
 		//for (int i=0; i<(int)mPasswordDisplayString.length(); i++)
 		//	mPasswordDisplayString[i] = mPasswordChar; 
@@ -120,7 +120,7 @@ void EditWidget::Draw(Graphics* g) // Already translated
 		mFont = FONT_PICO129->Duplicate();
 		//mFont = new SysFont(mWidgetManager->mApp, "Arial Unicode MS", 10, false);
 
-	SexyString &aString = GetDisplayString();
+	std::string &aString = GetDisplayString();
 
 	g->SetColor(mColors[COLOR_BKG]);			
 	g->FillRect(0, 0, mWidth, mHeight);
@@ -271,7 +271,7 @@ void EditWidget::EnforceMaxPixels()
 	} 
 }
 
-bool EditWidget::IsPartOfWord(SexyChar theChar)
+bool EditWidget::IsPartOfWord(char theChar)
 {
 	return (((theChar >= __S('A')) && (theChar <= __S('Z'))) ||
 			((theChar >= __S('a')) && (theChar <= __S('z'))) ||
@@ -280,7 +280,7 @@ bool EditWidget::IsPartOfWord(SexyChar theChar)
 			(theChar == __S('_')));
 }
 
-void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
+void EditWidget::ProcessKey(KeyCode theKey, char theChar)
 {
 	bool shiftDown = mWidgetManager->mKeyDown[KEYCODE_SHIFT];
 	bool controlDown = mWidgetManager->mKeyDown[KEYCODE_CONTROL];
@@ -294,7 +294,7 @@ void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
 	if (shiftDown && (mHilitePos == -1))
 		mHilitePos = mCursorPos;
 	
-	SexyString anOldString = mString;
+	std::string anOldString = mString;
 	int anOldCursorPos = mCursorPos;
 	int anOldHilitePos = mHilitePos;
 	if ((theChar == 3) || (theChar == 24))
@@ -304,9 +304,9 @@ void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
 		if ((mHilitePos != -1) && (mHilitePos != mCursorPos))
 		{
 			if (mCursorPos < mHilitePos)
-				mWidgetManager->mApp->CopyToClipboard(SexyStringToString(GetDisplayString().substr(mCursorPos, mHilitePos)));
+				mWidgetManager->mApp->CopyToClipboard(GetDisplayString().substr(mCursorPos, mHilitePos));
 			else
-				mWidgetManager->mApp->CopyToClipboard(SexyStringToString(GetDisplayString().substr(mHilitePos, mCursorPos)));
+				mWidgetManager->mApp->CopyToClipboard(GetDisplayString().substr(mHilitePos, mCursorPos));
 		
 			if (theChar == 3)
 			{				
@@ -325,11 +325,11 @@ void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
 	{
 		// Paste selection
 		
-		SexyString aBaseString = StringToSexyString(mWidgetManager->mApp->GetClipboard());
+		std::string aBaseString = mWidgetManager->mApp->GetClipboard();
 		
 		if (aBaseString.length() > 0)
 		{	
-			SexyString aString;
+			std::string aString;
 
 			for (ulong i = 0; i < aBaseString.length(); i++)
 			{
@@ -364,7 +364,7 @@ void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
 		
 		mLastModifyIdx = -1;
 		
-		SexyString aSwapString = mString;
+		std::string aSwapString = mString;
 		int aSwapCursorPos = mCursorPos;
 		int aSwapHilitePos = mHilitePos;			
 		
@@ -480,7 +480,7 @@ void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
 	}
 	else
 	{
-		SexyString aString = SexyString(1, theChar);
+		std::string aString = std::string(1, theChar);
 		unsigned int uTheChar = (unsigned int)theChar;
 		unsigned int range = 127;
 		if (gSexyAppBase->mbAllowExtendedChars)
@@ -493,7 +493,7 @@ void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
 			if ((mHilitePos != -1) && (mHilitePos != mCursorPos))
 			{
 				// Replace selection with new character
-				mString = mString.substr(0, std::min(mCursorPos, mHilitePos)) + SexyString(1, theChar) + mString.substr(std::max(mCursorPos, mHilitePos));
+				mString = mString.substr(0, std::min(mCursorPos, mHilitePos)) + std::string(1, theChar) + mString.substr(std::max(mCursorPos, mHilitePos));
 				mCursorPos = std::min(mCursorPos, mHilitePos);
 				mHilitePos = -1;
 				
@@ -502,7 +502,7 @@ void EditWidget::ProcessKey(KeyCode theKey, SexyChar theChar)
 			else
 			{
 				// Insert character where cursor is
-				mString = mString.substr(0, mCursorPos) + SexyString(1, theChar) + mString.substr(mCursorPos);
+				mString = mString.substr(0, mCursorPos) + std::string(1, theChar) + mString.substr(mCursorPos);
 				
 				if (mCursorPos != mLastModifyIdx+1)
 					bigChange = true;						
@@ -556,7 +556,7 @@ void EditWidget::KeyDown(KeyCode theKey)
 	Widget::KeyDown(theKey);
 }
 
-void EditWidget::KeyChar(SexyChar theChar)
+void EditWidget::KeyChar(char theChar)
 {
 //	if (mEditListener->AllowChar(mId, theChar))
 		ProcessKey(KEYCODE_UNKNOWN, theChar);
@@ -569,12 +569,12 @@ int EditWidget::GetCharAt(int x, int y)
 	(void)y;
 	int aPos = 0;
 
-	SexyString &aString = GetDisplayString();
+	std::string &aString = GetDisplayString();
 					
 	for (int i = mLeftPos; i < (int) aString.length(); i++)
 	{
-		SexyString aLoSubStr = aString.substr(mLeftPos, i-mLeftPos);
-		SexyString aHiSubStr = aString.substr(mLeftPos, i-mLeftPos+1);
+		std::string aLoSubStr = aString.substr(mLeftPos, i-mLeftPos);
+		std::string aHiSubStr = aString.substr(mLeftPos, i-mLeftPos+1);
 			
 		int aLoLen = mFont->StringWidth(aLoSubStr);
 		int aHiLen = mFont->StringWidth(aHiSubStr);
@@ -598,7 +598,7 @@ void EditWidget::FocusCursor(bool bigJump)
 					
 	if (mFont != nullptr)
 	{
-		SexyString &aString = GetDisplayString();
+		std::string &aString = GetDisplayString();
 		while ((mWidth-8 > 0) && (mFont->StringWidth(aString.substr(0, mCursorPos)) - mFont->StringWidth(aString.substr(0, mLeftPos)) >= mWidth-8))
 		{
 			if (bigJump)
@@ -649,7 +649,7 @@ void EditWidget::MouseUp(int x, int y, int theBtnNum, int theClickCount)
 
 void EditWidget::HiliteWord()
 {
-	SexyString &aString = GetDisplayString();
+	std::string &aString = GetDisplayString();
 
 	if (mCursorPos < (int) aString.length())
 	{

@@ -11,7 +11,7 @@ PropertiesParser::PropertiesParser(SexyAppBase* theApp)
 	mXMLParser = nullptr;
 }
 
-void PropertiesParser::Fail(const SexyString& theErrorText)
+void PropertiesParser::Fail(const std::string& theErrorText)
 {
 	if (!mHasFailed)
 	{
@@ -30,7 +30,7 @@ PropertiesParser::~PropertiesParser()
 }
 
 
-bool PropertiesParser::ParseSingleElement(SexyString* aString)
+bool PropertiesParser::ParseSingleElement(std::string* aString)
 {
 	*aString = __S("");
 
@@ -70,12 +70,12 @@ bool PropertiesParser::ParseStringArray(StringVector* theStringVector)
 		{
 			if (aXMLElement.mValue == __S("String"))
 			{
-				SexyString aString;
+				std::string aString;
 
 				if (!ParseSingleElement(&aString))
 					return false;
 
-				theStringVector->push_back(SexyStringToStringFast(aString));
+				theStringVector->push_back(aString);
 			}
 			else
 			{
@@ -108,12 +108,12 @@ bool PropertiesParser::ParseProperties()
 		{
 			if (aXMLElement.mValue == __S("String"))
 			{				
-				SexyString aDef;
+				std::string aDef;
 				if (!ParseSingleElement(&aDef))
 					return false;
 
 				std::string anId = SexyStringToStringFast(aXMLElement.mAttributes[__S("id")]);
-				mApp->SetString(anId, SexyStringToWStringFast(aDef));
+				mApp->SetString(anId, aDef);
 			}
 			else if (aXMLElement.mValue == __S("StringArray"))
 			{
@@ -128,7 +128,7 @@ bool PropertiesParser::ParseProperties()
 			}
 			else if (aXMLElement.mValue == __S("Boolean"))
 			{
-				SexyString aVal;
+				std::string aVal;
 
 				if (!ParseSingleElement(&aVal))
 					return false;
@@ -152,7 +152,7 @@ bool PropertiesParser::ParseProperties()
 			}
 			else if (aXMLElement.mValue == __S("Integer"))
 			{
-				SexyString aVal;
+				std::string aVal;
 
 				if (!ParseSingleElement(&aVal))
 					return false;
@@ -170,7 +170,7 @@ bool PropertiesParser::ParseProperties()
 			}
 			else if (aXMLElement.mValue == __S("Double"))
 			{
-				SexyString aVal;
+				std::string aVal;
 
 				if (!ParseSingleElement(&aVal))
 					return false;
@@ -248,7 +248,7 @@ bool PropertiesParser::ParsePropertiesBuffer(const Buffer& theBuffer)
 {
 	mXMLParser = new XMLParser();
 
-	mXMLParser->SetStringSource(theBuffer.UTF8ToWideString());
+	mXMLParser->SetStringSource(theBuffer.UTF8ToString());
 	return DoParseProperties();
 }
 
@@ -259,7 +259,7 @@ bool PropertiesParser::ParsePropertiesFile(const std::string& theFilename)
 	return DoParseProperties();	
 }
 
-SexyString PropertiesParser::GetErrorText()
+std::string PropertiesParser::GetErrorText()
 {
 	return mError;
 }

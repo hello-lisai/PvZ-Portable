@@ -10,11 +10,11 @@ namespace Sexy
 class EditListener
 {
 public:
-	virtual void			EditWidgetText(int theId, const SexyString& theString) = 0;
+	virtual void			EditWidgetText(int theId, const std::string& theString) = 0;
 
 //	virtual bool			AllowKey(int theId, KeyCode theKey) { return true; }
-//	virtual bool			AllowChar(int theId, SexyChar theChar) { return true; }
-//	virtual bool			AllowText(int theId, const SexyString& theText) { return true; }
+//	virtual bool			AllowChar(int theId, char theChar) { return true; }
+//	virtual bool			AllowText(int theId, const std::string& theText) { return true; }
 };
 
 }

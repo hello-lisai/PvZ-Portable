@@ -3,6 +3,8 @@
 
 #include "Common.h"
 
+#include <list>
+
 #include "PerfTimer.h"
 
 struct PFILE;
@@ -17,10 +19,10 @@ public:
 	std::string				mValue;
 };
 
-typedef std::map<SexyString, SexyString>	XMLParamMap;
+typedef std::map<std::string, std::string>	XMLParamMap;
 typedef std::list<XMLParamMap::iterator>	XMLParamMapIteratorList;
 
-typedef std::vector<wchar_t> XMLParserBuffer;
+typedef std::vector<char> XMLParserBuffer;
 
 class XMLElement
 {
@@ -37,9 +39,9 @@ public:
 public:
 	
 	int						mType;
-	SexyString				mSection;
-	SexyString				mValue;
-	SexyString				mInstruction;
+	std::string				mSection;
+	std::string				mValue;
+	std::string				mInstruction;
 	XMLParamMap				mAttributes;
 	XMLParamMapIteratorList	mAttributeIteratorList; // stores attribute iterators in their original order
 };
@@ -48,29 +50,29 @@ class XMLParser
 {
 protected:
 	std::string				mFileName;
-	SexyString				mErrorText;
+	std::string				mErrorText;
 	int						mLineNum;
 	PFILE*					mFile;
 	bool					mHasFailed;
 	bool					mAllowComments;
 	XMLParserBuffer			mBufferedText;
-	SexyString				mSection;
-	bool					(XMLParser::*mGetCharFunc)(wchar_t* theChar, bool* error);
+	std::string				mSection;
+	bool					(XMLParser::*mGetCharFunc)(char* theChar, bool* error);
 	bool					mForcedEncodingType;
 	bool					mFirstChar;
 	bool					mByteSwap;
 
 protected:
-	void					Fail(const SexyString& theErrorText);
+	void					Fail(const std::string& theErrorText);
 	void					Init();
 
-	bool					AddAttribute(XMLElement* theElement, const SexyString& aAttributeKey, const SexyString& aAttributeValue);
+	bool					AddAttribute(XMLElement* theElement, const std::string& aAttributeKey, const std::string& aAttributeValue);
 
-	bool					GetAsciiChar(wchar_t* theChar, bool* error);
-	bool					GetUTF8Char(wchar_t* theChar, bool* error);
-	bool					GetUTF16Char(wchar_t* theChar, bool* error);
-	bool					GetUTF16LEChar(wchar_t* theChar, bool* error);
-	bool					GetUTF16BEChar(wchar_t* theChar, bool* error);
+	bool					GetAsciiChar(char* theChar, bool* error);
+	bool					GetUTF8Char(char* theChar, bool* error);
+	bool					GetUTF16Char(char* theChar, bool* error);
+	bool					GetUTF16LEChar(char* theChar, bool* error);
+	bool					GetUTF16BEChar(char* theChar, bool* error);
 
 public:
 	enum XMLEncodingType
@@ -88,10 +90,9 @@ public:
 
 	void					SetEncodingType(XMLEncodingType theEncoding);
 	bool					OpenFile(const std::string& theFilename);
-	void					SetStringSource(const std::wstring& theString);
 	void					SetStringSource(const std::string& theString);
 	bool					NextElement(XMLElement* theElement);
-	SexyString				GetErrorText();
+	std::string				GetErrorText();
 	int						GetCurrentLineNum();
 	std::string				GetFileName();
 

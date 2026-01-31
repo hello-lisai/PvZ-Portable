@@ -95,7 +95,7 @@ public:
 	int								mCrazyDaveBlinkCounter;							//+0x848
 	ReanimationID					mCrazyDaveBlinkReanimID;						//+0x84C
 	int								mCrazyDaveMessageIndex;							//+0x850
-	SexyString						mCrazyDaveMessageText;							//+0x854
+	std::string						mCrazyDaveMessageText;							//+0x854
 	int								mAppRandSeed;									//+0x870
 	//HICON							mBigArrowCursor;								//+0x874
 	PopDRMComm*						mDRM;											//+0x878
@@ -152,14 +152,14 @@ public:
 	void							DoCheatDialog();
 	void							FinishCheatDialog(bool isYes);
 	void							FinishCreateUserDialog(bool isYes);
-	void							DoConfirmDeleteUserDialog(const SexyString& theName);
+	void							DoConfirmDeleteUserDialog(const std::string& theName);
 	void							FinishConfirmDeleteUserDialog(bool isYes);
-	void							DoRenameUserDialog(const SexyString& theName);
+	void							DoRenameUserDialog(const std::string& theName);
 	void							FinishRenameUserDialog(bool isYes);
 	void							FinishNameError(int theId);
 	void							FinishRestartConfirmDialog();
-	void							DoConfirmSellDialog(const SexyString& theMessage);
-	void							DoConfirmPurchaseDialog(const SexyString& theMessage);
+	void							DoConfirmSellDialog(const std::string& theMessage);
+	void							DoConfirmPurchaseDialog(const std::string& theMessage);
 	void							FinishTimesUpDialog();
 	void							KillBoard();
 	void							MakeNewBoard();
@@ -185,12 +185,12 @@ public:
 	void							DoContinueDialog();
 	void							DoPauseDialog();
 	void							FinishModelessDialogs();
-	virtual Dialog*					DoDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode);
-	virtual Dialog*					DoDialogDelay(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode);
+	virtual Dialog*					DoDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode);
+	virtual Dialog*					DoDialogDelay(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode);
 	virtual void					Shutdown();
 	virtual void					Init();
 	virtual void					Start();
-	virtual Dialog*					NewDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode);
+	virtual Dialog*					NewDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode);
 	virtual bool					KillDialog(int theDialogId);
 	virtual void					ModalOpen();
 	virtual void					ModalClose();
@@ -218,7 +218,7 @@ public:
 	void							PlayFoleyPitch(FoleyType theFoleyType, float thePitch);
 	void							PlaySample(int theSoundNum);
 	void							FastLoad(GameMode theGameMode);
-	static SexyString				GetStageString(int theLevel);
+	static std::string				GetStageString(int theLevel);
 	/*inline*/ void					KillChallengeScreen();
 	void							ShowChallengeScreen(ChallengePage thePage);
 	ChallengeDefinition&			GetCurrentChallengeDef();
@@ -253,7 +253,7 @@ public:
 	/*inline*/ bool					IsFinalBossLevel();
 	/*inline*/ bool					IsBungeeBlitzLevel();
 	static /*inline*/ SeedType		GetAwardSeedForLevel(int theLevel);
-	SexyString						GetCrazyDaveText(int theMessageIndex);
+	std::string						GetCrazyDaveText(int theMessageIndex);
 	/*inline*/ bool					CanShowAlmanac();
 	/*inline*/ bool					IsNight();
 	/*inline*/ bool					CanShowStore();
@@ -268,18 +268,18 @@ public:
 	void							CrazyDaveEnter();
 	void							UpdateCrazyDave();
 	void							CrazyDaveTalkIndex(int theMessageIndex);
-	void							CrazyDaveTalkMessage(const SexyString& theMessage);
+	void							CrazyDaveTalkMessage(const std::string& theMessage);
 	void							CrazyDaveLeave();
 	void							DrawCrazyDave(Graphics* g);
 	void							CrazyDaveDie();
 	void							CrazyDaveStopTalking();
 	void							PreloadForUser();
 	int								GetNumPreloadingTasks();
-	int								LawnMessageBox(int theDialogId, const SexyChar* theHeaderName, const SexyChar* theLinesName, const SexyChar* theButton1Name, const SexyChar* theButton2Name, int theButtonMode);
+	int								LawnMessageBox(int theDialogId, const char* theHeaderName, const char* theLinesName, const char* theButton1Name, const char* theButton2Name, int theButtonMode);
 	virtual void					EnforceCursor();
 	void							ShowCreditScreen();
 	void							KillCreditScreen();
-	static SexyString				Pluralize(int theCount, const SexyChar* theSingular, const SexyChar* thePlural);
+	static std::string				Pluralize(int theCount, const char* theSingular, const char* thePlural);
 	int								GetNumTrophies(ChallengePage thePage);
 	/*inline*/ bool					EarnedGoldTrophy();
 	inline bool						IsRegistered() { return false; }
@@ -290,7 +290,7 @@ public:
 	/*inline*/ bool					IsSquirrelLevel();
 	/*inline*/ bool					IsIZombieLevel();
 	/*inline*/ bool					CanShowZenGarden();
-	static SexyString				GetMoneyString(int theAmount);
+	static std::string				GetMoneyString(int theAmount);
 	bool							AdvanceCrazyDaveText();
 	/*inline*/ bool					IsWhackAZombieLevel();
 	void							UpdatePlayTimeStats();
@@ -300,7 +300,7 @@ public:
 	/*inline*/ bool					IsChallengeMode();
 	static /*inline*/ bool			IsEndlessIZombie(GameMode theGameMode);
 	void							CrazyDaveDoneHanding();
-	inline SexyString				GetCurrentLevelName() { return __S("Unknown"); }
+	inline std::string				GetCurrentLevelName() { return __S("Unknown"); }
 	/*inline*/ int					TrophiesNeedForGoldSunflower();
 	/*inline*/ int					GetCurrentChallengeIndex();
 	void							LoadGroup(const char* theGroupName, int theGroupAveMsToLoad);
@@ -317,14 +317,14 @@ public:
 	static /*inline*/ void			CenterDialog(Dialog* theDialog, int theWidth, int theHeight);
 };
 
-SexyString							LawnGetCurrentLevelName();
+std::string							LawnGetCurrentLevelName();
 bool								LawnGetCloseRequest();
 bool								LawnHasUsedCheatKeys();
 void								BetaSubmitFunc();
 
 extern bool (*gAppCloseRequest)();				//[0x69E6A0]
 extern bool (*gAppHasUsedCheatKeys)();			//[0x69E6A4]
-extern SexyString (*gGetCurrentLevelName)();
+extern std::string (*gGetCurrentLevelName)();
 
 extern bool gIsPartnerBuild;
 extern bool gFastMo;  //0x6A9EAB

@@ -29,7 +29,7 @@ public:
 	};
 
 	int						mId;	
-	SexyString				mLabel;
+	std::string				mLabel;
 	int						mLabelJustify;
 	_Font*					mFont;
 	Image*					mButtonImage;

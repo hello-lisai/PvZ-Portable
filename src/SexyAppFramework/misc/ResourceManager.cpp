@@ -170,7 +170,7 @@ bool ResourceManager::ParseCommonResource(XMLElement &theElement, BaseRes *theRe
 {
 	mHadAlreadyDefinedError = false;
 
-	const SexyString &aPath = theElement.mAttributes[__S("path")];
+	const std::string &aPath = theElement.mAttributes[__S("path")];
 	if (aPath.empty())
 		return Fail("No path specified.");
 
@@ -250,7 +250,7 @@ bool ResourceManager::ParseSoundResource(XMLElement &theElement)
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-static void ReadIntVector(const SexyString &theVal, std::vector<int> &theVector)
+static void ReadIntVector(const std::string &theVal, std::vector<int> &theVector)
 {
 	theVector.clear();
 
@@ -334,7 +334,7 @@ bool ResourceManager::ParseImageResource(XMLElement &theElement)
 	AnimType anAnimType = AnimType_None;
 	if (anItr != theElement.mAttributes.end())
 	{
-		const SexyChar *aType = anItr->second.c_str();
+		const char *aType = anItr->second.c_str();
 
 		if (strcasecmp(aType,__S("none"))==0) anAnimType = AnimType_None;
 		else if (strcasecmp(aType,__S("once"))==0) anAnimType = AnimType_Once;

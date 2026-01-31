@@ -336,8 +336,8 @@ void NewOptionsDialog::ButtonDepress(int theId)
     {
         if (mApp->mBoard)
         {
-            SexyString aDialogTitle;
-            SexyString aDialogMessage;
+            std::string aDialogTitle;
+            std::string aDialogMessage;
             if (mApp->IsPuzzleMode())
             {
                 aDialogTitle = __S("[RESTART_PUZZLE_HEADER]");

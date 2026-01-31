@@ -90,7 +90,7 @@ void GridItem::DrawGridItem(Graphics* g)
 //  case GridItemType::GRIDITEM_SQUIRREL:           DrawSquirrel(g);                                break;
     case GridItemType::GRIDITEM_STINKY:             DrawStinky(g);                                  break;
     case GridItemType::GRIDITEM_IZOMBIE_BRAIN:      DrawIZombieBrain(g);                            break;
-    default:                                        TOD_ASSERT();                                   break;
+    default:                                        TOD_ASSERT(false);                                   break;
     }
 
     Reanimation* aGridItemReanim = mApp->ReanimationTryToGet(mGridItemReanimID);

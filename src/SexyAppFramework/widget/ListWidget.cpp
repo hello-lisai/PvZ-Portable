@@ -9,7 +9,7 @@ using namespace Sexy;
 
 static int gInitialListWidgetColors[][3] = {{255, 255, 255}, {255, 255, 255}, {0, 0, 0}, {0, 192, 0}, {0, 0, 128}, {255, 255, 255}};
 
-ListWidget::ListWidget(int theId, _Font *theFont, ListListener *theListListener) 
+ListWidget::ListWidget(int theId, _Font *theFont, ListListener *theListListener)
 {
 	mJustify = JUSTIFY_LEFT;
 	mHiliteIdx = -1;
@@ -48,9 +48,9 @@ void ListWidget::RemovedFromManager(WidgetManager *theManager)
 		mListListener->ListClosed(mId);
 }
 
-SexyString ListWidget::GetSortKey(int theIdx) 
+std::string ListWidget::GetSortKey(int theIdx)
 {
-	SexyString aString = mLines[theIdx];
+	std::string aString = mLines[theIdx];
 	
 	while (aString.length() < (ulong) mMaxNumericPlaces) 
 		aString = __S("0") + aString;
@@ -72,7 +72,7 @@ void ListWidget::Sort(bool ascending)
 {
 	int aCount = mLines.size();
 	int* aMap = new int[aCount];
-	SexyString* aKeys = new SexyString[aCount];
+	std::string* aKeys = new std::string[aCount];
 
 	int i;
 	for (i = 0; i < aCount; i++) 
@@ -91,7 +91,7 @@ void ListWidget::Sort(bool ascending)
 				aMap[j] = aMap[j+1];
 				aMap[j+1] = aSwapInt;
 						
-				SexyString aSwapKey = aKeys[j];
+				std::string aSwapKey = aKeys[j];
 				aKeys[j] = aKeys[j+1];
 				aKeys[j+1] = aSwapKey;
 			}
@@ -124,13 +124,13 @@ void ListWidget::Sort(bool ascending)
 	delete[] aKeys;
 }
 	
-SexyString ListWidget::GetStringAt(int theIdx) 
+std::string ListWidget::GetStringAt(int theIdx)
 {
 	return
 		mLines[theIdx];
 }
 	
-void ListWidget::Resize(int theX, int theY, int theWidth, int theHeight) 
+void ListWidget::Resize(int theX, int theY, int theWidth, int theHeight)
 {
 	Widget::Resize(theX, theY, theWidth, theHeight);
 	
@@ -146,7 +146,7 @@ void ListWidget::Resize(int theX, int theY, int theWidth, int theHeight)
 		mScrollbar->SetPageSize(aPageSize);
 }
 	
-int ListWidget::AddLine(const SexyString& theLine, bool alphabetical) 
+int ListWidget::AddLine(const std::string& theLine, bool alphabetical)
 {	
 	int anIdx = -1;
 	bool inserted = false;
@@ -211,18 +211,18 @@ int ListWidget::AddLine(const SexyString& theLine, bool alphabetical)
 }
 
 	
-void ListWidget::SetLine(int theIdx, const SexyString& theString) 
+void ListWidget::SetLine(int theIdx, const std::string& theString)
 {
 	mLines[theIdx] = theString;	
 	MarkDirty();
 }
 	
-int ListWidget::GetLineCount() 
+int ListWidget::GetLineCount()
 {
 	return mLines.size();	
 }
 	
-int ListWidget::GetLineIdx(const SexyString& theLine) 
+int ListWidget::GetLineIdx(const std::string& theLine)
 {	
 	for (ulong i = 0; i < mLines.size(); i++)	
 		if (sexystrcmp(mLines[i].c_str(), theLine.c_str()) == 0)
@@ -231,7 +231,7 @@ int ListWidget::GetLineIdx(const SexyString& theLine)
 	return -1;
 }
 	
-void ListWidget::SetColor(const SexyString& theLine, const Color& theColor) 
+void ListWidget::SetColor(const std::string& theLine, const Color& theColor)
 {
 	int anIdx = GetLineIdx(theLine);
 	SetLineColor(anIdx, theColor);	
@@ -378,7 +378,7 @@ void ListWidget::Draw(Graphics *g)
 		else
 			aClipG.SetColor(mLineColors[i]);
 
-		SexyString aString = mLines[i];
+		std::string aString = mLines[i];
 		int aFontX;
 		switch (mJustify) 
 		{

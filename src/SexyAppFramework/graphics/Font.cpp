@@ -54,22 +54,22 @@ int _Font::GetLineSpacing()
 }
 
 
-int _Font::StringWidth(const SexyString&)
+int _Font::StringWidth(const std::string&)
 {
 	return 0;
 }
 
 
-int _Font::CharWidth(SexyChar theChar)
+int _Font::CharWidth(char theChar)
 {
-	SexyString aString(1, theChar);
+	std::string aString(1, theChar);
 	return StringWidth(aString);
 }
 
-int _Font::CharWidthKern(SexyChar theChar, SexyChar)
+int _Font::CharWidthKern(char theChar, char)
 {
 	return CharWidth(theChar);
 }
 
-void _Font::DrawString(Graphics*, int, int, const SexyString&, const Color&, const Rect&){}
+void _Font::DrawString(Graphics*, int, int, const std::string&, const Color&, const Rect&){}
 

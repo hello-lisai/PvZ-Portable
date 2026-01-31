@@ -1,9 +1,8 @@
 #include "Common.h"
 #include "misc/MTRand.h"
-#include "misc/Debug.h"
-#include <locale>
-#include <codecvt>
-#include <errno.h>
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
 #include <filesystem>
 #include <chrono>
 #include <stdarg.h>
@@ -24,6 +23,11 @@ namespace Sexy
 	std::filesystem::path gAppDataFolder;
 	std::filesystem::path gResourceFolder;
 	std::string gResourceFolderStr; // Cached string to avoid repeated conversions
+}
+
+static inline char ToLowerAscii(char c)
+{
+	return (char)std::tolower((unsigned char)c);
 }
 
 void Sexy::PrintF(const char *text, ...)
@@ -93,412 +97,100 @@ std::string Sexy::GetResourcePath(const std::string& theRelativePath)
 	return (Sexy::gResourceFolder / theRelativePath).string();
 }
 
-
-std::string Sexy::URLEncode(const std::string& theString)
-{
-	char* aHexChars = (char*)"0123456789ABCDEF";
-
-	std::string aString;
-
-	for (unsigned i = 0; i < theString.length(); i++)
-	{
-		switch (theString[i])
-		{
-		case ' ':
-			aString.insert(aString.end(), '+');
-			break;
-		case '?':
-		case '&':
-		case '%':
-		case '+':
-		case '\r':
-		case '\n':
-		case '\t':
-			aString.insert(aString.end(), '%');
-			aString.insert(aString.end(), aHexChars[(theString[i] >> 4) & 0xF]);
-			aString.insert(aString.end(), aHexChars[(theString[i]     ) & 0xF]);
-			break;
-		default:
-			aString.insert(aString.end(), theString[i]);
-		}
-	}
-
-	return aString;
-}
-
 std::string Sexy::StringToUpper(const std::string& theString)
 {
-	std::string aString;
-
-	for (unsigned i = 0; i < theString.length(); i++)
-		aString += toupper(theString[i]);
-
-	return aString;
-}
-
-std::wstring Sexy::StringToUpper(const std::wstring& theString)
-{
-	std::wstring aString;
-
-	for (unsigned i = 0; i < theString.length(); i++)
-		aString += towupper(theString[i]);
-
+	std::string aString = theString;
+	std::transform(aString.begin(), aString.end(), aString.begin(),
+		[](unsigned char c) { return (char)std::toupper(c); });
 	return aString;
 }
 
 std::string Sexy::StringToLower(const std::string& theString)
 {
-	std::string aString;
-
-	for (unsigned i = 0; i < theString.length(); i++)
-		aString += tolower(theString[i]);
-
+	std::string aString = theString;
+	std::transform(aString.begin(), aString.end(), aString.begin(),
+		[](unsigned char c) { return (char)std::tolower(c); });
 	return aString;
-}
-
-std::wstring Sexy::StringToLower(const std::wstring& theString)
-{
-	std::wstring aString;
-
-	for (unsigned i = 0; i < theString.length(); i++)
-		aString += tolower(theString[i]);
-
-	return aString;
-}
-
-std::wstring Sexy::StringToWString(const std::string &theString)
-{
-	try
-	{
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> aConv;
-		return aConv.from_bytes(theString);
-	}
-	catch (const std::range_error&)
-	{
-		std::wstring aFallback;
-		aFallback.reserve(theString.length());
-		for (size_t i = 0; i < theString.length(); i++)
-			aFallback += (unsigned char)theString[i];
-		return aFallback;
-	}
-}
-
-std::string Sexy::WStringToString(const std::wstring &theString)
-{
-	try
-	{
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> aConv;
-		return aConv.to_bytes(theString);
-	}
-	catch (const std::range_error&)
-	{
-		std::string aFallback;
-		aFallback.reserve(theString.length());
-		for (auto ch : theString)
-			aFallback += (ch <= 0xFF) ? (char)ch : '?';
-		return aFallback;
-	}
-}
-
-SexyString Sexy::StringToSexyString(const std::string& theString)
-{
-#ifdef _USE_WIDE_STRING
-	return StringToWString(theString);
-#else
-	return SexyString(theString);
-#endif
-}
-
-SexyString Sexy::WStringToSexyString(const std::wstring &theString)
-{
-#ifdef _USE_WIDE_STRING
-	return SexyString(theString);
-#else
-	return WStringToString(theString);
-#endif
-}
-
-std::string Sexy::SexyStringToString(const SexyString& theString)
-{
-#ifdef _USE_WIDE_STRING
-	return WStringToString(theString);
-#else
-	return std::string(theString);
-#endif
-}
-
-std::wstring Sexy::SexyStringToWString(const SexyString& theString)
-{
-#ifdef _USE_WIDE_STRING
-	return std::wstring(theString);
-#else
-	return StringToWString(theString);
-#endif
 }
 
 std::string Sexy::Trim(const std::string& theString)
 {
-	int aStartPos = 0;
-	while ( aStartPos < (int) theString.length() && isspace(theString[aStartPos]) )
-		aStartPos++;
+	if (theString.empty())
+		return theString;
 
-	int anEndPos = theString.length() - 1;
-	while ( anEndPos >= 0 && isspace(theString[anEndPos]) )
-		anEndPos--;
+	size_t start = 0;
+	while (start < theString.size() && std::isspace((unsigned char)theString[start]))
+		++start;
 
-	return theString.substr(aStartPos, anEndPos - aStartPos + 1);
+	if (start == theString.size())
+		return std::string();
+
+	size_t end = theString.size() - 1;
+	while (end > start && std::isspace((unsigned char)theString[end]))
+		--end;
+
+	return theString.substr(start, end - start + 1);
 }
 
-std::wstring Sexy::Trim(const std::wstring& theString)
-{   //0x5AFD80
-	int aStartPos = 0;
-	while ( aStartPos < (int) theString.length() && iswspace(theString[aStartPos]) )
-		aStartPos++;
-
-	int anEndPos = theString.length() - 1;
-	while ( anEndPos >= 0 && iswspace(theString[anEndPos]) )
-		anEndPos--;
-
-	return theString.substr(aStartPos, anEndPos - aStartPos + 1);
-}
-
-bool Sexy::StringToInt(const std::string theString, int* theIntVal)
+bool Sexy::StringToInt(const std::string& theString, int* theIntVal)
 {
+	if (theIntVal == nullptr)
+		return false;
+
 	*theIntVal = 0;
-
-	if (theString.length() == 0)
+	if (theString.empty())
 		return false;
 
-	int theRadix = 10;
-	bool isNeg = false;
-
-	unsigned i = 0;
-	if (theString[i] == '-')
-	{
-		isNeg = true;
-		i++;
-	}
-
-	for (; i < theString.length(); i++)
-	{
-		char aChar = theString[i];
-		
-		if ((theRadix == 10) && (aChar >= '0') && (aChar <= '9'))
-			*theIntVal = (*theIntVal * 10) + (aChar - '0');
-		else if ((theRadix == 0x10) && 
-			(((aChar >= '0') && (aChar <= '9')) || 
-			 ((aChar >= 'A') && (aChar <= 'F')) || 
-			 ((aChar >= 'a') && (aChar <= 'f'))))
-		{			
-			if (aChar <= '9')
-				*theIntVal = (*theIntVal * 0x10) + (aChar - '0');
-			else if (aChar <= 'F')
-				*theIntVal = (*theIntVal * 0x10) + (aChar - 'A') + 0x0A;
-			else
-				*theIntVal = (*theIntVal * 0x10) + (aChar - 'a') + 0x0A;
-		}
-		else if (((aChar == 'x') || (aChar == 'X')) && (i == 1) && (*theIntVal == 0))
-		{
-			theRadix = 0x10;
-		}
-		else
-		{
-			*theIntVal = 0;
-			return false;
-		}
-	}
-
-	if (isNeg)
-		*theIntVal = -*theIntVal;
-
+	const char* start = theString.c_str();
+	char* end = nullptr;
+	long value = std::strtol(start, &end, 0);
+	if (end != start + theString.size())
+		return false;
+	*theIntVal = (int)value;
 	return true;
 }
 
-bool Sexy::StringToInt(const std::wstring theString, int* theIntVal)
+bool Sexy::StringToDouble(const std::string& theString, double* theDoubleVal)
 {
-	*theIntVal = 0;
-
-	if (theString.length() == 0)
+	if (theDoubleVal == nullptr)
 		return false;
 
-	int theRadix = 10;
-	bool isNeg = false;
-
-	unsigned i = 0;
-	if (theString[i] == '-')
-	{
-		isNeg = true;
-		i++;
-	}
-
-	for (; i < theString.length(); i++)
-	{
-		wchar_t aChar = theString[i];
-		
-		if ((theRadix == 10) && (aChar >= L'0') && (aChar <= L'9'))
-			*theIntVal = (*theIntVal * 10) + (aChar - L'0');
-		else if ((theRadix == 0x10) && 
-			(((aChar >= L'0') && (aChar <= L'9')) || 
-			 ((aChar >= L'A') && (aChar <= L'F')) || 
-			 ((aChar >= L'a') && (aChar <= L'f'))))
-		{			
-			if (aChar <= L'9')
-				*theIntVal = (*theIntVal * 0x10) + (aChar - L'0');
-			else if (aChar <= L'F')
-				*theIntVal = (*theIntVal * 0x10) + (aChar - L'A') + 0x0A;
-			else
-				*theIntVal = (*theIntVal * 0x10) + (aChar - L'a') + 0x0A;
-		}
-		else if (((aChar == L'x') || (aChar == L'X')) && (i == 1) && (*theIntVal == 0))
-		{
-			theRadix = 0x10;
-		}
-		else
-		{
-			*theIntVal = 0;
-			return false;
-		}
-	}
-
-	if (isNeg)
-		*theIntVal = -*theIntVal;
-
-	return true;
-}
-
-bool Sexy::StringToDouble(const std::string theString, double* theDoubleVal)
-{
 	*theDoubleVal = 0.0;
-
-	if (theString.length() == 0)
+	if (theString.empty())
 		return false;
 
-	bool isNeg = false;
-
-	unsigned i = 0;
-	if (theString[i] == '-')
-	{
-		isNeg = true;
-		i++;
-	}
-
-	for (; i < theString.length(); i++)
-	{
-		char aChar = theString[i];
-
-		if ((aChar >= '0') && (aChar <= '9'))
-			*theDoubleVal = (*theDoubleVal * 10) + (aChar - '0');
-		else if (aChar == '.')
-		{
-			i++;
-			break;
-		}
-		else
-		{
-			*theDoubleVal = 0.0;
-			return false;
-		}
-	}
-
-	double aMult = 0.1;
-	for (; i < theString.length(); i++)
-	{
-		char aChar = theString[i];
-
-		if ((aChar >= '0') && (aChar <= '9'))
-		{
-			*theDoubleVal += (aChar - '0') * aMult;	
-			aMult /= 10.0;
-		}
-		else
-		{
-			*theDoubleVal = 0.0;
-			return false;
-		}
-	}
-
-	if (isNeg)
-		*theDoubleVal = -*theDoubleVal;
-
-	return true;
-}
-
-bool Sexy::StringToDouble(const std::wstring theString, double* theDoubleVal)
-{
-	*theDoubleVal = 0.0;
-
-	if (theString.length() == 0)
+	const char* start = theString.c_str();
+	char* end = nullptr;
+	double value = std::strtod(start, &end);
+	if (end != start + theString.size())
 		return false;
-
-	bool isNeg = false;
-
-	unsigned i = 0;
-	if (theString[i] == '-')
-	{
-		isNeg = true;
-		i++;
-	}
-
-	for (; i < theString.length(); i++)
-	{
-		wchar_t aChar = theString[i];
-
-		if ((aChar >= L'0') && (aChar <= L'9'))
-			*theDoubleVal = (*theDoubleVal * 10) + (aChar - L'0');
-		else if (aChar == L'.')
-		{
-			i++;
-			break;
-		}
-		else
-		{
-			*theDoubleVal = 0.0;
-			return false;
-		}
-	}
-
-	double aMult = 0.1;
-	for (; i < theString.length(); i++)
-	{
-		wchar_t aChar = theString[i];
-
-		if ((aChar >= L'0') && (aChar <= L'9'))
-		{
-			*theDoubleVal += (aChar - L'0') * aMult;	
-			aMult /= 10.0;
-		}
-		else
-		{
-			*theDoubleVal = 0.0;
-			return false;
-		}
-	}
-
-	if (isNeg)
-		*theDoubleVal = -*theDoubleVal;
-
+	*theDoubleVal = value;
 	return true;
 }
 
 // TODO: Use <locale> for localization of number output?
-SexyString Sexy::CommaSeperate(int theValue)
+std::string Sexy::CommaSeperate(int theValue)
 {	
 	if (theValue == 0)
-		return __S("0");
+		return "0";
 
-	SexyString aCurString;
+	bool isNeg = theValue < 0;
+	unsigned int aCurValue = isNeg ? (unsigned int)(-theValue) : (unsigned int)theValue;
+
+	std::string aCurString;
 
 	int aPlace = 0;
-	int aCurValue = theValue;
-
 	while (aCurValue > 0)
 	{
 		if ((aPlace != 0) && (aPlace % 3 == 0))
-			aCurString = __S(',') + aCurString;
-		aCurString = (SexyChar) (__S('0') + (aCurValue % 10)) + aCurString;
+			aCurString = ',' + aCurString;
+		aCurString = static_cast<char>('0' + (aCurValue % 10)) + aCurString;
 		aCurValue /= 10;
 		aPlace++;
 	}
+
+	if (isNeg)
+		aCurString = '-' + aCurString;
 
 	return aCurString;
 }
@@ -613,57 +305,34 @@ time_t Sexy::GetFileDate(const std::string& theFileName)
 
 std::string Sexy::vformat(const char* fmt, va_list argPtr) 
 {
-    // We draw the line at a 1MB string.
-    const int maxSize = 1000000;
+	va_list argsCopy;
+	va_copy(argsCopy, argPtr);
 
-    // If the string is less than 161 characters,
-    // allocate it on the stack because this saves
-    // the malloc/free time.
-    const int bufSize = 161;
-	char stackBuffer[bufSize];
-
-    int attemptedSize = bufSize - 1;
-
-	int numChars = 0;
 #ifdef _WIN32
-	numChars = _vsnprintf(stackBuffer, attemptedSize, fmt, argPtr);
+	int required = _vscprintf(fmt, argsCopy);
 #else
-	numChars = vsnprintf(stackBuffer, attemptedSize, fmt, argPtr);
+	int required = vsnprintf(nullptr, 0, fmt, argsCopy);
 #endif
+	va_end(argsCopy);
 
-	//cout << "NumChars: " << numChars << endl;
+	if (required <= 0)
+		return std::string();
 
-    if ((numChars >= 0) && (numChars <= attemptedSize)) 
-	{
-		// Needed for case of 160-character printf thing
-		stackBuffer[numChars] = '\0';
+	std::string result;
+	result.resize((size_t)required + 1);
 
-        // Got it on the first try.
-		return std::string(stackBuffer);
-    }
-
-    // Now use the heap.
-    char* heapBuffer = nullptr;
-
-    while (((numChars == -1) || (numChars > attemptedSize)) && 
-		(attemptedSize < maxSize)) 
-	{
-        // Try a bigger size
-        attemptedSize *= 2;
-		heapBuffer = (char*)realloc(heapBuffer, (attemptedSize + 1));
+	va_list argsCopy2;
+	va_copy(argsCopy2, argPtr);
 #ifdef _WIN32
-		numChars = _vsnprintf(heapBuffer, attemptedSize, fmt, argPtr);
+	_vsnprintf(result.data(), (size_t)required + 1, fmt, argsCopy2);
 #else
-		numChars = vsnprintf(heapBuffer, attemptedSize, fmt, argPtr);
+	vsnprintf(result.data(), (size_t)required + 1, fmt, argsCopy2);
 #endif
-    }
+	va_end(argsCopy2);
 
-	heapBuffer[numChars] = 0;
+	result.resize((size_t)required);
 
-	std::string result = std::string(heapBuffer);
-
-    free(heapBuffer);
-    return result;
+	return result;
 }
 
 //overloaded StrFormat: should only be used by the xml strings
@@ -672,73 +341,6 @@ std::string Sexy::StrFormat(const char* fmt ...)
     va_list argList;
     va_start(argList, fmt);
 	std::string result = vformat(fmt, argList);
-    va_end(argList);
-
-    return result;
-}
-
-std::wstring Sexy::vformat(const wchar_t* fmt, va_list argPtr) 
-{
-    // We draw the line at a 1MB string.
-    const int maxSize = 1000000;
-
-    // If the string is less than 161 characters,
-    // allocate it on the stack because this saves
-    // the malloc/free time.
-    const int bufSize = 161;
-	wchar_t stackBuffer[bufSize];
-
-    int attemptedSize = bufSize - 1;
-
-	int numChars = 0;
-#ifdef _WIN32
-	numChars = _vsnwprintf(stackBuffer, attemptedSize, fmt, argPtr);
-#else
-	numChars = vswprintf(stackBuffer, attemptedSize, fmt, argPtr);
-#endif
-
-	//cout << "NumChars: " << numChars << endl;
-
-    if ((numChars >= 0) && (numChars <= attemptedSize)) 
-	{
-		// Needed for case of 160-character printf thing
-		stackBuffer[numChars] = '\0';
-
-        // Got it on the first try.
-		return std::wstring(stackBuffer);
-    }
-
-    // Now use the heap.
-	wchar_t* heapBuffer = nullptr;
-
-    while (((numChars == -1) || (numChars > attemptedSize)) && 
-		(attemptedSize < maxSize)) 
-	{
-        // Try a bigger size
-        attemptedSize *= 2;
-		heapBuffer = (wchar_t*)realloc(heapBuffer, (attemptedSize + 1));
-#ifdef _WIN32
-		numChars = _vsnwprintf(heapBuffer, attemptedSize, fmt, argPtr);
-#else
-		numChars = vswprintf(heapBuffer, attemptedSize, fmt, argPtr);
-#endif
-    }
-
-	heapBuffer[numChars] = 0;
-
-	std::wstring result = std::wstring(heapBuffer);
-
-    free(heapBuffer);
-
-    return result;
-}
-
-//overloaded StrFormat: should only be used by the xml strings
-std::wstring Sexy::StrFormat(const wchar_t* fmt ...)
-{
-    va_list argList;
-    va_start(argList, fmt);
-	std::wstring result = vformat(fmt, argList);
     va_end(argList);
 
     return result;
@@ -768,8 +370,7 @@ std::string Sexy::Evaluate(const std::string& theString, const DefinesMap& theDe
 		else
 			aValue = "";		
 
-		anEvaluatedString.erase(anEvaluatedString.begin() + aPercentPos, anEvaluatedString.begin() + aSecondPercentPos + 1);
-		anEvaluatedString.insert(anEvaluatedString.begin() + aPercentPos, aValue.begin(), aValue.begin() + aValue.length());
+		anEvaluatedString.replace(aPercentPos, aSecondPercentPos - aPercentPos + 1, aValue);
 	}
 
 	return anEvaluatedString;
@@ -778,20 +379,24 @@ std::string Sexy::Evaluate(const std::string& theString, const DefinesMap& theDe
 std::string Sexy::XMLDecodeString(const std::string& theString)
 {
 	std::string aNewString;
+	aNewString.reserve(theString.size());
+
+	if (theString.find('&') == std::string::npos)
+		return theString;
 
 	// unused
 	//int aUTF8Len = 0;
 	//int aUTF8CurVal = 0;
 
-	for (ulong i = 0; i < theString.length(); i++)
+	for (size_t i = 0; i < theString.length(); i++)
 	{
 		char c = theString[i];
 
 		if (c == '&')
 		{
-			int aSemiPos = theString.find(';', i);
+			size_t aSemiPos = theString.find(';', i);
 
-			if (aSemiPos != -1)
+			if (aSemiPos != std::string::npos)
 			{
 				std::string anEntName = theString.substr(i+1, aSemiPos-i-1);
 				i = aSemiPos;
@@ -819,57 +424,14 @@ std::string Sexy::XMLDecodeString(const std::string& theString)
 	return aNewString;
 }
 
-std::wstring Sexy::XMLDecodeString(const std::wstring& theString)
-{
-	std::wstring aNewString;
-
-	// unused
-	//int aUTF8Len = 0;
-	//int aUTF8CurVal = 0;
-
-	for (ulong i = 0; i < theString.length(); i++)
-	{
-		wchar_t c = theString[i];
-
-		if (c == L'&')
-		{
-			int aSemiPos = theString.find(L';', i);
-
-			if (aSemiPos != -1)
-			{
-				std::wstring anEntName = theString.substr(i+1, aSemiPos-i-1);
-				i = aSemiPos;
-											
-				if (anEntName == L"lt")
-					c = L'<';
-				else if (anEntName == L"amp")
-					c = L'&';
-				else if (anEntName == L"gt")
-					c = L'>';
-				else if (anEntName == L"quot")
-					c = L'"';
-				else if (anEntName == L"apos")
-					c = L'\'';
-				else if (anEntName == L"nbsp")
-					c = L' ';
-				else if (anEntName == L"cr")
-					c = L'\n';
-			}
-		}				
-		
-		aNewString += c;
-	}
-
-	return aNewString;
-}
-
 std::string Sexy::XMLEncodeString(const std::string& theString)
 {
 	std::string aNewString;
+	aNewString.reserve(theString.size() * 2);
 
 	bool hasSpace = false;
 
-	for (ulong i = 0; i < theString.length(); i++)
+	for (size_t i = 0; i < theString.length(); i++)
 	{
 		char c = theString[i];
 
@@ -924,110 +486,31 @@ std::string Sexy::XMLEncodeString(const std::string& theString)
 	return aNewString;
 }
 
-std::wstring Sexy::XMLEncodeString(const std::wstring& theString)
-{
-	std::wstring aNewString;
-
-	bool hasSpace = false;
-
-	for (ulong i = 0; i < theString.length(); i++)
-	{
-		wchar_t c = theString[i];
-
-		if (c == ' ')
-		{
-			if (hasSpace)
-			{
-				aNewString += L"&nbsp;";
-				continue;
-			}
-			
-			hasSpace = true;
-		}
-		else
-			hasSpace = false;
-
-		/*if ((uchar) c >= 0x80)
-		{
-			// Convert to UTF
-			aNewString += (char) (0xC0 | ((c >> 6) & 0xFF));
-			aNewString += (char) (0x80 | (c & 0x3F));
-		}
-		else*/
-		{		
-			switch (c)
-			{
-			case L'<':
-				aNewString += L"&lt;";
-				break;
-			case L'&':		
-				aNewString += L"&amp;";
-				break;
-			case L'>':
-				aNewString += L"&gt;";
-				break;
-			case L'"':
-				aNewString += L"&quot;";
-				break;
-			case L'\'':
-				aNewString += L"&apos;";
-				break;
-			case L'\n':
-				aNewString += L"&cr;";
-				break;
-			default:
-				aNewString += c;
-				break;
-			}
-		}
-	}
-
-	return aNewString;
-}
-
 std::string Sexy::Upper(const std::string& _data)
 {
-	std::string s = _data;
-	std::transform(s.begin(), s.end(), s.begin(), toupper);
-	return s;
-}
-
-std::wstring Sexy::Upper(const std::wstring& _data)
-{
-	std::wstring s = _data;
-	std::transform(s.begin(), s.end(), s.begin(), towupper);
-	return s;
+	return StringToUpper(_data);
 }
 
 std::string Sexy::Lower(const std::string& _data)
 {
-	std::string s = _data;
-	std::transform(s.begin(), s.end(), s.begin(), tolower);
-	return s;
-}
-
-std::wstring Sexy::Lower(const std::wstring& _data)
-{
-	std::wstring s = _data;
-	std::transform(s.begin(), s.end(), s.begin(), towlower);
-	return s;
+	return StringToLower(_data);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 int Sexy::StrFindNoCase(const char *theStr, const char *theFind)
 {
-	int p1,p2;
+	int p1, p2;
 	int cp = 0;
 	const int len1 = (int)strlen(theStr);
 	const int len2 = (int)strlen(theFind);
-	while(cp < len1)
+	while (cp < len1)
 	{
 		p1 = cp;
 		p2 = 0;
-		while(p1<len1 && p2<len2)
+		while (p1 < len1 && p2 < len2)
 		{
-			if(tolower(theStr[p1])!=tolower(theFind[p2]))
+			if (ToLowerAscii(theStr[p1]) != ToLowerAscii(theFind[p2]))
 				break;
 
 			p1++; p2++;
@@ -1049,8 +532,8 @@ bool Sexy::StrPrefixNoCase(const char *theStr, const char *thePrefix, int maxLen
 	char c1 = 0, c2 = 0;
 	for (i=0; i<maxLength; i++)
 	{
-		c1 = tolower(*theStr++);
-		c2 = tolower(*thePrefix++);
+		c1 = ToLowerAscii(*theStr++);
+		c2 = ToLowerAscii(*thePrefix++);
 
 		if (c1==0 || c2==0)
 			break;
@@ -1060,20 +543,6 @@ bool Sexy::StrPrefixNoCase(const char *theStr, const char *thePrefix, int maxLen
 	}
 
 	return c2==0 || i==maxLength;
-}
-
-std::wstring Sexy::UTF8StringToWString(const std::string theString)
-{
-	std::wstring_convert<std::codecvt_utf8<wchar_t> > cv;
-	return cv.from_bytes(theString);
-	/*
-	int size = MultiByteToWideChar(CP_UTF8, 0, theString.c_str(), theString.length() + 1, nullptr, 0);
-	wchar_t* buffer = new wchar_t[size];
-	MultiByteToWideChar(CP_UTF8, 0, theString.c_str(), theString.length() + 1, buffer, size);
-	std::wstring result = buffer;
-	delete[] buffer;
-	return result;
-	*/
 }
 
 void Sexy::SMemR(void*& _Src, void* _Dst, size_t _Size)
@@ -1087,7 +556,8 @@ void Sexy::SMemRStr(void*& _Src, std::string& theString)
 	size_t aStrLen;
 	SMemR(_Src, &aStrLen, sizeof(aStrLen));
 	theString.resize(aStrLen);
-	SMemR(_Src, (void*)theString.c_str(), aStrLen);
+	if (aStrLen > 0)
+		SMemR(_Src, &theString[0], aStrLen);
 }
 
 void Sexy::SMemW(void*& _Dst, const void* _Src, size_t _Size)

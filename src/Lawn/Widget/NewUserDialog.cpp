@@ -64,27 +64,27 @@ void NewUserDialog::Draw(Graphics* g)
 }
 
 //0x45D9D0
-void NewUserDialog::EditWidgetText(int theId, const SexyString& theString)
+void NewUserDialog::EditWidgetText(int theId, const std::string& theString)
 {
 	(void)theId;(void)theString;
 	mApp->ButtonDepress(mId + 2000);
 }
 
 //0x45D9F0
-bool NewUserDialog::AllowChar(int, SexyChar theChar)
+bool NewUserDialog::AllowChar(int, char theChar)
 {
 	return sexyisalnum(theChar) || theChar == __S(' ');
 }
 
 //0x45DA20
-SexyString NewUserDialog::GetName()
+std::string NewUserDialog::GetName()
 {
-	SexyString aString;
-	SexyChar aLastChar = __S(' ');
+	std::string aString;
+	char aLastChar = __S(' ');
 
 	for (size_t i = 0; i < mNameEditWidget->mString.size(); i++)
 	{
-		SexyChar aChar = mNameEditWidget->mString[i];
+		char aChar = mNameEditWidget->mString[i];
 		if (aChar != __S(' '))
 		{
 			aString.append(1, aChar);
@@ -105,7 +105,7 @@ SexyString NewUserDialog::GetName()
 	return aString;
 }
 
-void NewUserDialog::SetName(const SexyString& theName)
+void NewUserDialog::SetName(const std::string& theName)
 {
 	mNameEditWidget->SetText(theName, true);
 	mNameEditWidget->mCursorPos = theName.size();

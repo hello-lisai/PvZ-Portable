@@ -557,7 +557,7 @@ void SeedChooserScreen::Update()
 }
 
 //0x485340
-bool SeedChooserScreen::DisplayRepickWarningDialog(const SexyChar* theMessage)
+bool SeedChooserScreen::DisplayRepickWarningDialog(const char* theMessage)
 {
 	return mApp->LawnMessageBox(
 		Dialogs::DIALOG_CHOOSER_WARNING, 
@@ -607,7 +607,7 @@ bool SeedChooserScreen::CheckSeedUpgrade(SeedType theSeedTypeTo, SeedType theSee
 	if (mApp->IsSurvivalMode() || !PickedPlantType(theSeedTypeTo) || PickedPlantType(theSeedTypeFrom))
 		return true;
 
-	SexyString aWarning = TodStringTranslate(__S("[SEED_CHOOSER_UPGRADE_WARNING]"));
+	std::string aWarning = TodStringTranslate(__S("[SEED_CHOOSER_UPGRADE_WARNING]"));
 	aWarning = TodReplaceString(aWarning, __S("{UPGRADE_TO}"), Plant::GetNameString(theSeedTypeTo));
 	aWarning = TodReplaceString(aWarning, __S("{UPGRADE_FROM}"), Plant::GetNameString(theSeedTypeFrom));
 	return DisplayRepickWarningDialog(aWarning.c_str());
@@ -1138,7 +1138,7 @@ void SeedChooserScreen::KeyDown(KeyCode theKey)
 }
 
 //0x486EA0
-void SeedChooserScreen::KeyChar(SexyChar theChar)
+void SeedChooserScreen::KeyChar(char theChar)
 {
 	if (mChooseState == CHOOSE_VIEW_LAWN && (theChar == ' ' || theChar == '\r' || theChar == '\u001B'))
 		CancelLawnView();

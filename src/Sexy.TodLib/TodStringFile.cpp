@@ -119,7 +119,7 @@ bool TodStringListReadItems(const char* theFileText)
 			return false;
 
 		std::string aNameUpper = Sexy::StringToUpper(aName);
-		gSexyAppBase->SetString(aNameUpper, Sexy::StringToWString(aValue));
+		gSexyAppBase->SetString(aNameUpper, aValue);
 	}
 }
 
@@ -162,13 +162,12 @@ void TodStringListLoad(const char* theFileName)
 }
 
 //0x519410
-SexyString TodStringListFind(const SexyString& theName)
+std::string TodStringListFind(const std::string& theName)
 {
-	std::string aNameString = Sexy::SexyStringToString(theName);
-	StringWStringMap::iterator anItr = gSexyAppBase->mStringProperties.find(aNameString);
+	StringSexyStringMap::iterator anItr = gSexyAppBase->mStringProperties.find(theName);
 	if (anItr != gSexyAppBase->mStringProperties.end())
 	{
-		return Sexy::WStringToSexyString(anItr->second);
+		return anItr->second;
 	}
 	else
 	{
@@ -178,25 +177,25 @@ SexyString TodStringListFind(const SexyString& theName)
 
 //0x519520
 // GOTY @Patoke: 0x523B90
-SexyString TodStringTranslate(const SexyString& theString)
+std::string TodStringTranslate(const std::string& theString)
 {
 	if (theString.size() >= 3 && theString[0] == '[')
 	{
-		SexyString aName = theString.substr(1, theString.size() - 2);  // 取“[”与“]”中间的部分
+		std::string aName = theString.substr(1, theString.size() - 2);  // 取“[”与“]”中间的部分
 		return TodStringListFind(aName);
 	}
 	return theString;
 }
 
 //0x5195D0
-SexyString TodStringTranslate(const SexyChar* theString)
+std::string TodStringTranslate(const char* theString)
 {
 	if (theString != nullptr)
 	{
 		int aLen = strlen(theString);
 		if (aLen >= 3 && theString[0] == '[')
 		{
-			SexyString aName(theString, 1, aLen - 2);  // 取“[”与“]”中间的部分
+			std::string aName(theString, 1, aLen - 2);  // 取“[”与“]”中间的部分
 			return TodStringListFind(aName);
 		}
 		else
@@ -207,11 +206,11 @@ SexyString TodStringTranslate(const SexyChar* theString)
 }
 
 //0x5196C0
-bool TodStringListExists(const SexyString& theString)
+bool TodStringListExists(const std::string& theString)
 {
 	if (theString.size() >= 3 && theString[0] == '[')
 	{
-		SexyString aName = theString.substr(1, theString.size() - 2);  // 取“[”与“]”中间的部分
+		std::string aName = theString.substr(1, theString.size() - 2);  // 取“[”与“]”中间的部分
 		return gSexyAppBase->mStringProperties.find(aName) != gSexyAppBase->mStringProperties.end();
 	}
 	return false;
@@ -243,7 +242,7 @@ bool CharIsSpaceInFormat(char theChar, const TodStringListFormat& theCurrentForm
 }
 
 //0x519870
-int TodWriteString(Graphics* g, const SexyString& theString, int theX, int theY, TodStringListFormat& theCurrentFormat, int theWidth, DrawStringJustification theJustification, bool drawString, int theOffset, int theLength)
+int TodWriteString(Graphics* g, const std::string& theString, int theX, int theY, TodStringListFormat& theCurrentFormat, int theWidth, DrawStringJustification theJustification, bool drawString, int theOffset, int theLength)
 {
 	_Font* aFont = *theCurrentFormat.mNewFont;
 	if (drawString)  // 如果需要实际绘制
@@ -270,7 +269,7 @@ int TodWriteString(Graphics* g, const SexyString& theString, int theX, int theY,
 	else
 		theLength = theOffset + theLength;  // 将 theLength 更改为子串结束位置
 
-	SexyString aString;
+	std::string aString;
 	int aXOffset = 0;
 	bool aPrevCharWasSpace = false;
 	for (int i = theOffset; i < theLength; i++)
@@ -314,7 +313,7 @@ int TodWriteString(Graphics* g, const SexyString& theString, int theX, int theY,
 	return aXOffset + aFont->StringWidth(aString);
 }
 
-int TodWriteWordWrappedHelper(Graphics* g, const SexyString& theString, int theX, int theY, TodStringListFormat& theCurrentFormat, int theWidth, DrawStringJustification theJustification, bool drawString, int theOffset, int theLength, int theMaxChars)
+int TodWriteWordWrappedHelper(Graphics* g, const std::string& theString, int theX, int theY, TodStringListFormat& theCurrentFormat, int theWidth, DrawStringJustification theJustification, bool drawString, int theOffset, int theLength, int theMaxChars)
 {
 	if (theOffset + theLength > theMaxChars)  // 如果指定子串超出了字符串的最大长度
 	{
@@ -327,7 +326,7 @@ int TodWriteWordWrappedHelper(Graphics* g, const SexyString& theString, int theX
 
 //0x519B50
 // GOTY @Patoke: 0x5241C0
-int TodDrawStringWrappedHelper(Graphics* g, const SexyString& theText, const Rect& theRect, _Font* theFont, const Color& theColor, DrawStringJustification theJustification, bool drawString)
+int TodDrawStringWrappedHelper(Graphics* g, const std::string& theText, const Rect& theRect, _Font* theFont, const Color& theColor, DrawStringJustification theJustification, bool drawString)
 {
 	int theMaxChars = theText.size();
 	TodStringListFormat aCurrentFormat;
@@ -339,12 +338,12 @@ int TodDrawStringWrappedHelper(Graphics* g, const SexyString& theText, const Rec
 
 	int aYOffset = theFont->GetAscent() - theFont->GetAscentPadding();
 	int aLineSpacing = theFont->GetLineSpacing() + aCurrentFormat.mLineSpacingOffset;
-	SexyString aCurString;
+	std::string aCurString;
 	size_t aLineFeedPos = 0;
 	size_t aCurPos = 0;
 	int aCurWidth = 0;
-	SexyChar aCurChar = '\0';
-	SexyChar aPrevChar = '\0';
+	char aCurChar = '\0';
+	char aPrevChar = '\0';
 	int aSpacePos = -1;
 	int aMaxWidth = 0;
 	while (aCurPos < theText.size())
@@ -476,9 +475,9 @@ int TodDrawStringWrappedHelper(Graphics* g, const SexyString& theText, const Rec
 
 //0x51A040
 // GOTY @Patoke: 0x5246A0
-void TodDrawStringWrapped(Graphics* g, const SexyString& theText, const Rect& theRect, _Font* theFont, const Color& theColor, DrawStringJustification theJustification)
+void TodDrawStringWrapped(Graphics* g, const std::string& theText, const Rect& theRect, _Font* theFont, const Color& theColor, DrawStringJustification theJustification)
 {
-	SexyString aTextFinal = TodStringTranslate(theText);
+	std::string aTextFinal = TodStringTranslate(theText);
 	Rect aRectTodUse = theRect;
 	if (theJustification == DrawStringJustification::DS_ALIGN_LEFT_VERTICAL_MIDDLE ||
 		theJustification == DrawStringJustification::DS_ALIGN_RIGHT_VERTICAL_MIDDLE ||

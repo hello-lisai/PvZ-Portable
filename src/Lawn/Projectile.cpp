@@ -98,7 +98,7 @@ void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, in
 	}
 	else if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
 	{
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 	}
 	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG)
 	{
@@ -1032,7 +1032,7 @@ void Projectile::Draw(Graphics* g)
 	}
 	else
 	{
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 	}
 
 	bool aMirror = false;

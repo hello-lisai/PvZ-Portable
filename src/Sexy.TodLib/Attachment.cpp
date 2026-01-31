@@ -73,7 +73,7 @@ void Attachment::Update()
 		}
 
 		default:
-			TOD_ASSERT();
+			TOD_ASSERT(false);
 			break;
 		}
 

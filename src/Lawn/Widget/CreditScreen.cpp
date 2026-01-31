@@ -591,7 +591,7 @@ Reanimation* CreditScreen::PlayReanim(int aIndex)
     }
     else
     {
-        TOD_ASSERT();
+        TOD_ASSERT(false);
         return nullptr;
     }
 
@@ -1574,7 +1574,7 @@ void CreditScreen::JumpToFrame(CreditsPhase thePhase, float theFrame)
     //((TodsHackyUnprotectedPerfTimer*)&mTimerSinceStart)->SetStartTime(aJumpMilliseconds);
 }
 
-void CreditScreen::KeyChar(SexyChar theChar)
+void CreditScreen::KeyChar(char theChar)
 {
     if (mCreditsPaused || !mApp->mDebugKeysEnabled)
         return;

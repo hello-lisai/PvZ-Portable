@@ -4,6 +4,7 @@
 #include "SexyAppBase.h"
 #include "MemoryImage.h"
 #include "graphics/GLImage.h"
+#include <algorithm>
 #include <mutex>
 #include "fcaseopen/fcaseopen.h"
 
@@ -142,7 +143,7 @@ FontLayer::FontLayer(const FontLayer& theFontLayer) :
 	}
 }
 
-CharData* FontLayer::GetCharData(SexyChar theChar)
+CharData* FontLayer::GetCharData(char theChar)
 {
 	auto anItr = mCharDataMap.find(theChar);
 	if (anItr == mCharDataMap.end())
@@ -259,6 +260,67 @@ static char32_t UTF8CharToUTF32Char(const std::string &theString)
 	char32_t ret = 0;
 	memcpy(&ret, theString.data(), theString.length());
 	return ret;
+}
+
+static bool UTF8DecodeNext(const std::string& theString, size_t& offset, char32_t& outChar)
+{
+	if (offset >= theString.size())
+		return false;
+
+	unsigned char first = static_cast<unsigned char>(theString[offset]);
+	if (first < 0x80)
+	{
+		outChar = first;
+		offset += 1;
+		return true;
+	}
+
+	size_t length = 0;
+	if ((first & 0xE0) == 0xC0)
+		length = 2;
+	else if ((first & 0xF0) == 0xE0)
+		length = 3;
+	else if ((first & 0xF8) == 0xF0)
+		length = 4;
+	else
+		return false;
+
+	if (offset + length > theString.size())
+		return false;
+
+	for (size_t i = 1; i < length; ++i)
+	{
+		unsigned char c = static_cast<unsigned char>(theString[offset + i]);
+		if ((c & 0xC0) != 0x80)
+			return false;
+	}
+
+	char32_t value = 0;
+	if (length == 2)
+		value = ((first & 0x1F) << 6) | (static_cast<unsigned char>(theString[offset + 1]) & 0x3F);
+	else if (length == 3)
+		value = ((first & 0x0F) << 12) |
+				((static_cast<unsigned char>(theString[offset + 1]) & 0x3F) << 6) |
+				(static_cast<unsigned char>(theString[offset + 2]) & 0x3F);
+	else
+		value = ((first & 0x07) << 18) |
+				((static_cast<unsigned char>(theString[offset + 1]) & 0x3F) << 12) |
+				((static_cast<unsigned char>(theString[offset + 2]) & 0x3F) << 6) |
+				(static_cast<unsigned char>(theString[offset + 3]) & 0x3F);
+
+	outChar = value;
+	offset += length;
+	return true;
+}
+
+static bool UTF8PairToUTF32Pair(const std::string& theString, char32_t& firstChar, char32_t& secondChar)
+{
+	size_t offset = 0;
+	if (!UTF8DecodeNext(theString, offset, firstChar))
+		return false;
+	if (!UTF8DecodeNext(theString, offset, secondChar))
+		return false;
+	return offset == theString.size();
 }
 
 bool FontData::HandleCommand(const ListDataElement& theParams)
@@ -944,11 +1006,12 @@ bool FontData::HandleCommand(const ListDataElement& theParams)
 				{
 					for (uint32_t i = 0; i < aPairsVector.size(); i++)
 					{
-						std::wstring aWString = UTF8StringToWString(aPairsVector[i]);
-						if (aWString.length() == 2)
+						char32_t firstChar = 0;
+						char32_t secondChar = 0;
+						if (UTF8PairToUTF32Pair(aPairsVector[i], firstChar, secondChar))
 						{
 							//aLayer->mCharData[(uchar) aPairsVector[i][0]].mKerningOffsets[(uchar) aPairsVector[i][1]] = anOffsetsVector[i];
-							aLayer->GetCharData(aWString[0])->mKerningOffsets[aWString[1]] = anOffsetsVector[i];
+							aLayer->GetCharData(firstChar)->mKerningOffsets[secondChar] = anOffsetsVector[i];
 						}
 						else
 							invalidParamFormat = true;
@@ -1439,13 +1502,13 @@ void ImageFont::GenerateActiveFontLayers()
 	}
 }
 
-int ImageFont::StringWidth(const SexyString& theString)
+int ImageFont::StringWidth(const std::string& theString)
 {
 	int aWidth = 0;
-	SexyChar aPrevChar = 0;
+	char aPrevChar = 0;
 	for (int i = 0; i < (int)theString.length(); i++)
 	{
-		SexyChar aChar = theString[i];
+		char aChar = theString[i];
 		aWidth += CharWidthKern(aChar, aPrevChar);
 		aPrevChar = aChar;
 	}
@@ -1453,7 +1516,7 @@ int ImageFont::StringWidth(const SexyString& theString)
 	return aWidth;
 }
 
-int ImageFont::CharWidthKern(SexyChar theChar, SexyChar thePrevChar)
+int ImageFont::CharWidthKern(char theChar, char thePrevChar)
 {
 	Prepare();
 
@@ -1519,7 +1582,7 @@ int ImageFont::CharWidthKern(SexyChar theChar, SexyChar thePrevChar)
 	return aMaxXPos;
 }
 
-int ImageFont::CharWidth(SexyChar theChar)
+int ImageFont::CharWidth(char theChar)
 {
 	return CharWidthKern(theChar, 0);
 }
@@ -1530,7 +1593,7 @@ static RenderCommand gRenderCommandPool[POOL_SIZE];
 static RenderCommand* gRenderTail[256];
 static RenderCommand* gRenderHead[256];
 
-void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const SexyString& theString, const Color& theColor, RectList* theDrawnAreas, int* theWidth)
+void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const std::string& theString, const Color& theColor, RectList* theDrawnAreas, int* theWidth)
 {
 	std::lock_guard<std::mutex> anAutoCrit(gRenderCritSec);
 
@@ -1568,9 +1631,9 @@ void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const SexyString& 
 
 	for (uint32_t aCharNum = 0; aCharNum < theString.length(); aCharNum++)
 	{
-		SexyChar aChar = GetMappedChar(theString[aCharNum]);//mFontData->mCharMap[(uchar) theString[aCharNum]];
+		char aChar = GetMappedChar(theString[aCharNum]);//mFontData->mCharMap[(uchar) theString[aCharNum]];
 
-		SexyChar aNextChar = 0;
+		char aNextChar = 0;
 		if (aCharNum < theString.length() - 1)
 			aNextChar = GetMappedChar(theString[aCharNum + 1]);//mFontData->mCharMap[(uchar) theString[aCharNum+1]];
 
@@ -1779,7 +1842,7 @@ void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const SexyString& 
 	g->SetColorizeImages(colorizeImages);
 }
 
-void ImageFont::DrawString(Graphics* g, int theX, int theY, const SexyString& theString, const Color& theColor, const Rect& theClipRect)
+void ImageFont::DrawString(Graphics* g, int theX, int theY, const std::string& theString, const Color& theColor, const Rect& theClipRect)
 {
 	(void)theClipRect;
 	DrawStringEx(g, theX, theY, theString, theColor, nullptr, nullptr);
@@ -1861,7 +1924,7 @@ void ImageFont::Prepare()
 	}
 }
 
-SexyChar ImageFont::GetMappedChar(SexyChar theChar)
+char ImageFont::GetMappedChar(char theChar)
 {
 	auto anItr = mFontData->mCharMap.find(theChar);
 	if (anItr != mFontData->mCharMap.end())

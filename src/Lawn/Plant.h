@@ -208,8 +208,8 @@ public:
     void                    LaunchThreepeater();
     static Image*           GetImage(SeedType theSeedType);
     static int              GetCost(SeedType theSeedType, SeedType theImitaterType = SeedType::SEED_NONE);
-    static SexyString       GetNameString(SeedType theSeedType, SeedType theImitaterType = SeedType::SEED_NONE);
-    static SexyString       GetToolTip(SeedType theSeedType);
+    static std::string       GetNameString(SeedType theSeedType, SeedType theImitaterType = SeedType::SEED_NONE);
+    static std::string       GetToolTip(SeedType theSeedType);
     static int              GetRefreshTime(SeedType theSeedType, SeedType theImitaterType = SeedType::SEED_NONE);
     static /*inline*/ bool  IsNocturnal(SeedType theSeedtype);
     static /*inline*/ bool  IsFungus(SeedType theSeedType);
@@ -310,7 +310,7 @@ public:
     int                     mRefreshTime;       //+0x14
     PlantSubClass           mSubClass;          //+0x18
     int                     mLaunchRate;        //+0x1C
-    const SexyChar*         mPlantName;         //+0x20
+    const char*         mPlantName;         //+0x20
 };
 extern PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES];
 

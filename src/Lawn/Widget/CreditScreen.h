@@ -101,7 +101,7 @@ public:
 
 	virtual void			Update();
 	virtual void			Draw(Graphics* g);
-	virtual void			KeyChar(SexyChar theChar);
+	virtual void			KeyChar(char theChar);
 	virtual void			KeyDown(KeyCode theKey);
 	virtual void			MouseUp(int x, int y, int theClickCount);
 	virtual void			AddedToManager(WidgetManager* theWidgetManager);

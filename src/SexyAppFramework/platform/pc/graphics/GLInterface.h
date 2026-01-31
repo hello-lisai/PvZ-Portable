@@ -3,6 +3,7 @@
 
 #include "Common.h"
 #include "graphics/MemoryImage.h"
+#include <set>
 #include <mutex>
 #include "graphics/NativeDisplay.h"
 #include "misc/Rect.h"

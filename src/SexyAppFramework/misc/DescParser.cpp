@@ -175,7 +175,7 @@ bool DescParser::DataToInt(DataElement* theSource, int* theInt)
 	std::string aTempString;
 	if (!DataToString(theSource, &aTempString))
 		return false;
-	
+
 	if (!StringToInt(aTempString, theInt))
 		return false;
 

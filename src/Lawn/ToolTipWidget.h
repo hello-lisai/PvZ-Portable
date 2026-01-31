@@ -10,9 +10,9 @@ namespace Sexy
 class ToolTipWidget
 {
 public:
-    SexyString			mTitle;                 //+0x0
-    SexyString			mLabel;                 //+0x1C
-    SexyString			mWarningText;           //+0x28
+    std::string			mTitle;                 //+0x0
+    std::string			mLabel;                 //+0x1C
+    std::string			mWarningText;           //+0x28
     int                 mX;                     //+0x54
     int                 mY;                     //+0x58
     int                 mWidth;                 //+0x5C
@@ -28,11 +28,11 @@ public:
     ToolTipWidget();
 
     void                Draw(Sexy::Graphics* g);
-    void                SetLabel(const SexyString& theLabel);
-    void                SetTitle(const SexyString& theTitle);
-    void                SetWarningText(const SexyString& theWarningText);
+    void                SetLabel(const std::string& theLabel);
+    void                SetTitle(const std::string& theTitle);
+    void                SetWarningText(const std::string& theWarningText);
     void                CalculateSize();
-    void                GetLines(std::vector<SexyString>& theLines);
+    void                GetLines(std::vector<std::string>& theLines);
     inline void         FlashWarning() { mWarningFlashCounter = 70; }
     inline void         Update() { if (mWarningFlashCounter > 0) mWarningFlashCounter--; }
     inline void         SetPosition(int theX, int theY) { mX = theX; mY = theY; }

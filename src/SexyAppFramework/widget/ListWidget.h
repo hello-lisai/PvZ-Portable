@@ -7,7 +7,7 @@
 namespace Sexy 
 {
 
-typedef std::vector<SexyString> SexyStringVector;
+typedef std::vector<std::string> SexyStringVector;
 typedef std::vector<Color> ColorVector;
 
 class ScrollbarWidget;
@@ -65,15 +65,15 @@ public:
 
 	virtual void				RemovedFromManager(WidgetManager *theManager);
 
-	virtual SexyString			GetSortKey(int theIdx);
+	virtual std::string			GetSortKey(int theIdx);
 	virtual void				Sort(bool ascending);
-	virtual SexyString			GetStringAt(int theIdx);
+	virtual std::string			GetStringAt(int theIdx);
 	virtual void				Resize(int theX, int theY, int theWidth, int theHeight);
-	virtual int					AddLine(const SexyString& theLine, bool alphabetical);
-	virtual void				SetLine(int theIdx, const SexyString& theString);
+	virtual int					AddLine(const std::string& theLine, bool alphabetical);
+	virtual void				SetLine(int theIdx, const std::string& theString);
 	virtual int					GetLineCount();
-	virtual int					GetLineIdx(const SexyString& theLine);	
-	virtual void				SetColor(const SexyString& theLine, const Color& theColor);
+	virtual int					GetLineIdx(const std::string& theLine);
+	virtual void				SetColor(const std::string& theLine, const Color& theColor);
 	virtual void				SetColor(int theIdx, const Color& theColor);
 	virtual void				SetLineColor(int theIdx, const Color& theColor);	
 	virtual void				RemoveLine(int theIdx);

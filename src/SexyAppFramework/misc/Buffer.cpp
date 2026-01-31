@@ -1,6 +1,4 @@
 #include "Buffer.h"
-#include "Debug.h"
-
 #define POLYNOMIAL 0x04c11db7L
 
 static bool 	     bCrcTableGenerated = false;
@@ -68,92 +66,6 @@ static uint32_t UpdateCRC(uint32_t crc_accum,
 	return crc_accum;
 }
 
-//----------------------------------------------------------------------------
-// Stream UTF8 data in a const char* to keep receiving wchar_ts
-//----------------------------------------------------------------------------
-static int GetUTF8Char(const char** theBuffer, int theLen, wchar_t* theChar)
-{
-	static const unsigned short aMaskData[] = {
-		0xC0,		// 1 extra byte
-		0xE0,		// 2 extra bytes
-		0xF0,		// 3 extra bytes
-		0xF8,		// 4 extra bytes
-		0xFC		// 5 extra bytes
-	};
-
-	if (theLen == 0) return 0;
-
-	const char* aBuffer = *theBuffer;
-
-	int aTempChar = int((unsigned char)*aBuffer++);
-	if ((aTempChar & 0x80) != 0)
-	{
-		if ((aTempChar & 0xC0) != 0xC0) return 0; // sanity check: high bit should not be set without the next highest bit being set, too.
-
-		int aBytesRead[6];
-		int* aBytesReadPtr = &aBytesRead[0];
-
-		*aBytesReadPtr++ = aTempChar;
-
-		int aLen;
-		for (aLen = 0; aLen < (int)(sizeof(aMaskData)/sizeof(*aMaskData)); ++aLen)
-		{
-			if ( (aTempChar & aMaskData[aLen]) == ((aMaskData[aLen] << 1) & aMaskData[aLen]) ) break;
-		}
-		if (aLen >= (int)(sizeof(aMaskData)/sizeof(*aMaskData))) return 0;
-
-		aTempChar &= ~aMaskData[aLen];
-		int aTotalLen = aLen+1;
-
-		if (aTotalLen < 2 || aTotalLen > 6) return 0;
-
-		int anExtraChar = 0;
-		while (aLen > 0 && (aBuffer - *theBuffer) < theLen)
-		{
-			anExtraChar = int((unsigned char)*aBuffer++);
-			if ((anExtraChar & 0xC0) != 0x80) return 0; // sanity check: high bit set, and next highest bit NOT set.
-
-			*aBytesReadPtr++ = anExtraChar;
-
-			aTempChar = (aTempChar << 6) | (anExtraChar & 0x3F);
-			--aLen;
-		}
-		if (aLen > 0) return 0; // ran out of data before ending sequence
-
-		// validate substrings
-		bool valid = true;
-		switch (aTotalLen)
-		{
-			case 2:
-				valid = !((aBytesRead[0] & 0x3E) == 0);
-				break;
-			case 3:
-				valid = !((aBytesRead[0] & 0x1F) == 0 && (aBytesRead[1] & 0x20) == 0);
-				break;
-			case 4:
-				valid = !((aBytesRead[0] & 0x0F) == 0 && (aBytesRead[1] & 0x30) == 0);
-				break;
-			case 5:
-				valid = !((aBytesRead[0] & 0x07) == 0 && (aBytesRead[1] & 0x38) == 0);
-				break;
-			case 6:
-				valid = !((aBytesRead[0] & 0x03) == 0 && (aBytesRead[1] & 0x3C) == 0);
-				break;
-		}
-		if (!valid) return 0;
-	}
-
-	int aConsumedCount = aBuffer - *theBuffer;
-	
-	if ( (aTempChar >= 0xD800 && aTempChar <= 0xDFFF) || (aTempChar >= 0xFFFE && aTempChar <= 0xFFFF) ) 
-		return 0;
-
-	*theChar = (wchar_t)aTempChar;
-
-	*theBuffer = aBuffer;
-	return aConsumedCount;
-}
-
 Buffer::Buffer()
 {
 	mDataBitSize = 0;
@@ -186,31 +98,11 @@ std::string Buffer::ToWebString() const
 	return aString;
 }
 
-std::wstring Buffer::UTF8ToWideString() const
+std::string Buffer::UTF8ToString() const
 {
 	const char* aData = (const char*)GetDataPtr();
 	int aLen = GetDataLen();
-
-	bool firstChar = true;
-
-	std::wstring aString;
-	aString.reserve(aLen); // worst case
-	while (aLen > 0)
-	{
-		wchar_t aChar;
-		int aConsumed = GetUTF8Char(&aData, aLen, &aChar);
-		if (aConsumed == 0) break;
-		aLen -= aConsumed;
-
-		if (firstChar)
-		{
-			firstChar = false;
-			if (aChar == 0xFEFF) continue;
-		}
-
-		aString += aChar;
-	}
-	return aString;
+	return std::string(aData, aData + aLen);
 }
 
 void Buffer::FromWebString(const std::string& theString)
@@ -336,40 +228,6 @@ void Buffer::WriteString(const std::string& theString)
 		WriteByte(theString[i]);
 }
 
-void Buffer::WriteUTF8String(const std::wstring& theString)
-{
-	if ((mWriteBitPos & 7) != 0) // boo! let's get byte aligned.
-		mWriteBitPos = (mWriteBitPos + 8) & ~7;
-
-	WriteShort((short) theString.length());
-	for (int i = 0; i < (int)theString.length(); ++i)
-	{
-		const unsigned int c = (unsigned int)theString[i]; // just in case wchar_t is only 16 bits, and it generally is in visual studio
-		if (c < 0x80)
-		{
-			WriteByte((uchar)c);
-		}
-		else if (c < 0x800) 
-		{
-			WriteByte((uchar)(0xC0 | (c>>6)));
-			WriteByte((uchar)(0x80 | (c & 0x3F)));
-		}
-		else if (c < 0x10000) 
-		{
-			WriteByte((uchar)(0xE0 | c>>12));
-			WriteByte((uchar)(0x80 | ((c>>6) & 0x3F)));
-			WriteByte((uchar)(0x80 | (c & 0x3F)));
-		}
-		else if (c < 0x110000) 
-		{
-			WriteByte((uchar)(0xF0 | (c>>18)));
-			WriteByte((uchar)(0x80 | ((c>>12) & 0x3F)));
-			WriteByte((uchar)(0x80 | ((c>>6) & 0x3F)));
-			WriteByte((uchar)(0x80 | (c & 0x3F)));
-		} // are the remaining ranges really necessary? add if so!
-	}
-}
-
 void Buffer::WriteLine(const std::string& theString)
 {
 	WriteBytes((const uchar*) (theString + "\r\n").c_str(), (int) theString.length() + 2);
@@ -487,33 +345,6 @@ std::string	Buffer::ReadString() const
 
 	return aString;
 }
-
-std::wstring Buffer::ReadUTF8String() const
-{
-	if ((mReadBitPos & 7) != 0)
-		mReadBitPos = (mReadBitPos + 8) & ~7; // byte align the read position
-
-	std::wstring aString;
-	int aLen = ReadShort();
-
-	const char* aData = (const char*)(&mData[mReadBitPos/8]);
-	int aDataSizeBytes = (mDataBitSize - mReadBitPos)/8;
-
-	int i;
-	for (i = 0; aDataSizeBytes > 0 && i < aLen; ++i)
-	{
-		wchar_t aChar;
-		int aConsumed = GetUTF8Char(&aData, aDataSizeBytes, &aChar);
-		if (aConsumed == 0) break;
-		aDataSizeBytes -= aConsumed;
-
-		aString += aChar;
-	}
-	DBG_ASSERT(i == aLen); // if this fires, the UTF-8 data was malformed.
-
-	return aString;
-}
-
 
 std::string Buffer::ReadLine() const
 {

@@ -29,11 +29,11 @@ public:
 	virtual int				GetHeight();
 	virtual int				GetLineSpacingOffset();
 	virtual int				GetLineSpacing();
-	virtual int				StringWidth(const SexyString& theString);
-	virtual int				CharWidth(SexyChar theChar);
-	virtual int				CharWidthKern(SexyChar theChar, SexyChar thePrevChar);
+	virtual int				StringWidth(const std::string& theString);
+	virtual int				CharWidth(char theChar);
+	virtual int				CharWidthKern(char theChar, char thePrevChar);
 
-	virtual void			DrawString(Graphics* g, int theX, int theY, const SexyString& theString, const Color& theColor, const Rect& theClipRect);
+	virtual void			DrawString(Graphics* g, int theX, int theY, const std::string& theString, const Color& theColor, const Rect& theClipRect);
 
 	virtual _Font*			Duplicate() = 0;
 };

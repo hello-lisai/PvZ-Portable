@@ -99,7 +99,7 @@ void UserDialog::RemovedFromManager(WidgetManager* theWidgetManager)
 }
 
 //0x51CE10
-SexyString UserDialog::GetSelName()
+std::string UserDialog::GetSelName()
 {
     if (mUserList->mSelectIdx < 0 || mUserList->mSelectIdx >= mNumUsers)
     {
@@ -131,7 +131,7 @@ void UserDialog::FinishDeleteUser()
     }
 }
 
-void UserDialog::FinishRenameUser(const SexyString& theNewName)
+void UserDialog::FinishRenameUser(const std::string& theNewName)
 {
     if (mUserList->mSelectIdx < mNumUsers)
     {
@@ -168,7 +168,7 @@ void UserDialog::ListClicked(int theId, int theIdx, int theClickCount)
 void UserDialog::ButtonDepress(int theId)
 {
     LawnDialog::ButtonDepress(theId);
-    SexyString aSelName = GetSelName();
+    std::string aSelName = GetSelName();
     if (!aSelName.empty())
     {
         switch (theId)
@@ -185,14 +185,14 @@ void UserDialog::ButtonDepress(int theId)
 }
 
 //0x51D060
-void UserDialog::EditWidgetText(int theId, const SexyString& theString)
+void UserDialog::EditWidgetText(int theId, const std::string& theString)
 {
     (void)theId;(void)theString;
     mApp->ButtonDepress(mId + 2000);
 }
 
 //0x51D080
-bool UserDialog::AllowChar(int theId, SexyChar theChar)
+bool UserDialog::AllowChar(int theId, char theChar)
 {
     (void)theId;
     return sexyisdigit(theChar);

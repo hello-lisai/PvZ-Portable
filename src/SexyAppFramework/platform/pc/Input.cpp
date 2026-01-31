@@ -146,7 +146,7 @@ bool SexyAppBase::ProcessDeferredMessages(bool singleMessage)
 
 			case SDL_TEXTINPUT:
 				mLastUserInputTick = mLastTimerTime;
-				mWidgetManager->KeyChar((SexyChar)event.text.text[0]);
+				mWidgetManager->KeyChar((char)event.text.text[0]);
 				break;
 
 			/*

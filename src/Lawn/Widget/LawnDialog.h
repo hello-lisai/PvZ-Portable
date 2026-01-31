@@ -53,7 +53,7 @@ public:
 	bool					mVerticalCenterText;	//+0x169
 
 public:
-	LawnDialog(LawnApp* theApp, int theId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode);
+	LawnDialog(LawnApp* theApp, int theId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode);
 	~LawnDialog();
 
 	int						GetLeft();
@@ -78,7 +78,7 @@ public:
 	DialogButton*			mMenuButton;
 
 public:
-	GameOverDialog(const SexyString& theMessage, bool theShowChallengeName);
+	GameOverDialog(const std::string& theMessage, bool theShowChallengeName);
 	virtual ~GameOverDialog();
 
 	virtual void			ButtonDepress(int theId);

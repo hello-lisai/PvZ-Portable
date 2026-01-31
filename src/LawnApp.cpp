@@ -775,7 +775,7 @@ void LawnApp::DoPauseDialog()
 
 //0x4504B0
 // GOTY @Patoke: 0x4538A0
-int LawnApp::LawnMessageBox(int theDialogId, const SexyChar* theHeaderName, const SexyChar* theLinesName, const SexyChar* theButton1Name, const SexyChar* theButton2Name, int theButtonMode)
+int LawnApp::LawnMessageBox(int theDialogId, const char* theHeaderName, const char* theLinesName, const char* theButton1Name, const char* theButton2Name, int theButtonMode)
 {
 	Widget* aOldFocus = mWidgetManager->mFocusWidget;
 
@@ -798,11 +798,11 @@ int LawnApp::LawnMessageBox(int theDialogId, const SexyChar* theHeaderName, cons
 }
 
 //0x450770
-Dialog* LawnApp::DoDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode)
+Dialog* LawnApp::DoDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode)
 {
-	SexyString aHeader = TodStringTranslate(theDialogHeader);
-	SexyString aLines = TodStringTranslate(theDialogLines);
-	SexyString aFooter = TodStringTranslate(theDialogFooter);
+	std::string aHeader = TodStringTranslate(theDialogHeader);
+	std::string aLines = TodStringTranslate(theDialogLines);
+	std::string aFooter = TodStringTranslate(theDialogFooter);
 
 	Dialog* aDialog = SexyAppBase::DoDialog(theDialogId, isModal, aHeader, aLines, aFooter, theButtonMode);
 	if (mWidgetManager->mFocusWidget == nullptr)
@@ -813,7 +813,7 @@ Dialog* LawnApp::DoDialog(int theDialogId, bool isModal, const SexyString& theDi
 	return aDialog;
 }
 
-Dialog* LawnApp::DoDialogDelay(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode)
+Dialog* LawnApp::DoDialogDelay(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode)
 {
 	LawnDialog* aDialog = (LawnDialog*)SexyAppBase::DoDialog(theDialogId, isModal, theDialogHeader, theDialogLines, theDialogFooter, theButtonMode);
 	aDialog->SetButtonDelay(30);
@@ -875,7 +875,7 @@ void LawnApp::FinishCreateUserDialog(bool isYes)
 	if (aNewUserDialog == nullptr)
 		return;
 
-	SexyString aName = aNewUserDialog->GetName();
+	std::string aName = aNewUserDialog->GetName();
 
 	if (isYes && aName.empty())
 	{
@@ -936,7 +936,7 @@ void LawnApp::FinishCreateUserDialog(bool isYes)
 
 //0x450E20
 // GOTY @Patoke: 0x4541F0
-void LawnApp::DoConfirmDeleteUserDialog(const SexyString& theName)
+void LawnApp::DoConfirmDeleteUserDialog(const std::string& theName)
 {
 	KillDialog(Dialogs::DIALOG_CONFIRMDELETEUSER);
 	DoDialog(
@@ -964,8 +964,8 @@ void LawnApp::FinishConfirmDeleteUserDialog(bool isYes)
 	if (!isYes)
 		return;
 
-	SexyString aCurName = mPlayerInfo ? mPlayerInfo->mName : __S("");
-	SexyString aName = aUserDialog->GetSelName();
+	std::string aCurName = mPlayerInfo ? mPlayerInfo->mName : __S("");
+	std::string aName = aUserDialog->GetSelName();
 	if (aName == aCurName)
 	{
 		mPlayerInfo = nullptr;
@@ -997,7 +997,7 @@ void LawnApp::FinishConfirmDeleteUserDialog(bool isYes)
 
 //0x451180
 // GOTY @Patoke: 0x454560
-void LawnApp::DoRenameUserDialog(const SexyString& theName)
+void LawnApp::DoRenameUserDialog(const std::string& theName)
 {
 	KillDialog(Dialogs::DIALOG_RENAMEUSER);
 
@@ -1022,8 +1022,8 @@ void LawnApp::FinishRenameUserDialog(bool isYes)
 	if (aUserDialog == nullptr || aNewUserDialog == nullptr)
 		return;
 
-	SexyString anOldName = aUserDialog->GetSelName();
-	SexyString aNewName = aNewUserDialog->GetName();
+	std::string anOldName = aUserDialog->GetSelName();
+	std::string aNewName = aNewUserDialog->GetName();
 	if (aNewName.empty())
 		return;
 	
@@ -1110,14 +1110,14 @@ void LawnApp::FinishTimesUpDialog()
 }
 
 // GOTY @Patoke: 0x5282E0
-void LawnApp::DoConfirmSellDialog(const SexyString& theMessage)
+void LawnApp::DoConfirmSellDialog(const std::string& theMessage)
 {
 	Dialog* aConfirmDialog = DoDialog(Dialogs::DIALOG_ZEN_SELL, true, __S("[ZEN_SELL_HEADER]"), theMessage, __S(""), Dialog::BUTTONS_YES_NO);
 	aConfirmDialog->mYesButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_YES]"));
 	aConfirmDialog->mNoButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_NO]"));
 }
 
-void LawnApp::DoConfirmPurchaseDialog(const SexyString& theMessage)
+void LawnApp::DoConfirmPurchaseDialog(const std::string& theMessage)
 {
 	LawnDialog* aComfirmDialog = (LawnDialog*)DoDialog(Dialogs::DIALOG_STORE_PURCHASE, true, __S("买下这个物品？"), theMessage, __S(""), Dialog::BUTTONS_YES_NO);
 	aComfirmDialog->mLawnYesButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_YES]"));
@@ -1125,7 +1125,7 @@ void LawnApp::DoConfirmPurchaseDialog(const SexyString& theMessage)
 }
 
 //0x451580
-Dialog* LawnApp::NewDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode)
+Dialog* LawnApp::NewDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode)
 {
 	LawnDialog* aDialog = new LawnDialog(
 		this, 
@@ -1892,8 +1892,8 @@ bool LawnApp::OpenURL(const std::string& theURL, bool shutdownOnOpen)
 // GOTY @Patoke: 0x4564F0
 void LawnApp::ConfirmQuit()
 {
-	SexyString aBody = TodStringTranslate(__S("[QUIT_MESSAGE]"));
-	SexyString aHeader = TodStringTranslate(__S("[QUIT_HEADER]"));
+	std::string aBody = TodStringTranslate(__S("[QUIT_MESSAGE]"));
+	std::string aHeader = TodStringTranslate(__S("[QUIT_HEADER]"));
 	LawnDialog* aDialog = (LawnDialog*)DoDialog(Dialogs::DIALOG_QUIT, true, aHeader, aBody, __S(""), Dialog::BUTTONS_OK_CANCEL);
 	aDialog->mLawnYesButton->mLabel = TodStringTranslate(__S("[QUIT_BUTTON]"));
 	CenterDialog(aDialog, aDialog->mWidth, aDialog->mHeight);
@@ -2097,7 +2097,7 @@ void LawnApp::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
 }
 
 //0x453670
-SexyString LawnApp::GetStageString(int theLevel)
+std::string LawnApp::GetStageString(int theLevel)
 {
 	int aArea = ClampInt((theLevel - 1) / LEVELS_PER_AREA + 1, 1, ADVENTURE_AREAS + 1);
 	int aSub = theLevel - (aArea - 1) * LEVELS_PER_AREA;
@@ -2530,7 +2530,7 @@ void LawnApp::RemoveParticle(ParticleSystemID theParticleID)
 //0x453D20
 bool LawnApp::AdvanceCrazyDaveText()
 {
-	SexyString aMessageName = StrFormat(__S("[CRAZY_DAVE_%d]"), mCrazyDaveMessageIndex + 1);
+	std::string aMessageName = StrFormat(__S("[CRAZY_DAVE_%d]"), mCrazyDaveMessageIndex + 1);
 	if (!TodStringListExists(aMessageName))
 	{
 		return false;
@@ -2541,9 +2541,9 @@ bool LawnApp::AdvanceCrazyDaveText()
 }
 
 //0x453DC0
-SexyString LawnApp::GetCrazyDaveText(int theMessageIndex)
+std::string LawnApp::GetCrazyDaveText(int theMessageIndex)
 {
-	SexyString aMessage = StrFormat(__S("[CRAZY_DAVE_%d]"), theMessageIndex);
+	std::string aMessage = StrFormat(__S("[CRAZY_DAVE_%d]"), theMessageIndex);
 	aMessage = TodReplaceString(aMessage, __S("{PLAYER_NAME}"), mPlayerInfo->mName);
 	aMessage = TodReplaceString(aMessage, __S("{MONEY}"), GetMoneyString(mPlayerInfo->mCoins));
 	int aCost = StoreScreen::GetItemCost(StoreItem::STORE_ITEM_PACKET_UPGRADE);
@@ -2694,7 +2694,7 @@ void LawnApp::CrazyDaveLeave()
 void LawnApp::CrazyDaveTalkIndex(int theMessageIndex)
 {
 	mCrazyDaveMessageIndex = theMessageIndex;
-	SexyString aMessageText = GetCrazyDaveText(theMessageIndex);
+	std::string aMessageText = GetCrazyDaveText(theMessageIndex);
 	CrazyDaveTalkMessage(aMessageText);
 }
 
@@ -2718,12 +2718,12 @@ void LawnApp::CrazyDaveStopSound()
 }
 
 //0x454570
-void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
+void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 {
 	Reanimation* aCrazyDaveReanim = ReanimationGet(mCrazyDaveReanimID);
 
 	bool doHanding = false;
-	if (theMessage.find(__S("{HANDING}")) != SexyString::npos)
+	if (theMessage.find(__S("{HANDING}")) != std::string::npos)
 	{
 		doHanding = true;
 	}
@@ -2733,7 +2733,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 	}
 
 	bool doSound = true;
-	if (theMessage.find(__S("{NO_SOUND}")) != SexyString::npos)
+	if (theMessage.find(__S("{NO_SOUND}")) != std::string::npos)
 	{
 		doSound = false;
 	}
@@ -2770,11 +2770,11 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			if (doSound)
 			{
-				if (theMessage.find(__S("{SHORT_SOUND}")) != SexyString::npos)
+				if (theMessage.find(__S("{SHORT_SOUND}")) != std::string::npos)
 				{
 					PlayFoley(FoleyType::FOLEY_CRAZY_DAVE_SHORT);
 				}
-				else if (theMessage.find(__S("{SCREAM}")) != SexyString::npos)
+				else if (theMessage.find(__S("{SCREAM}")) != std::string::npos)
 				{
 					PlayFoley(FoleyType::FOLEY_CRAZY_DAVE_SCREAM);
 				}
@@ -2786,7 +2786,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 			
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHAKE}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SHAKE}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_crazy", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 50, 12.0f);
 
@@ -2797,7 +2797,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_TALKING;
 		}
-		else if (theMessage.find(__S("{SCREAM}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SCREAM}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_smalltalk", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 50, 12.0f);
 
@@ -2808,7 +2808,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_TALKING;
 		}
-		else if (theMessage.find(__S("{SCREAM2}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SCREAM2}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_mediumtalk", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 50, 12.0f);
 
@@ -2819,7 +2819,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_WALLNUT}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SHOW_WALLNUT}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2841,7 +2841,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_HAMMER}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SHOW_HAMMER}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2863,7 +2863,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_FERTILIZER}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SHOW_FERTILIZER}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2882,7 +2882,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_TREE_FOOD}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SHOW_TREE_FOOD}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2901,7 +2901,7 @@ void LawnApp::CrazyDaveTalkMessage(const SexyString& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_MONEYBAG}")) != SexyString::npos)
+		else if (theMessage.find(__S("{SHOW_MONEYBAG}")) != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -3099,9 +3099,9 @@ void LawnApp::DrawCrazyDave(Graphics* g)
 		}
 		g->DrawImage(aBubbleImage, aPosX, aPosY);
 
-		SexyString aBubbleText = mCrazyDaveMessageText;
+		std::string aBubbleText = mCrazyDaveMessageText;
 		Rect aRect(aPosX + 25, aPosY + 6, 233, 144);
-		if (aBubbleText.find(__S("{SHAKE}")) != SexyString::npos)
+		if (aBubbleText.find(__S("{SHAKE}")) != std::string::npos)
 		{
 			aBubbleText = TodReplaceString(aBubbleText, __S("{SHAKE}"), __S(""));
 			aRect.mX += rand() % 2;
@@ -3113,7 +3113,7 @@ void LawnApp::DrawCrazyDave(Graphics* g)
 		{
 			clickToContinue = false;
 		}
-		else if (aBubbleText.find(__S("{NO_CLICK}")) != SexyString::npos)
+		else if (aBubbleText.find(__S("{NO_CLICK}")) != std::string::npos)
 		{
 			aBubbleText = TodReplaceString(aBubbleText, __S("{NO_CLICK}"), __S(""));
 			clickToContinue = false;
@@ -3334,7 +3334,7 @@ void LawnApp::EnforceCursor()
 }
 
 //0x455AA0
-SexyString LawnApp::Pluralize(int theCount, const SexyChar* theSingular, const SexyChar* thePlural)
+std::string LawnApp::Pluralize(int theCount, const char* theSingular, const char* thePlural)
 {
 	if (theCount == 1)
 	{
@@ -3414,7 +3414,7 @@ void LawnApp::InitHook()
 }
 
 //0x455E10
-SexyString LawnApp::GetMoneyString(int theAmount)
+std::string LawnApp::GetMoneyString(int theAmount)
 {
 	int aValue = theAmount * 10;
 	if (aValue > 999999)
@@ -3432,7 +3432,7 @@ SexyString LawnApp::GetMoneyString(int theAmount)
 }
 
 //0x455EE0
-SexyString LawnGetCurrentLevelName()
+std::string LawnGetCurrentLevelName()
 {
 	if (gLawnApp == nullptr)
 	{

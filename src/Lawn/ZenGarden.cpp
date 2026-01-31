@@ -402,7 +402,7 @@ int ZenGarden::GetPlantSellPrice(Plant* thePlant)
         {
             return 300;
         }
-        TOD_ASSERT();
+        TOD_ASSERT(false);
     }
     if (aPottedPlant->mPlantAge == PottedPlantAge::PLANTAGE_SPROUT)
     {
@@ -424,7 +424,7 @@ int ZenGarden::GetPlantSellPrice(Plant* thePlant)
         }
         return 800;
     }
-    TOD_ASSERT();
+    TOD_ASSERT(false);
 
     unreachable();
 }
@@ -434,8 +434,8 @@ void ZenGarden::MouseDownWithMoneySign(Plant* thePlant)
 {
     mBoard->ClearCursor();
 
-    SexyString aHeader = TodStringTranslate(__S("[ZEN_SELL_HEADER]"));
-    SexyString aLines = TodStringTranslate(__S("[ZEN_SELL_LINES]"));
+    std::string aHeader = TodStringTranslate(__S("[ZEN_SELL_HEADER]"));
+    std::string aLines = TodStringTranslate(__S("[ZEN_SELL_LINES]"));
     int aPrice = GetPlantSellPrice(thePlant);
     if (mApp->mCrazyDaveState == CrazyDaveState::CRAZY_DAVE_OFF)
     {
@@ -443,10 +443,10 @@ void ZenGarden::MouseDownWithMoneySign(Plant* thePlant)
     }
 
     PottedPlant* aPottedPlant = PottedPlantFromIndex(thePlant->mPottedPlantIndex);
-    SexyString aMessageText = mApp->GetCrazyDaveText(1700);
+    std::string aMessageText = mApp->GetCrazyDaveText(1700);
     aMessageText = TodReplaceNumberString(aMessageText, __S("{SELL_PRICE}"), aPrice);
 
-    SexyString aPlantName;
+    std::string aPlantName;
     if (thePlant->mSeedType == SeedType::SEED_SPROUT && aPottedPlant->mSeedType == SeedType::SEED_MARIGOLD)
     {
         aPlantName = TodStringTranslate(__S("[MARIGOLD_SPROUT]"));
@@ -1897,7 +1897,7 @@ void ZenGarden::GotoNextGarden()
     }
     else
     {
-        TOD_ASSERT();
+        TOD_ASSERT(false);
     }
 
 	for (std::string& resource : mLoadedResourceNames)
@@ -1983,7 +1983,7 @@ SpecialGridPlacement* ZenGarden::GetSpecialGridPlacements(int& theCount)
         theCount = LENGTH(gGreenhouseGridPlacement);
         return gGreenhouseGridPlacement;
     }
-    TOD_ASSERT();
+    TOD_ASSERT(false);
     return nullptr;
 }
 

@@ -35,14 +35,14 @@ void TextWidget::Clear()
 	MarkDirty();
 }
 
-void TextWidget::DrawColorString(Graphics* g, const SexyString& theString, int x, int y, bool useColors)
+void TextWidget::DrawColorString(Graphics* g, const std::string& theString, int x, int y, bool useColors)
 {		
 	int aWidth = 0;
 	
 	if (useColors)
 		g->SetColor(Color(0, 0, 0));				
 	
-	SexyString aCurString = __S("");
+	std::string aCurString = __S("");
 	for (int i = 0; i < (int)theString.length(); i++)
 	{
 		// Widestrings are cringe, can safely compare to zero
@@ -66,7 +66,7 @@ void TextWidget::DrawColorString(Graphics* g, const SexyString& theString, int x
 		g->DrawString(aCurString, x + aWidth, y);
 }	
 
-void TextWidget::DrawColorStringHilited(Graphics* g, const SexyString& theString, int x, int y, int theStartPos, int theEndPos)
+void TextWidget::DrawColorStringHilited(Graphics* g, const std::string& theString, int x, int y, int theStartPos, int theEndPos)
 {
 	DrawColorString(g, theString, x, y, true);				
 	
@@ -86,14 +86,14 @@ void TextWidget::DrawColorStringHilited(Graphics* g, const SexyString& theString
 	}
 }
 
-int TextWidget::GetStringIndex(const SexyString& theString, int thePixel)
+int TextWidget::GetStringIndex(const std::string& theString, int thePixel)
 {
 	int aPos = 0;
 	
 	for (int i = 0; i < (int)theString.length(); i++)
 	{
-		SexyString aLoSubStr = theString.substr(0, i);
-		SexyString aHiSubStr = theString.substr(0, i+1);
+		std::string aLoSubStr = theString.substr(0, i);
+		std::string aHiSubStr = theString.substr(0, i+1);
 			
 		int aLoLen = GetColorStringWidth(aLoSubStr);
 		int aHiLen = GetColorStringWidth(aHiSubStr);
@@ -105,10 +105,10 @@ int TextWidget::GetStringIndex(const SexyString& theString, int thePixel)
 }
 
 //UNICODE
-int TextWidget::GetColorStringWidth(const SexyString& theString)
+int TextWidget::GetColorStringWidth(const std::string& theString)
 {				
 	int aWidth = 0;	
-	SexyString aTempString;
+	std::string aTempString;
 					
 	for (int i = 0; i < (int)theString.length(); i++)
 	{
@@ -169,7 +169,7 @@ void TextWidget::Resize(int theX, int theY, int theWidth, int theHeight)
 }
 
 //UNICODE
-Color TextWidget::GetLastColor(const SexyString& theString)
+Color TextWidget::GetLastColor(const std::string& theString)
 {
 	int anIdx = theString.rfind((char)0xFF);
 	if (anIdx < 0)
@@ -179,9 +179,9 @@ Color TextWidget::GetLastColor(const SexyString& theString)
 }
 
 //UNICODE
-void TextWidget::AddToPhysicalLines(int theIdx, const SexyString& theLine)
+void TextWidget::AddToPhysicalLines(int theIdx, const std::string& theLine)
 {		
-	SexyString aCurString = __S("");
+	std::string aCurString = __S("");
 		
 	if (GetColorStringWidth(theLine) <= mWidth - 8)
 	{
@@ -200,13 +200,13 @@ void TextWidget::AddToPhysicalLines(int theIdx, const SexyString& theLine)
 			if (aSpacePos == -1)
 				aSpacePos = theLine.length();
 			
-			SexyString aNewString = aCurString + theLine.substr(aCurPos, aSpacePos - aCurPos);
+			std::string aNewString = aCurString + theLine.substr(aCurPos, aSpacePos - aCurPos);
 			if (GetColorStringWidth(aNewString) > mWidth-8)
 			{
 				mPhysicalLines.push_back(aCurString);					
 				mLineMap.push_back(theIdx);
 				Color aColor = GetLastColor(aCurString);
-				aCurString = __S("  ") [SexyChar(0xFF) + (SexyChar) aColor.mRed + (SexyChar) aColor.mGreen + (SexyChar) aColor.mBlue] +
+				aCurString = __S("  ") [char(0xFF) + (char) aColor.mRed + (char) aColor.mGreen + (char) aColor.mBlue] +
 					theLine.substr(aNextCheckPos, aSpacePos - aNextCheckPos);
 			}
 			else
@@ -224,9 +224,9 @@ void TextWidget::AddToPhysicalLines(int theIdx, const SexyString& theLine)
 }
 
 //UNICODE
-void TextWidget::AddLine(const SexyString& theLine)
+void TextWidget::AddLine(const std::string& theLine)
 {
-	SexyString aLine = theLine;
+	std::string aLine = theLine;
 
 	if (aLine.compare(__S("")) == 0)
 		aLine = __S(" ");
@@ -327,7 +327,7 @@ void TextWidget::Draw(Graphics* g)
 	for (int i = aFirstLine; i <= aLastLine; i++)
 	{
 		int aYPos = 4 + (int) ((i - (int) mPosition)*mFont->GetHeight()) + mFont->GetAscent();
-		SexyString aString = mPhysicalLines[i];
+		std::string aString = mPhysicalLines[i];
 		
 		int aHilitePos[2];
 		GetSelectedIndices(i, aHilitePos);
@@ -383,16 +383,16 @@ void TextWidget::MouseDrag(int x, int y)
 	MarkDirty();
 }
 
-SexyString TextWidget::GetSelection()
+std::string TextWidget::GetSelection()
 {
-	SexyString aSelString = __S("");
+	std::string aSelString = __S("");
 	int aSelIndices[2];	
 	bool first = true;
 	
 	bool reverse = SelectionReversed();
 	for (int aLineNum = mHiliteArea[reverse ? 1 : 0][1]; aLineNum <= mHiliteArea[reverse ? 0 : 1][1]; aLineNum++)
 	{
-		SexyString aString = mPhysicalLines[aLineNum];
+		std::string aString = mPhysicalLines[aLineNum];
 		
 		GetSelectedIndices(aLineNum, aSelIndices);
 		
@@ -401,7 +401,7 @@ SexyString TextWidget::GetSelection()
 		
 		for (int aStrIdx = aSelIndices[0]; aStrIdx < aSelIndices[1]; aStrIdx++)
 		{
-			SexyChar aChar = aString[aStrIdx];
+			char aChar = aString[aStrIdx];
 			// Widechars are cringe
 			if (aChar != 0x00)
 				aSelString += aChar;

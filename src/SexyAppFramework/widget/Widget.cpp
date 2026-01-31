@@ -215,7 +215,7 @@ void Widget::Update()
 	WidgetContainer::Update();
 }
 
-void Widget::KeyChar(SexyChar){}
+void Widget::KeyChar(char){}
 
 void Widget::KeyDown(KeyCode theKey)
 {
@@ -310,7 +310,7 @@ void Widget::MouseWheel(int){}
 
 //////// Helper functions
 
-Rect Widget::WriteCenteredLine(Graphics* g, int anOffset, const SexyString& theLine)
+Rect Widget::WriteCenteredLine(Graphics* g, int anOffset, const std::string& theLine)
 {
 	_Font* aFont = g->GetFont();
 	int aWidth = aFont->StringWidth(theLine);
@@ -321,7 +321,7 @@ Rect Widget::WriteCenteredLine(Graphics* g, int anOffset, const SexyString& theL
 	return Rect(aX, anOffset - aFont->GetAscent(), aWidth, aFont->GetHeight());
 }
 
-Rect Widget::WriteCenteredLine(Graphics* g, int anOffset, const SexyString& theLine, Color theColor1, Color theColor2, const Point& theShadowOffset)
+Rect Widget::WriteCenteredLine(Graphics* g, int anOffset, const std::string& theLine, Color theColor1, Color theColor2, const Point& theShadowOffset)
 {
 	_Font* aFont = g->GetFont();
 	int aWidth = aFont->StringWidth(theLine);
@@ -342,7 +342,7 @@ Rect Widget::WriteCenteredLine(Graphics* g, int anOffset, const SexyString& theL
 		aFont->GetHeight() + abs(theShadowOffset.mY));
 }
 
-int Widget::WriteString(Graphics* g, const SexyString& theString, int theX, int theY, int theWidth, int theJustification, bool drawString, int theOffset, int theLength)
+int Widget::WriteString(Graphics* g, const std::string& theString, int theX, int theY, int theWidth, int theJustification, bool drawString, int theOffset, int theLength)
 {
 	bool oldColored = g->mWriteColoredString;
 	g->mWriteColoredString = mWriteColoredString;
@@ -352,7 +352,7 @@ int Widget::WriteString(Graphics* g, const SexyString& theString, int theX, int 
 	return aXOffset;
 }
 
-int	Widget::WriteWordWrapped(Graphics* g, const Rect& theRect, const SexyString& theLine, int theLineSpacing, int theJustification)
+int	Widget::WriteWordWrapped(Graphics* g, const Rect& theRect, const std::string& theLine, int theLineSpacing, int theJustification)
 {
 	bool oldColored = g->mWriteColoredString;
 	g->mWriteColoredString = mWriteColoredString;
@@ -362,7 +362,7 @@ int	Widget::WriteWordWrapped(Graphics* g, const Rect& theRect, const SexyString&
 	return aReturn;
 }
 
-int Widget::GetWordWrappedHeight(Graphics* g, int theWidth, const SexyString& theLine, int aLineSpacing)
+int Widget::GetWordWrappedHeight(Graphics* g, int theWidth, const std::string& theLine, int aLineSpacing)
 {
 	return g->GetWordWrappedHeight(theWidth,theLine,aLineSpacing);
 }

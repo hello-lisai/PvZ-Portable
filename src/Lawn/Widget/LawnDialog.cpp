@@ -13,7 +13,7 @@
 
 
 //0x456A80
-LawnDialog::LawnDialog(LawnApp* theApp, int theId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode) :
+LawnDialog::LawnDialog(LawnApp* theApp, int theId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode) :
 	Dialog(nullptr, nullptr, theId, isModal, theDialogHeader, theDialogLines, __S(""), BUTTONS_NONE)
 {
     mApp = theApp;
@@ -440,7 +440,7 @@ void ReanimationWidget::Update()
 }
 
 //0x457BC0
-GameOverDialog::GameOverDialog(const SexyString& theMessage, bool theShowChallengeName) : LawnDialog(
+GameOverDialog::GameOverDialog(const std::string& theMessage, bool theShowChallengeName) : LawnDialog(
     gLawnApp, 
     Dialogs::DIALOG_GAME_OVER, 
     true, 

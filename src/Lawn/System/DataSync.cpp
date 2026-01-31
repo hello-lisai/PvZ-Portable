@@ -131,7 +131,7 @@ double DataReader::ReadDouble()
 	return aDouble;
 }
 
-void DataReader::ReadString(SexyString& theStr)
+void DataReader::ReadString(std::string& theStr)
 {
 	unsigned int aStrLen = ReadShort();
 	theStr.resize(aStrLen);
@@ -477,7 +477,7 @@ void DataSync::SyncDouble(double& theDouble)
 	}
 }
 
-void DataSync::SyncString(SexyString& theStr)
+void DataSync::SyncString(std::string& theStr)
 {
 	if (mReader)
 	{
@@ -632,7 +632,7 @@ void DataWriter::WriteDouble(double theDouble)
 }
 
 //0x443810
-void DataWriter::WriteString(const SexyString& theStr)
+void DataWriter::WriteString(const std::string& theStr)
 {
 	unsigned short aStrLen = (unsigned short)theStr.length();
 	WriteShort(aStrLen);

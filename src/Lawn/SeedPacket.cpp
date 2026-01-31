@@ -538,7 +538,7 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 
 	if (theDrawCost)
 	{
-		SexyString aCostStr;
+		std::string aCostStr;
 		if (gLawnApp->mBoard && gLawnApp->mBoard->PlantUsesAcceleratedPricing(aSeedType))
 		{
 			if (theUseCurrentCost)
@@ -787,7 +787,7 @@ void SeedPacket::MouseDown(int x, int y, int theClickCount)
 			}
 			else
 			{
-				TOD_ASSERT();
+				TOD_ASSERT(false);
 			}
 
 			return;
@@ -965,7 +965,7 @@ void SeedBank::Draw(Graphics* g)
 
 	if (!mBoard->HasConveyorBeltSeedBank())
 	{
-		SexyString aMoneyLabel = StrFormat(__S("%d"), std::max(mBoard->mSunMoney, 0));
+		std::string aMoneyLabel = StrFormat(__S("%d"), std::max(mBoard->mSunMoney, 0));
 		Color aMoneyColor(0, 0, 0);
 		if (mBoard->mOutOfMoneyCounter > 0 && mBoard->mOutOfMoneyCounter % 20 < 10)
 		{

@@ -45,7 +45,7 @@ class DataSync;
 class PlayerInfo
 {
 public:
-    SexyString          mName;                              //+0x0
+    std::string          mName;                              //+0x0
     uint32_t            mUseSeq;                            //+0x1C
     uint32_t            mId;                                //+0x20
     int                 mLevel;                             //+0x24

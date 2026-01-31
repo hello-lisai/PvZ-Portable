@@ -15,7 +15,7 @@ CheatDialog::CheatDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_C
 	mLevelEditWidget->mMaxChars = 12;
 	mLevelEditWidget->AddWidthCheckFont(FONT_BRIANNETOD12, 220);
 
-	SexyString aCheatStr;
+	std::string aCheatStr;
 	if (mApp->mGameMode != GameMode::GAMEMODE_ADVENTURE)
 	{
 		aCheatStr = StrFormat(__S("C%d"), (int)mApp->mGameMode);
@@ -68,13 +68,13 @@ void CheatDialog::Draw(Graphics* g)
 	DrawEditBox(g, mLevelEditWidget);
 }
 
-void CheatDialog::EditWidgetText(int theId, const SexyString& theString)
+void CheatDialog::EditWidgetText(int theId, const std::string& theString)
 {
 	(void)theId;(void)theString;
 	mApp->ButtonDepress(mId + 2000);
 }
 
-bool CheatDialog::AllowChar(int theId, SexyChar theChar)
+bool CheatDialog::AllowChar(int theId, char theChar)
 {
 	(void)theId;
 	return sexyisdigit(theChar) || theChar == __S('-') || theChar == __S('c') || theChar == __S('C') || theChar == __S('f') || theChar == __S('F');

@@ -19,10 +19,10 @@ public:
 	virtual void		AddedToManager(WidgetManager* theWidgetManager);
 	virtual void		RemovedFromManager(WidgetManager* theWidgetManager);
 	virtual void		Draw(Graphics* g);
-	virtual void		EditWidgetText(int theId, const SexyString& theString);
-	virtual bool		AllowChar(int, SexyChar theChar);
-	SexyString			GetName();
-	void				SetName(const SexyString& theName);
+	virtual void		EditWidgetText(int theId, const std::string& theString);
+	virtual bool		AllowChar(int, char theChar);
+	std::string			GetName();
+	void				SetName(const std::string& theName);
 };
 
 #endif

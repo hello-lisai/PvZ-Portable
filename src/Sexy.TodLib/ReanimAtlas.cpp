@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "TodDebug.h"
 #include "TodCommon.h"
 #include "Reanimator.h"
@@ -163,7 +164,7 @@ bool ReanimAtlas::PlaceAtlasImage(ReanimAtlasImage* theAtlasImageToPlace, int th
 	if (ImageFindPlace(theAtlasImageToPlace, theImageCount, theMaxWidth))
 		return true;
 
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 	return false;
 }
 

@@ -251,7 +251,7 @@ bool AwardScreen::IsPaperNote()
 }
 
 //0x4064D0
-void AwardScreen::DrawBottom(Graphics* g, const SexyString& theTitle, const SexyString& theAward, const SexyString& theMessage)
+void AwardScreen::DrawBottom(Graphics* g, const std::string& theTitle, const std::string& theAward, const std::string& theMessage)
 {
 	g->DrawImage(Sexy::IMAGE_AWARDSCREEN_BACK, 0, 0);
 	TodDrawString(g, theTitle, BOARD_WIDTH / 2, 58, Sexy::FONT_DWARVENTODCRAFT24, Color(213, 159, 43), DS_ALIGN_CENTER);
@@ -263,8 +263,8 @@ void AwardScreen::DrawBottom(Graphics* g, const SexyString& theTitle, const Sexy
 void AwardScreen::DrawAwardSeed(Graphics* g)
 {
 	SeedType aSeedType = mApp->GetAwardSeedForLevel(mApp->mPlayerInfo->GetLevel() - 1);
-	SexyString aAward = Plant::GetNameString(aSeedType, SEED_NONE);
-	SexyString aMessage;
+	std::string aAward = Plant::GetNameString(aSeedType, SEED_NONE);
+	std::string aMessage;
 	if (mApp->IsTrialStageLocked() && aSeedType >= SEED_SQUASH && aSeedType != SEED_TANGLEKELP)
 		aMessage = __S("[AVAILABLE_IN_FULL_VERSION]");
 	else

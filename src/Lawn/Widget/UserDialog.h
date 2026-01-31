@@ -37,12 +37,12 @@ public:
 	virtual void 		ListClosed(int){}
 	virtual void 		ListHiliteChanged(int, int, int){}
 	virtual void		ButtonDepress(int theId);
-	virtual void		EditWidgetText(int theId, const SexyString& theString);
-	virtual bool		AllowChar(int theId, SexyChar theChar);
+	virtual void		EditWidgetText(int theId, const std::string& theString);
+	virtual bool		AllowChar(int theId, char theChar);
 	virtual void		Draw(Graphics* g);
 	void				FinishDeleteUser();
-	void				FinishRenameUser(const SexyString& theNewName);
-	SexyString			GetSelName();
+	void				FinishRenameUser(const std::string& theNewName);
+	std::string			GetSelName();
 };
 
 #endif

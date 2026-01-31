@@ -318,7 +318,7 @@ void* DefinitionAlloc(int theSize)
 }
 
 //0x443BE0
-bool DefinitionLoadImage(Image** theImage, const SexyString& theName)
+bool DefinitionLoadImage(Image** theImage, const std::string& theName)
 {
     // 当贴图文件路径不存在时，无须获取贴图
     if (theName.size() == 0)
@@ -343,7 +343,7 @@ bool DefinitionLoadImage(Image** theImage, const SexyString& theName)
         int aPrefixLen = strlen(aLoadResPath.mPrefix);
         if (aPrefixLen < aNameLen)
         {
-            SexyString aPathToTry = aLoadResPath.mDirectory + theName.substr(aPrefixLen, aNameLen);
+            std::string aPathToTry = aLoadResPath.mDirectory + theName.substr(aPrefixLen, aNameLen);
             SharedImageRef aImageRef = gSexyAppBase->GetSharedImage(aPathToTry);
             if ((Image*)aImageRef != nullptr)
             {
@@ -359,14 +359,14 @@ bool DefinitionLoadImage(Image** theImage, const SexyString& theName)
 }
 
 //0x443F60
-bool DefinitionLoadFont(_Font** theFont, const SexyString& theName)
+bool DefinitionLoadFont(_Font** theFont, const std::string& theName)
 {
-    _Font* aFont = gSexyAppBase->mResourceManager->LoadFont(SexyStringToString(theName));
+    _Font* aFont = gSexyAppBase->mResourceManager->LoadFont(theName);
     *theFont = aFont;
     return aFont != nullptr;
 }
 
-bool DefinitionLoadXML(const SexyString& theFileName, DefMap* theDefMap, void* theDefinition)
+bool DefinitionLoadXML(const std::string& theFileName, DefMap* theDefMap, void* theDefinition)
 {
     return DefinitionCompileAndLoad(theFileName, theDefMap, theDefinition);
 }
@@ -540,7 +540,7 @@ uint DefinitionCalcHash(DefMap* theDefMap)
 }
 
 //0x444500 : UnCompress(&theUncompressedSize, theCompressedBufferSize, esi = *theCompressedBuffer)
-void* DefinitionUncompressCompiledBuffer(void* theCompressedBuffer, size_t theCompressedBufferSize, size_t& theUncompressedSize, const SexyString& theCompiledFilePath)
+void* DefinitionUncompressCompiledBuffer(void* theCompressedBuffer, size_t theCompressedBufferSize, size_t& theUncompressedSize, const std::string& theCompiledFilePath)
 {
     // theCompressedBuffer 的前两个四字节存有特殊数据，此处检测其长度是否足够 8 字节（即 2 个四字节）
     if (theCompressedBufferSize < 8)
@@ -569,24 +569,24 @@ void* DefinitionUncompressCompiledBuffer(void* theCompressedBuffer, size_t theCo
 }
 
 //0x444770
-SexyString DefinitionGetCompiledFilePathFromXMLFilePath(const SexyString& theXMLFilePath)
+std::string DefinitionGetCompiledFilePathFromXMLFilePath(const std::string& theXMLFilePath)
 {
     return __S("compiled/") + theXMLFilePath + __S(".compiled");
 }
 
-static SexyString DefinitionGetCompiledCacheFullPath(const SexyString& theCompiledFilePath)
+static std::string DefinitionGetCompiledCacheFullPath(const std::string& theCompiledFilePath)
 {
-    const SexyString aCacheRoot = (sizeof(void*) == 8) ? __S("cache64/") : __S("cache32/");
+    const std::string aCacheRoot = (sizeof(void*) == 8) ? __S("cache64/") : __S("cache32/");
     return GetAppDataPath(aCacheRoot + theCompiledFilePath);
 }
 
 //0x444560 : (void* def, *defMap, eax = string& compiledFilePath)  //esp -= 8
-bool DefinitionReadCompiledFile(const SexyString& theCompiledFilePath, DefMap* theDefMap, void* theDefinition)
+bool DefinitionReadCompiledFile(const std::string& theCompiledFilePath, DefMap* theDefMap, void* theDefinition)
 {
     PerfTimer aTimer;
     aTimer.Start();
 
-    SexyString aFullCompiledPath = DefinitionGetCompiledCacheFullPath(theCompiledFilePath);
+    std::string aFullCompiledPath = DefinitionGetCompiledCacheFullPath(theCompiledFilePath);
     FILE* pFile = fopen(aFullCompiledPath.c_str(), "rb");
     if (!pFile)
     {
@@ -647,7 +647,7 @@ bool DefinitionReadCompiledFile(const SexyString& theCompiledFilePath, DefMap* t
     return aResult;
 }
 
-bool IsFileInPakFile(const SexyString& theFilePath)
+bool IsFileInPakFile(const std::string& theFilePath)
 {
     PFILE* pFile = p_fopen(theFilePath.c_str(), __S("rb"));
     bool aIsInPak = pFile && !pFile->mFP;  // 通过 mPakRecordMap.find 找到并打开的文件，其 mFP 为空指针（因为不是从实际文件中打开的）
@@ -658,15 +658,15 @@ bool IsFileInPakFile(const SexyString& theFilePath)
     return aIsInPak;
 }
 
-bool DefinitionIsCompiled(const SexyString& theXMLFilePath)
+bool DefinitionIsCompiled(const std::string& theXMLFilePath)
 {
-    SexyString aCompiledFilePath = DefinitionGetCompiledFilePathFromXMLFilePath(theXMLFilePath);
+    std::string aCompiledFilePath = DefinitionGetCompiledFilePathFromXMLFilePath(theXMLFilePath);
     if (IsFileInPakFile(aCompiledFilePath))
         return true;
 
     struct stat attr;
 
-    SexyString aFullCompiledPath = DefinitionGetCompiledCacheFullPath(aCompiledFilePath);
+    std::string aFullCompiledPath = DefinitionGetCompiledCacheFullPath(aCompiledFilePath);
     if (stat(aFullCompiledPath.c_str(), &attr) != 0)
     {
         if (stat(aCompiledFilePath.c_str(), &attr) != 0)
@@ -712,7 +712,7 @@ void DefinitionXmlError(XMLParser* theXmlParser, const char* theFormat, ...)
 {
     va_list argList;
     va_start(argList, theFormat);
-    std::string aFormattedMessage = SexyStringToString(vformat(theFormat, argList));
+    std::string aFormattedMessage = vformat(theFormat, argList);
     va_end(argList);
 
     int aLine = theXmlParser->GetCurrentLineNum();
@@ -720,7 +720,7 @@ void DefinitionXmlError(XMLParser* theXmlParser, const char* theFormat, ...)
     TodTraceAndLog("%s(%d): XML Definition Error: %s\n", aFileName.c_str(), aLine, aFormattedMessage.c_str());
 }
 
-bool DefinitionReadXMLString(XMLParser* theXmlParser, SexyString& theValue)
+bool DefinitionReadXMLString(XMLParser* theXmlParser, std::string& theValue)
 {
     XMLElement aXMLElement;
     if (!theXmlParser->NextElement(&aXMLElement))  // 读取下一个 XML 元素
@@ -767,7 +767,7 @@ bool DefSymbolValueFromString(DefSymbol* theSymbolMap, const char* theName, int*
 
 bool DefinitionReadIntField(XMLParser* theXmlParser, int* theValue)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -780,7 +780,7 @@ bool DefinitionReadIntField(XMLParser* theXmlParser, int* theValue)
 
 bool DefinitionReadFloatField(XMLParser* theXmlParser, float* theValue)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -793,7 +793,7 @@ bool DefinitionReadFloatField(XMLParser* theXmlParser, float* theValue)
 
 bool DefinitionReadStringField(XMLParser* theXmlParser, char** theValue)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -812,7 +812,7 @@ bool DefinitionReadStringField(XMLParser* theXmlParser, char** theValue)
 
 bool DefinitionReadEnumField(XMLParser* theXmlParser, int* theValue, DefSymbol* theSymbolMap)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -825,7 +825,7 @@ bool DefinitionReadEnumField(XMLParser* theXmlParser, int* theValue, DefSymbol* 
 
 bool DefinitionReadVector2Field(XMLParser* theXmlParser, SexyVector2* theValue)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -911,7 +911,7 @@ DefSymbol gDefTrackEaseSymbols[] = {
 
 bool DefinitionReadFloatTrackField(XMLParser* theXmlParser, FloatParameterTrack* theTrack)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
 
     if (!DefinitionReadXMLString(theXmlParser, aStringValue)) return false;
     
@@ -1062,13 +1062,13 @@ bool DefinitionReadFloatTrackField(XMLParser* theXmlParser, FloatParameterTrack*
     return true;
 }
 
-bool DefinitionReadFlagField(XMLParser* theXmlParser, const SexyString& theElementName, uint* theResultValue, DefSymbol* theSymbolMap)
+bool DefinitionReadFlagField(XMLParser* theXmlParser, const std::string& theElementName, uint* theResultValue, DefSymbol* theSymbolMap)
 {
     int aValue;
     if (!DefSymbolValueFromString(theSymbolMap, theElementName.c_str(), &aValue))
         return false;
 
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -1098,7 +1098,7 @@ bool DefinitionReadFlagField(XMLParser* theXmlParser, const SexyString& theEleme
 
 bool DefinitionReadImageField(XMLParser* theXmlParser, Image** theImage)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -1113,7 +1113,7 @@ bool DefinitionReadImageField(XMLParser* theXmlParser, Image** theImage)
 
 bool DefinitionReadFontField(XMLParser* theXmlParser, _Font** theFont)
 {
-    SexyString aStringValue;
+    std::string aStringValue;
     if (!DefinitionReadXMLString(theXmlParser, aStringValue))
         return false;
 
@@ -1291,7 +1291,7 @@ void* DefinitionCompressCompiledBuffer(void* theBuffer, unsigned int theBufferSi
     return aCompressedBuffer;
 }
 
-bool DefinitionWriteCompiledFile(const SexyString& theCompiledFilePath, DefMap* theDefMap, void* theDefinition) {
+bool DefinitionWriteCompiledFile(const std::string& theCompiledFilePath, DefMap* theDefMap, void* theDefinition) {
     unsigned int aCompressedSize = 0;
     unsigned int aDefSize = DefinitionGetSize(theDefMap, theDefinition) + sizeof(unsigned int);
     void* aDefBasePtr = DefinitionAlloc(aDefSize);
@@ -1305,7 +1305,7 @@ bool DefinitionWriteCompiledFile(const SexyString& theCompiledFilePath, DefMap* 
 
     delete[] (uint *)aDefBasePtr; // already compressed, no need to keep this instance alive
 
-    SexyString aFullCompiledPath = DefinitionGetCompiledCacheFullPath(theCompiledFilePath);
+    std::string aFullCompiledPath = DefinitionGetCompiledCacheFullPath(theCompiledFilePath);
     std::string aFilePath = GetFileDir(aFullCompiledPath);
     MkDir(aFilePath);
 
@@ -1323,7 +1323,7 @@ bool DefinitionWriteCompiledFile(const SexyString& theCompiledFilePath, DefMap* 
     return false;
 }
 
-bool DefinitionCompileFile(const SexyString theXMLFilePath, const SexyString& theCompiledFilePath, DefMap* theDefMap, void* theDefinition)
+bool DefinitionCompileFile(const std::string theXMLFilePath, const std::string& theCompiledFilePath, DefMap* theDefMap, void* theDefinition)
 {
     XMLParser aXMLParser = XMLParser();
     if (!aXMLParser.OpenFile(theXMLFilePath))
@@ -1338,7 +1338,7 @@ bool DefinitionCompileFile(const SexyString theXMLFilePath, const SexyString& th
 }
 
 //0x4447F0 : (void* def, *defMap, string& xmlFilePath)  //esp -= 0xC
-bool DefinitionCompileAndLoad(const SexyString& theXMLFilePath, DefMap* theDefMap, void* theDefinition)
+bool DefinitionCompileAndLoad(const std::string& theXMLFilePath, DefMap* theDefMap, void* theDefinition)
 {
 #ifdef _PVZ_DEBUG
     const bool aRequireCompiledUpToDate = true;
@@ -1347,7 +1347,7 @@ bool DefinitionCompileAndLoad(const SexyString& theXMLFilePath, DefMap* theDefMa
 #endif
 
     TodHesitationTrace(__S("predef"));
-    SexyString aCompiledFilePath = DefinitionGetCompiledFilePathFromXMLFilePath(theXMLFilePath);
+    std::string aCompiledFilePath = DefinitionGetCompiledFilePathFromXMLFilePath(theXMLFilePath);
 
     const bool aShouldTryCompiled = !aRequireCompiledUpToDate || DefinitionIsCompiled(theXMLFilePath);
     if (aShouldTryCompiled && DefinitionReadCompiledFile(aCompiledFilePath, theDefMap, theDefinition))

@@ -1,4 +1,5 @@
 #include <time.h>
+#include <algorithm>
 #include <SDL.h>
 #include "ZenGarden.h"
 #include "BoardInclude.h"
@@ -894,7 +895,7 @@ void Board::LoadBackgroundImages()
 		break;
 
 	default:
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 		break;
 	}
 
@@ -1042,7 +1043,7 @@ void Board::PickBackground()
 		break;
 
 	default:
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 		break;
 	}
 	LoadBackgroundImages();
@@ -1106,7 +1107,7 @@ void Board::PickBackground()
 	}
 	else
 	{
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 	}
 
 	for (int x = 0; x < MAX_GRID_SIZE_X; x++)
@@ -1190,7 +1191,7 @@ void Board::PickBackground()
 			}
 			else
 			{
-				TOD_ASSERT();
+				TOD_ASSERT(false);
 			}
 		}
 	}
@@ -1953,8 +1954,8 @@ void Board::FadeOutLevel()
 		else
 		{
 			mLevelAwardSpawned = true;
-			SexyString aStreakStr = mApp->IsEndlessScaryPotter(mApp->mGameMode) ? __S("[ADVICE_MORE_SCARY_POTS]") : __S("[ADVICE_3_IN_A_ROW]");
-			SexyString aMessage = TodReplaceNumberString(aStreakStr, __S("{STREAK}"), mChallenge->mSurvivalStage + 1);
+			std::string aStreakStr = mApp->IsEndlessScaryPotter(mApp->mGameMode) ? __S("[ADVICE_MORE_SCARY_POTS]") : __S("[ADVICE_3_IN_A_ROW]");
+			std::string aMessage = TodReplaceNumberString(aStreakStr, __S("{STREAK}"), mChallenge->mSurvivalStage + 1);
 			PuzzleSaveStreak();
 			ClearAdvice(AdviceType::ADVICE_NONE);
 			DisplayAdvice(aMessage, MessageStyle::MESSAGE_STYLE_BIG_MIDDLE, AdviceType::ADVICE_NONE);
@@ -1965,7 +1966,7 @@ void Board::FadeOutLevel()
 	if (mApp->IsEndlessIZombie(mApp->mGameMode))
 	{
 		mNextSurvivalStageCounter = 500;
-		SexyString aMessage = TodReplaceNumberString(__S("[ADVICE_MORE_IZOMBIE]"), __S("{STREAK}"), mChallenge->mSurvivalStage + 1);
+		std::string aMessage = TodReplaceNumberString(__S("[ADVICE_MORE_IZOMBIE]"), __S("{STREAK}"), mChallenge->mSurvivalStage + 1);
 		PuzzleSaveStreak();
 		ClearAdvice(AdviceType::ADVICE_NONE);
 		DisplayAdvice(aMessage, MessageStyle::MESSAGE_STYLE_BIG_MIDDLE, AdviceType::ADVICE_NONE);
@@ -2017,7 +2018,7 @@ void Board::FadeOutLevel()
 	mApp->SetCursor(CURSOR_POINTER);
 }
 
-void Board::DisplayAdvice(const SexyString& theAdvice, MessageStyle theMessageStyle, AdviceType theHelpIndex)
+void Board::DisplayAdvice(const std::string& theAdvice, MessageStyle theMessageStyle, AdviceType theHelpIndex)
 {
 	if (theHelpIndex != AdviceType::ADVICE_NONE)
 	{
@@ -2032,7 +2033,7 @@ void Board::DisplayAdvice(const SexyString& theAdvice, MessageStyle theMessageSt
 }
 
 //0x40CA10
-void Board::DisplayAdviceAgain(const SexyString& theAdvice, MessageStyle theMessageStyle, AdviceType theHelpIndex)
+void Board::DisplayAdviceAgain(const std::string& theAdvice, MessageStyle theMessageStyle, AdviceType theHelpIndex)
 {
 	if (theHelpIndex != AdviceType::ADVICE_NONE)
 	{
@@ -2360,7 +2361,7 @@ Plant* Board::GetTopPlantAt(int theGridX, int theGridY, PlantPriority thePriorit
 	case PlantPriority::TOPPLANT_ONLY_FLYING:					return aPlantOnLawn.mFlyingPlant;
 	case PlantPriority::TOPPLANT_ONLY_PUMPKIN:					return aPlantOnLawn.mPumpkinPlant;
 	case PlantPriority::TOPPLANT_ONLY_UNDER_PLANT:				return aPlantOnLawn.mUnderPlant;
-	default:													TOD_ASSERT();
+	default:													TOD_ASSERT(false);
 	}
 	unreachable();
 }
@@ -3405,7 +3406,7 @@ void Board::UpdateToolTip()
 			return;
 		}
 
-		SexyString aZombieName = StrFormat(__S("[%s]"), GetZombieDefinition(aZombie->mZombieType).mZombieName);
+		std::string aZombieName = StrFormat(__S("[%s]"), GetZombieDefinition(aZombie->mZombieType).mZombieName);
 		mToolTip->SetTitle(aZombieName);
 		if (mApp->CanShowAlmanac() && aZombie->mZombieType != ZombieType::ZOMBIE_REDEYE_GARGANTUAR)
 		{
@@ -3882,8 +3883,8 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 		}
 		else if (aReason == PlantingReason::PLANTING_NOT_ON_ART)
 		{
-			SexyString aSeedName = Plant::GetNameString(mChallenge->GetArtChallengeSeed(aGridX, aGridY), SeedType::SEED_NONE);
-			SexyString aMessage = TodReplaceString(__S("ADVICE_WRONG_ART_TYPE"), __S("{SEED}"), aSeedName);
+			std::string aSeedName = Plant::GetNameString(mChallenge->GetArtChallengeSeed(aGridX, aGridY), SeedType::SEED_NONE);
+			std::string aMessage = TodReplaceString(__S("ADVICE_WRONG_ART_TYPE"), __S("{SEED}"), aSeedName);
 			DisplayAdvice(aMessage, MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_WRONG_ART_TYPE);
 		}
 		else if (aReason == PlantingReason::PLANTING_NEEDS_POT)
@@ -4062,7 +4063,7 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 	}
 	else
 	{
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 	}
 	
 	// 柱子关卡中，一列种植
@@ -4562,7 +4563,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 		break;
 
 	default:
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 		break;
 	}
 
@@ -5298,14 +5299,14 @@ void Board::ZombiesWon(Zombie* theZombie)
 	}
 	SurvivalSaveScore();
 
-	SexyString aGameOverMsg;
+	std::string aGameOverMsg;
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZOMBIQUARIUM)
 	{
 		aGameOverMsg = __S("[ZOMBIQUARIUM_DEATH_MESSAGE]");
 	}
 	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND)
 	{
-		SexyString aFlagStr = mApp->Pluralize(GetSurvivalFlagsCompleted(), __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
+		std::string aFlagStr = mApp->Pluralize(GetSurvivalFlagsCompleted(), __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
 		aGameOverMsg = TodReplaceString(__S("[LAST_STAND_DEATH_MESSAGE]"), __S("{FLAGS}"), aFlagStr);
 	}
 	else if (mApp->IsEndlessIZombie(mApp->mGameMode) || mApp->IsEndlessScaryPotter(mApp->mGameMode))
@@ -6111,7 +6112,7 @@ void Board::DrawBackdrop(Graphics* g)
 	case BackgroundType::BACKGROUND_GREENHOUSE:			aBgImage = Sexy::IMAGE_BACKGROUND_GREENHOUSE;			break;
 	case BackgroundType::BACKGROUND_ZOMBIQUARIUM:		aBgImage = Sexy::IMAGE_AQUARIUM1;						break;
 	case BackgroundType::BACKGROUND_TREEOFWISDOM:		aBgImage = nullptr;										break;
-	default:											TOD_ASSERT();											break;
+	default:											TOD_ASSERT(false);											break;
 	}
 
 	if (mLevel == 1 && mApp->IsFirstTimeAdventureMode())
@@ -6726,7 +6727,7 @@ void Board::DrawGameObjects(Graphics* g)
 			break;
 
 		default:
-			TOD_ASSERT();
+			TOD_ASSERT(false);
 			break;
 		}
 	}
@@ -6801,29 +6802,29 @@ void Board::DrawProgressMeter(Graphics* g)
 	// @Patoke: updated these
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
 	{
-		SexyString aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 75, TodStringTranslate(__S("[MATCHES]")).c_str());
+		std::string aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 75, TodStringTranslate(__S("[MATCHES]")).c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->IsSquirrelLevel())
 	{
-		SexyString aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 7, TodStringTranslate(__S("[SQUIRRELS]")).c_str());
+		std::string aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 7, TodStringTranslate(__S("[SQUIRRELS]")).c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_SLOT_MACHINE)
 	{
 		int aSunMoney = ClampInt(mSunMoney, 0, 2000);
-		SexyString aMatchStr = StrFormat(__S("%d/%d %s"), aSunMoney, 2000, TodStringTranslate(__S("[SUN]")).c_str());
+		std::string aMatchStr = StrFormat(__S("%d/%d %s"), aSunMoney, 2000, TodStringTranslate(__S("[SUN]")).c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZOMBIQUARIUM)
 	{
 		int aSunMoney = ClampInt(mSunMoney, 0, 1000);
-		SexyString aMatchStr = StrFormat(__S("%d/%d %s"), aSunMoney, 1000, TodStringTranslate(__S("[SUN]")).c_str());
+		std::string aMatchStr = StrFormat(__S("%d/%d %s"), aSunMoney, 1000, TodStringTranslate(__S("[SUN]")).c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->IsIZombieLevel())
 	{
-		SexyString aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 5, TodStringTranslate(__S("[BRAINS]")).c_str());
+		std::string aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 5, TodStringTranslate(__S("[BRAINS]")).c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (ProgressMeterHasFlags())
@@ -6907,7 +6908,7 @@ void Board::DrawLevel(Graphics* g)
 	// ====================================================================================================
 	// ▲ 获取完整的关卡名称的字符串
 	// ====================================================================================================
-	SexyString aLevelStr;
+	std::string aLevelStr;
 	if (mApp->IsAdventureMode())
 	{
 		aLevelStr = TodStringTranslate(__S("[LEVEL]")) + __S(" ") + mApp->GetStageString(mLevel);
@@ -6920,8 +6921,8 @@ void Board::DrawLevel(Graphics* g)
 			int aFlags = GetSurvivalFlagsCompleted();
 			if (aFlags > 0)
 			{
-				SexyString aFlagStr = mApp->Pluralize(aFlags, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
-				SexyString aCompletedStr = TodReplaceString(__S("[FLAGS_COMPLETED]"), __S("{FLAGS}"), aFlagStr);
+				std::string aFlagStr = mApp->Pluralize(aFlags, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
+				std::string aCompletedStr = TodReplaceString(__S("[FLAGS_COMPLETED]"), __S("{FLAGS}"), aFlagStr);
 				aLevelStr = StrFormat(__S("%s - %s"), TodStringTranslate(aLevelStr).c_str(), aCompletedStr.c_str());
 			}
 		}
@@ -6934,7 +6935,7 @@ void Board::DrawLevel(Graphics* g)
 			}
 			if (aStreak > 0)
 			{
-				SexyString aStreakStr = TodReplaceNumberString(__S("[ENDLESS_STREAK]"), __S("{STREAK}"), aStreak);
+				std::string aStreakStr = TodReplaceNumberString(__S("[ENDLESS_STREAK]"), __S("{STREAK}"), aStreak);
 				aLevelStr = StrFormat(__S("%s - %s"), TodStringTranslate(aLevelStr).c_str(), aStreakStr.c_str());
 			}
 		}
@@ -7051,7 +7052,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_FERTILIZER, aButtonRect.mX - 6, aButtonRect.mY + aOffsetY - 7);
 				g->SetColorizeImages(false);
 
-				SexyString aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_BUG_SPRAY)
@@ -7065,7 +7066,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_BUG_SPRAY, aButtonRect.mX, aButtonRect.mY + aOffsetY - 1);
 				g->SetColorizeImages(false);
 
-				SexyString aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_PHONOGRAPH)
@@ -7083,7 +7084,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_CHOCOLATE, aButtonRect.mX + 6, aButtonRect.mY + aOffsetY + 4);
 				g->SetColorizeImages(false);
 
-				SexyString aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_GLOVE)
@@ -7119,7 +7120,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_TREEFOOD, aButtonRect.mX - 6, aButtonRect.mY + aOffsetY - 7);
 				g->SetColorizeImages(false);
 
-				SexyString aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 		}
@@ -7158,7 +7159,7 @@ void Board::DrawShovel(Graphics* g)
 //0x418C70
 void Board::DrawDebugText(Graphics* g)
 {
-	SexyString aText;
+	std::string aText;
 
 	switch (mDebugTextMode)
 	{
@@ -7326,7 +7327,7 @@ void Board::DrawDebugText(Graphics* g)
 		break;
 
 	default:
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 		break;
 	}
 
@@ -7534,7 +7535,7 @@ void Board::DrawUICoinBank(Graphics* g)
 
 	g->SetColor(Color(180, 255, 90, anAlpha));
 	g->SetFont(Sexy::FONT_CONTINUUMBOLD14);
-	SexyString aCoinLabel = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
+	std::string aCoinLabel = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
 	g->DrawString(aCoinLabel, aPosX + 116 - Sexy::FONT_CONTINUUMBOLD14->StringWidth(aCoinLabel), aPosY + 24);
 	g->SetColorizeImages(false);
 }
@@ -8002,7 +8003,7 @@ static void TodCrash()
 }
 
 //0x41B950（原版中废弃）
-void Board::KeyChar(SexyChar theChar)
+void Board::KeyChar(char theChar)
 {
 	if (!mApp->mDebugKeysEnabled)
 		return;
@@ -9056,7 +9057,7 @@ int Board::LeftFogColumn()
 	if (mLevel == 31)													return 6;
 	if (mLevel >= 32 && mLevel <= 36)									return 5;
 	if (mLevel >= 37 && mLevel <= 40)									return 4;
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 
 	unreachable();
 }
@@ -9905,7 +9906,7 @@ int Board::GetNumWavesPerSurvivalStage()
 		return 20;
 	}
 
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 
 	unreachable();
 }
@@ -9996,7 +9997,7 @@ bool Board::CanUseGameObject(GameObjectType theGameObject)
 		return false;
 	}
 	
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 
 	unreachable();
 }
@@ -10062,7 +10063,7 @@ int Board::NumberZombiesInWave(int theWaveIndex)
 		}
 	}
 
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 	return 0;
 }
 

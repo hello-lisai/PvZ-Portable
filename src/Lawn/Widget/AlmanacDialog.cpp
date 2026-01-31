@@ -334,17 +334,17 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 
 	g->DrawImage(Sexy::IMAGE_ALMANAC_PLANTCARD, 459, 86);
 	PlantDefinition& aPlantDef = GetPlantDefinition(mSelectedSeed);
-	SexyString aName = Plant::GetNameString(mSelectedSeed, SEED_NONE);
-	SexyString aDescriptionName = StrFormat(__S("[%s_DESCRIPTION]"), aPlantDef.mPlantName);
+	std::string aName = Plant::GetNameString(mSelectedSeed, SEED_NONE);
+	std::string aDescriptionName = StrFormat(__S("[%s_DESCRIPTION]"), aPlantDef.mPlantName);
 	TodDrawString(g, aName, 617, 288, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
 	TodDrawStringWrapped(g, aDescriptionName, Rect(485, 309, 258, 230), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_LEFT);
 
 	if (mSelectedSeed != SeedType::SEED_IMITATER)
 	{
-		SexyString aCostStr = TodReplaceString(StrFormat(__S("{KEYWORD}{COST}:{STAT} %d"), aPlantDef.mSeedCost), __S("{COST}"), __S("[COST]"));
+		std::string aCostStr = TodReplaceString(StrFormat(__S("{KEYWORD}{COST}:{STAT} %d"), aPlantDef.mSeedCost), __S("{COST}"), __S("[COST]"));
 		TodDrawStringWrapped(g, aCostStr, Rect(485, 520, 134, 50), Sexy::FONT_BRIANNETOD12, Color::White, DS_ALIGN_LEFT);
 
-		SexyString aRechargeStr = TodReplaceString(
+		std::string aRechargeStr = TodReplaceString(
 			__S("{KEYWORD}{WAIT_TIME}:{STAT}{WAIT_TIME_LENGTH}"), 
 			__S("{WAIT_TIME_LENGTH}"),
 			aPlantDef.mRefreshTime == 750 ? __S("[WAIT_TIME_SHORT]") : aPlantDef.mRefreshTime == 3000 ? __S("[WAIT_TIME_LONG]") : __S("[WAIT_TIME_VERY_LONG]") // @Patoke: fix typo XD
@@ -461,10 +461,10 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 	g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIECARD, 455, 78);
 
 	ZombieDefinition& aZombieDef = GetZombieDefinition(mSelectedZombie);
-	SexyString aName = ZombieHasSilhouette(mSelectedZombie) ? __S("???") : StrFormat(__S("[%s]"), aZombieDef.mZombieName);
+	std::string aName = ZombieHasSilhouette(mSelectedZombie) ? __S("???") : StrFormat(__S("[%s]"), aZombieDef.mZombieName);
 	TodDrawString(g, aName, 613, 362, Sexy::FONT_DWARVENTODCRAFT18GREENINSET, Color(190, 255, 235, 255), DS_ALIGN_CENTER);
 
-	SexyString aDescription;
+	std::string aDescription;
 	DrawStringJustification aAlign;
 	if (ZombieHasDescription(mSelectedZombie))
 	{

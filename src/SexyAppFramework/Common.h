@@ -14,10 +14,7 @@
 
 #include <string>
 #include <vector>
-#include <set>
 #include <map>
-#include <list>
-#include <algorithm>
 #include <cstdlib>
 #include <cstdint>
 #include <ctime>
@@ -29,7 +26,6 @@
 #include <mmsystem.h>
 #else
 
-#include <wctype.h>
 #include <string.h>
 #include <stdint.h>
 #define _stricmp strcasecmp
@@ -75,8 +71,6 @@ typedef struct _GUID {
 
 #endif
 
-#include "misc/ModVal.h"
-
 // fallback if NOMINMAX fails (somehow?)
 #undef min
 #undef max
@@ -95,8 +89,6 @@ typedef struct _GUID {
 inline int nanosleep(const struct timespec* ts, struct timespec* rem)
 {
 	// rem is not implemented
-	rem = nullptr;
-
 	HANDLE timer = CreateWaitableTimer(nullptr, TRUE, nullptr);
 	if (!timer)
 		return -1;
@@ -128,7 +120,6 @@ inline int nanosleep(const struct timespec* ts, struct timespec* rem)
 #endif
 
 // Removed wide string support
-typedef std::string			SexyString;
 #define __S(x)				x
 
 #define sexystrncmp			strncmp
@@ -143,9 +134,7 @@ typedef std::string			SexyString;
 #define sexystrchr			strchr
 
 #define SexyStringToStringFast(x)	(x)
-#define SexyStringToWStringFast(x)	StringToWString(x)
 #define StringToSexyStringFast(x)	(x)
-#define WStringToSexyStringFast(x)	WStringToString(x)
 
 #define LONG_BIGE_TO_NATIVE(l) (((l >> 24) & 0xFF) | ((l >> 8) & 0xFF00) | ((l << 8) & 0xFF0000) | ((l << 24) & 0xFF000000))
 #define WORD_BIGE_TO_NATIVE(w) (((w >> 8) & 0xFF) | ((w << 8) & 0xFF00))
@@ -161,9 +150,7 @@ typedef unsigned long ulong;
 typedef int64_t int64;
 
 typedef std::map<std::string, std::string>		DefinesMap;
-typedef std::map<std::wstring, std::wstring>	WStringWStringMap;
-typedef SexyString::value_type					SexyChar;
-#define HAS_SEXYCHAR
+typedef std::vector<char>				CharVector;
 
 namespace Sexy
 {
@@ -181,9 +168,7 @@ int					Rand(int range);
 float				Rand(float range);
 void				SRand(ulong theSeed);
 extern std::string	vformat(const char* fmt, va_list argPtr);
-extern std::wstring	vformat(const wchar_t* fmt, va_list argPtr);
 extern std::string	StrFormat(const char* fmt ...);
-extern std::wstring	StrFormat(const wchar_t* fmt ...);
 //bool				CheckFor98Mill();
 //bool				CheckForVista();
 std::string			GetAppDataFolder();
@@ -194,33 +179,18 @@ void				SetResourceFolder(const std::string& thePath);
 std::string			GetResourcePath(const std::string& theRelativePath);
 std::string			URLEncode(const std::string& theString);
 std::string			StringToUpper(const std::string& theString);
-std::wstring		StringToUpper(const std::wstring& theString);
 std::string			StringToLower(const std::string& theString);
-std::wstring		StringToLower(const std::wstring& theString);
-std::wstring		StringToWString(const std::string &theString);
-std::string			WStringToString(const std::wstring &theString);
-SexyString			StringToSexyString(const std::string& theString);
-SexyString			WStringToSexyString(const std::wstring& theString);
-std::string			SexyStringToString(const SexyString& theString);
-std::wstring		SexyStringToWString(const SexyString& theString);
 std::string			Upper(const std::string& theData);
-std::wstring		Upper(const std::wstring& theData);
 std::string			Lower(const std::string& theData);
-std::wstring		Lower(const std::wstring& theData);
 std::string			Trim(const std::string& theString);
-std::wstring		Trim(const std::wstring& theString);
-bool				StringToInt(const std::string theString, int* theIntVal);
-bool				StringToDouble(const std::string theString, double* theDoubleVal);
-bool				StringToInt(const std::wstring theString, int* theIntVal);
-bool				StringToDouble(const std::wstring theString, double* theDoubleVal);
+bool				StringToInt(const std::string& theString, int* theIntVal);
+bool				StringToDouble(const std::string& theString, double* theDoubleVal);
 int					StrFindNoCase(const char *theStr, const char *theFind);
 bool				StrPrefixNoCase(const char *theStr, const char *thePrefix, int maxLength = 10000000);
-SexyString			CommaSeperate(int theValue);
+std::string			CommaSeperate(int theValue);
 std::string			Evaluate(const std::string& theString, const DefinesMap& theDefinesMap);
 std::string			XMLDecodeString(const std::string& theString);
 std::string			XMLEncodeString(const std::string& theString);
-std::wstring		XMLDecodeString(const std::wstring& theString);
-std::wstring		XMLEncodeString(const std::wstring& theString);
 
 bool				Deltree(const std::string& thePath);
 bool				FileExists(const std::string& theFileName);
@@ -233,7 +203,6 @@ std::string			GetCurDir();
 std::string			GetFullPath(const std::string& theRelPath);
 std::string			GetPathFrom(const std::string& theRelPath, const std::string& theDir);
 bool				AllowAllAccess(const std::string& theFileName);
-std::wstring		UTF8StringToWString(const std::string theString);
 
 // Read memory and then move the pointer
 void				SMemR(void*& _Src, void* _Dst, size_t _Size);
@@ -242,48 +211,12 @@ void				SMemRStr(void*& _Src, std::string& theString);
 void				SMemW(void*& _Dst, const void* _Src, size_t _Size);
 void				SMemWStr(void*& _Dst, const std::string& theString);
 
-inline void			inlineUpper(std::string &theData)
-{
-    //std::transform(theData.begin(), theData.end(), theData.begin(), toupper);
-
-	int aStrLen = (int) theData.length();
-	for (int i = 0; i < aStrLen; i++)
-	{
-		theData[i] = toupper(theData[i]);
-	}
-}
-
-inline void			inlineUpper(std::wstring &theData)
-{
-    //std::transform(theData.begin(), theData.end(), theData.begin(), toupper);
-
-	int aStrLen = (int) theData.length();
-	for (int i = 0; i < aStrLen; i++)
-	{
-		theData[i] = towupper(theData[i]);
-	}
-}
-
-inline void			inlineLower(std::string &theData)
-{
-    std::transform(theData.begin(), theData.end(), theData.begin(), tolower);
-}
-
-inline void			inlineLower(std::wstring &theData)
-{
-    std::transform(theData.begin(), theData.end(), theData.begin(), tolower);
-}
+// Removed wide string support
 
 inline void			inlineLTrim(std::string &theData, const std::string& theChars = " \t\r\n")
 {
     theData.erase(0, theData.find_first_not_of(theChars));
 }
-
-inline void			inlineLTrim(std::wstring &theData, const std::wstring& theChars = L" \t\r\n")
-{
-    theData.erase(0, theData.find_first_not_of(theChars));
-}
-
 
 inline void			inlineRTrim(std::string &theData, const std::string& theChars = " \t\r\n")
 {

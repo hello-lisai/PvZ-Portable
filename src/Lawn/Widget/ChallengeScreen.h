@@ -68,7 +68,7 @@ public:
     ChallengePage               mPage;
     int                         mRow;
     int                         mCol;
-    const SexyChar*             mChallengeName;
+    const char*             mChallengeName;
 };
 extern ChallengeDefinition gChallengeDefs[NUM_CHALLENGE_MODES];
 

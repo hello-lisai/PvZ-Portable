@@ -193,7 +193,7 @@ inline void ReanimationFillInMissingData(void*& thePrev, void*& theValue)
 }
 
 //0x4715F0 : (*def, eax = string& fileName)  //esp -= 0x4
-bool ReanimationLoadDefinition(const SexyString& theFileName, ReanimatorDefinition* theDefinition)
+bool ReanimationLoadDefinition(const std::string& theFileName, ReanimatorDefinition* theDefinition)
 {
 	if (!DefinitionLoadXML(theFileName, &gReanimatorDefMap, theDefinition))
 		return false;
@@ -1167,7 +1167,7 @@ void ReanimatorLoadDefinitions(ReanimationParams* theReanimationParamArray, int 
 	{
 		ReanimationParams* aReanimationParams = &theReanimationParamArray[i];
 		TOD_ASSERT(aReanimationParams->mReanimationType == i);
-		if (DefinitionIsCompiled(StringToSexyString(aReanimationParams->mReanimFileName)))
+		if (DefinitionIsCompiled(aReanimationParams->mReanimFileName))
 			ReanimatorEnsureDefinitionLoaded(aReanimationParams->mReanimationType, true);
 	}
 #endif

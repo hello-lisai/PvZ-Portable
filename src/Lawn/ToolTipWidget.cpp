@@ -22,7 +22,7 @@ ToolTipWidget::ToolTipWidget()
 }
 
 //0x51A530
-void ToolTipWidget::GetLines(std::vector<SexyString>& theLines)
+void ToolTipWidget::GetLines(std::vector<std::string>& theLines)
 {
 	int aLineWidth = 0;
 	unsigned int aIndexStart = 0;
@@ -43,7 +43,7 @@ void ToolTipWidget::GetLines(std::vector<SexyString>& theLines)
 		}
 		else
 		{
-			SexyString aLine = mLabel.substr(aIndexStart, aIndexInLine - aIndexStart);
+			std::string aLine = mLabel.substr(aIndexStart, aIndexInLine - aIndexStart);
 			aLineWidth = 0;
 			theLines.push_back(aLine);
 
@@ -64,7 +64,7 @@ void ToolTipWidget::GetLines(std::vector<SexyString>& theLines)
 //0x51A710
 void ToolTipWidget::CalculateSize()
 {
-	std::vector<SexyString> aLines;
+	std::vector<std::string> aLines;
 
 	int aTitleWidth = FONT_TINYBOLD->StringWidth(mTitle);
 	int aWarningWidth = FONT_PICO129->StringWidth(mWarningText);
@@ -95,21 +95,21 @@ void ToolTipWidget::CalculateSize()
 }
 
 //0x51A8D0
-void ToolTipWidget::SetLabel(const SexyString& theLabel)
+void ToolTipWidget::SetLabel(const std::string& theLabel)
 {
 	mLabel = TodStringTranslate(theLabel);
 	CalculateSize();
 }
 
 //0x51A950
-void ToolTipWidget::SetTitle(const SexyString& theTitle)
+void ToolTipWidget::SetTitle(const std::string& theTitle)
 {
 	mTitle = TodStringTranslate(theTitle);
 	CalculateSize();
 }
 
 //0x51A9D0
-void ToolTipWidget::SetWarningText(const SexyString& theWarningText)
+void ToolTipWidget::SetWarningText(const std::string& theWarningText)
 {
 	mWarningText = TodStringTranslate(theWarningText);
 	CalculateSize();
@@ -177,13 +177,13 @@ void ToolTipWidget::Draw(Graphics* g)
 		aPosY += FONT_PICO129->GetAscent() + 2;
 	}
 
-	std::vector<SexyString> aLines;
+	std::vector<std::string> aLines;
 	GetLines(aLines);
 
 	g->SetFont(FONT_PICO129);
 	for (size_t i = 0; i < aLines.size(); i++)
 	{
-		SexyString aLine = aLines[i];
+		std::string aLine = aLines[i];
 		g->DrawString(aLine, aPosX + (mWidth - FONT_PICO129->StringWidth(aLine)) / 2, aPosY + FONT_PICO129->GetAscent());
 		aPosY += FONT_PICO129->GetAscent() + 2;
 	}

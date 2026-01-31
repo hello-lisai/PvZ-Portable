@@ -66,7 +66,7 @@ public:
 //	virtual void			UpdateF(float theFrac);
 	virtual void			GotFocus();
 	virtual void			LostFocus();	
-	virtual void			KeyChar(SexyChar theChar);
+	virtual void			KeyChar(char theChar);
 	virtual void			KeyDown(KeyCode theKey);
 	virtual void			KeyUp(KeyCode theKey);	
 	virtual void			MouseEnter();
@@ -83,12 +83,12 @@ public:
 	
 	//////// Helper functions
 	
-	virtual Rect			WriteCenteredLine(Graphics* g, int anOffset, const SexyString& theLine);
-	virtual Rect			WriteCenteredLine(Graphics* g, int anOffset, const SexyString& theLine, Color theColor1, Color theColor2, const Point& theShadowOffset = Point(1,2));
+	virtual Rect			WriteCenteredLine(Graphics* g, int anOffset, const std::string& theLine);
+	virtual Rect			WriteCenteredLine(Graphics* g, int anOffset, const std::string& theLine, Color theColor1, Color theColor2, const Point& theShadowOffset = Point(1,2));
 
-	virtual int				WriteString(Graphics* g, const SexyString& theString, int theX, int theY, int theWidth = -1, int theJustification = -1, bool drawString = true, int theOffset = 0, int theLength = -1);
-	virtual int				WriteWordWrapped(Graphics* g, const Rect& theRect, const SexyString& theLine, int theLineSpacing, int theJustification);
-	virtual int				GetWordWrappedHeight(Graphics* g, int theWidth, const SexyString& theLine, int aLineSpacing);
+	virtual int				WriteString(Graphics* g, const std::string& theString, int theX, int theY, int theWidth = -1, int theJustification = -1, bool drawString = true, int theOffset = 0, int theLength = -1);
+	virtual int				WriteWordWrapped(Graphics* g, const Rect& theRect, const std::string& theLine, int theLineSpacing, int theJustification);
+	virtual int				GetWordWrappedHeight(Graphics* g, int theWidth, const std::string& theLine, int aLineSpacing);
 	virtual int				GetNumDigits(int theNumber);
 	virtual void			WriteNumberFromStrip(Graphics* g, int theNumber, int theX, int theY, Image* theNumberStrip, int aSpacing);
 	virtual bool			Contains(int theX, int theY);

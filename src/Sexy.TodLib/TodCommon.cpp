@@ -93,7 +93,7 @@ void Tod_SWTri_AddAllDrawTriFuncs()
 }
 
 //0x5114E0
-SexyString TodGetCurrentLevelName()
+std::string TodGetCurrentLevelName()
 {
 	return __S("Unknown level");
 }
@@ -138,7 +138,7 @@ TodWeightedArray* TodPickArrayItemFromWeightedArray(const TodWeightedArray* theA
 		}
 	}
 
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 	return nullptr;
 }
 
@@ -166,7 +166,7 @@ TodWeightedGridArray* TodPickFromWeightedGridArray(const TodWeightedGridArray* t
 		}
 	}
 
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 	return nullptr;
 }
 
@@ -355,7 +355,7 @@ float TodCurveEvaluate(float theTime, float thePositionStart, float thePositionE
 	case TodCurves::CURVE_BOUNCE_SLOW_MIDDLE:	aWarpedTime = TodCurveInvQuad(TodCurveBounce(theTime));				break;
 	case TodCurves::CURVE_SIN_WAVE:				aWarpedTime = sinf(2 * PI * theTime);								break;
 	case TodCurves::CURVE_EASE_SIN_WAVE:		aWarpedTime = sinf(2 * PI * TodCurveS(theTime));					break;
-	default:									TOD_ASSERT();														break;
+	default:									TOD_ASSERT(false);														break;
 	}
 	return (thePositionEnd - thePositionStart) * aWarpedTime + thePositionStart;
 }
@@ -424,9 +424,9 @@ float RandRangeFloat(float theMin, float theMax)
 }
 
 //0x511CE0
-void TodDrawString(Graphics* g, const SexyString& theText, int thePosX, int thePosY, _Font* theFont, const Color& theColor, DrawStringJustification theJustification)
+void TodDrawString(Graphics* g, const std::string& theText, int thePosX, int thePosY, _Font* theFont, const Color& theColor, DrawStringJustification theJustification)
 {
-	SexyString aFinalString = TodStringTranslate(theText);
+	std::string aFinalString = TodStringTranslate(theText);
 
 	int aPosX = thePosX;
 	if (theJustification == DrawStringJustification::DS_ALIGN_RIGHT || theJustification == DrawStringJustification::DS_ALIGN_RIGHT_VERTICAL_MIDDLE)
@@ -460,9 +460,9 @@ static RenderCommand* gRenderTail[256];
 static RenderCommand* gRenderHead[256];
 
 //0x511E50
-void TodDrawStringMatrix(Graphics* g, const _Font* theFont, const SexyMatrix3& theMatrix, const SexyString& theString, const Color& theColor)
+void TodDrawStringMatrix(Graphics* g, const _Font* theFont, const SexyMatrix3& theMatrix, const std::string& theString, const Color& theColor)
 {
-	SexyString aFinalString = TodStringTranslate(theString);
+	std::string aFinalString = TodStringTranslate(theString);
 
 	memset(gRenderTail, 0, sizeof(gRenderTail));
 	memset(gRenderHead, 0, sizeof(gRenderHead));
@@ -475,8 +475,8 @@ void TodDrawStringMatrix(Graphics* g, const _Font* theFont, const SexyMatrix3& t
 	int aCurPoolIdx = 0;
 	for (int aCharNum = 0; aCharNum < (int)aFinalString.size(); aCharNum++)
 	{
-		SexyChar aChar = aFont->GetMappedChar(aFinalString[aCharNum]);
-		SexyChar aNextChar = '\0';
+		char aChar = aFont->GetMappedChar(aFinalString[aCharNum]);
+		char aNextChar = '\0';
 		if (aCharNum < (int)aFinalString.size() - 1)
 		{
 			aNextChar = aFont->GetMappedChar(aFinalString[aCharNum + 1]);
@@ -1270,13 +1270,13 @@ void FreeGlobalAllocators()
 }
 
 //0x513660
-SexyString TodReplaceString(const SexyString& theText, const SexyChar* theStringToFind, const SexyString& theStringToSubstitute)
+std::string TodReplaceString(const std::string& theText, const char* theStringToFind, const std::string& theStringToSubstitute)
 {
-	SexyString aFinalString = TodStringTranslate(theText);
+	std::string aFinalString = TodStringTranslate(theText);
 	size_t aPos = aFinalString.find(theStringToFind);
-	if (aPos != SexyString::npos)
+	if (aPos != std::string::npos)
 	{
-		SexyString aFinalStringToSubstitute = TodStringTranslate(theStringToSubstitute);
+		std::string aFinalStringToSubstitute = TodStringTranslate(theStringToSubstitute);
 		aFinalString.replace(aPos, strlen(theStringToFind), aFinalStringToSubstitute);
 	}
 
@@ -1284,13 +1284,13 @@ SexyString TodReplaceString(const SexyString& theText, const SexyChar* theString
 }
 
 //0x513720
-SexyString TodReplaceNumberString(const SexyString& theText, const SexyChar* theStringToFind, int theNumber)
+std::string TodReplaceNumberString(const std::string& theText, const char* theStringToFind, int theNumber)
 {
-	SexyString aFinalString = TodStringTranslate(theText);
+	std::string aFinalString = TodStringTranslate(theText);
 	size_t aPos = aFinalString.find(theStringToFind);
-	if (aPos != SexyString::npos)
+	if (aPos != std::string::npos)
 	{
-		SexyString aNumberString = StrFormat(__S("%d"), theNumber);
+		std::string aNumberString = StrFormat(__S("%d"), theNumber);
 		aFinalString.replace(aPos, strlen(theStringToFind), aNumberString);
 	}
 

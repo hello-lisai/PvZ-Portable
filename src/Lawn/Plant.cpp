@@ -927,7 +927,7 @@ void Plant::StarFruitFire()
         case 2:     aProjectile->mVelX = 0.0f;          aProjectile->mVelY = -3.33f;            break;
         case 3:     aProjectile->mVelX = aShootAngleX;  aProjectile->mVelY = aShootAngleY;      break;
         case 4:     aProjectile->mVelX = aShootAngleX;  aProjectile->mVelY = -aShootAngleY;     break;
-        default:    TOD_ASSERT();                                                               break;
+        default:    TOD_ASSERT(false);                                                               break;
         }
     }
 }
@@ -2206,7 +2206,7 @@ void Plant::GoldMagnetFindTargets()
 {
     if (GetFreeMagnetItem() == nullptr)
     {
-        TOD_ASSERT();
+        TOD_ASSERT(false);
         return;
     }
 
@@ -2230,7 +2230,7 @@ void Plant::GoldMagnetFindTargets()
         case CoinType::COIN_SILVER:     aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_SILVER_COIN;   break;
         case CoinType::COIN_GOLD:       aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_GOLD_COIN;     break;
         case CoinType::COIN_DIAMOND:    aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_DIAMOND;       break;
-        default:                        TOD_ASSERT();                                                       return;
+        default:                        TOD_ASSERT(false);                                                       return;
         }
         
         aCoin->Die();
@@ -2277,7 +2277,7 @@ void Plant::UpdateGoldMagnetShroom()
                 case MagnetItemType::MAGNET_ITEM_SILVER_COIN:   aCoinType = CoinType::COIN_SILVER;      break;
                 case MagnetItemType::MAGNET_ITEM_GOLD_COIN:     aCoinType = CoinType::COIN_GOLD;        break;
                 case MagnetItemType::MAGNET_ITEM_DIAMOND:       aCoinType = CoinType::COIN_DIAMOND;     break;
-                default:                                        TOD_ASSERT();                           return;
+                default:                                        TOD_ASSERT(false);                           return;
                 }
 
                 int aValue = Coin::GetCoinValue(aCoinType);
@@ -3840,7 +3840,7 @@ void Plant::DrawMagnetItems(Graphics* g)
             }
             else
             {
-                TOD_ASSERT();
+                TOD_ASSERT(false);
             }
 
             if (aScale == 1.0f)
@@ -4600,7 +4600,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
         aProjectileType = ProjectileType::PROJECTILE_COBBIG;
         break;
     default:
-        TOD_ASSERT();
+        TOD_ASSERT(false);
         break;
     }
     if (mSeedType == SeedType::SEED_KERNELPULT && thePlantWeapon == PlantWeapon::WEAPON_SECONDARY)
@@ -5109,11 +5109,11 @@ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
 
 //0x467C00
 // GOTY @Patoke: 0x46B6C0
-SexyString Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
+std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
 {
     const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
-    SexyString aName = StrFormat(__S("[%s]"), aPlantDef.mPlantName);
-    SexyString aTranslatedName = TodStringTranslate(StringToSexyStringFast(aName));
+    std::string aName = StrFormat(__S("[%s]"), aPlantDef.mPlantName);
+    std::string aTranslatedName = TodStringTranslate(StringToSexyStringFast(aName));
 
     if (theSeedType == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)
     {
@@ -5127,10 +5127,10 @@ SexyString Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
 }
 
 //0x467DB0
-SexyString Plant::GetToolTip(SeedType theSeedType)
+std::string Plant::GetToolTip(SeedType theSeedType)
 {
     const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
-    SexyString aToolTip = StrFormat(__S("[%s_TOOLTIP]"), aPlantDef.mPlantName);
+    std::string aToolTip = StrFormat(__S("[%s_TOOLTIP]"), aPlantDef.mPlantName);
     return TodStringTranslate(aToolTip);
 }
 

@@ -112,7 +112,7 @@ void ProfileMgr::DeleteProfile(ProfileMap::iterator theProfile)
 }
 
 //0x46AF70
-bool ProfileMgr::DeleteProfile(const SexyString& theName)
+bool ProfileMgr::DeleteProfile(const std::string& theName)
 {
     auto anItr = mProfileMap.find(theName);
     if (anItr == mProfileMap.end())
@@ -123,7 +123,7 @@ bool ProfileMgr::DeleteProfile(const SexyString& theName)
 }
 
 //0x46AFF0
-bool ProfileMgr::RenameProfile(const SexyString& theOldName, const SexyString& theNewName)
+bool ProfileMgr::RenameProfile(const std::string& theOldName, const std::string& theNewName)
 {
     auto anOldItr = mProfileMap.find(theOldName);
     if (anOldItr == mProfileMap.end())
@@ -169,7 +169,7 @@ void ProfileMgr::DeleteOldestProfile()
 
 //0x46B290
 // GOTY @Patoke: 0x46F7C0
-PlayerInfo* ProfileMgr::GetProfile(const SexyString& theName)
+PlayerInfo* ProfileMgr::GetProfile(const std::string& theName)
 {
     auto anItr = mProfileMap.find(theName);
     if (anItr != mProfileMap.end())
@@ -183,7 +183,7 @@ PlayerInfo* ProfileMgr::GetProfile(const SexyString& theName)
 }
 
 //0x46B310
-PlayerInfo* ProfileMgr::AddProfile(const SexyString& theName)
+PlayerInfo* ProfileMgr::AddProfile(const std::string& theName)
 {
     auto aRet = mProfileMap.emplace(theName, PlayerInfo());
     if (aRet.second)

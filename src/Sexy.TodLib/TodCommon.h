@@ -108,8 +108,8 @@ void					SexyMatrix3Inverse(const SexyMatrix3& m, SexyMatrix3& r);  // r = m ^ -
 void					SexyMatrix3Multiply(SexyMatrix3& m, const SexyMatrix3& l, const SexyMatrix3& r);  // m = l × r
 bool					TodIsPointInPolygon(const SexyVector2* thePolygonPoint, int theNumberPolygonPoints, const SexyVector2& theCheckPoint);
 
-void					TodDrawString(Graphics* g, const SexyString& theText, int thePosX, int thePosY, _Font* theFont, const Color& theColor, DrawStringJustification theJustification);
-void					TodDrawStringMatrix(Graphics* g, const _Font* theFont, const SexyMatrix3& theMatrix, const SexyString& theString, const Color& theColor);
+void					TodDrawString(Graphics* g, const std::string& theText, int thePosX, int thePosY, _Font* theFont, const Color& theColor, DrawStringJustification theJustification);
+void					TodDrawStringMatrix(Graphics* g, const _Font* theFont, const SexyMatrix3& theMatrix, const std::string& theString, const Color& theColor);
 void					TodDrawImageScaledF(Graphics* g, Image* theImage, float thePosX, float thePosY, float theScaleX, float theScaleY);
 void					TodDrawImageCenterScaledF(Graphics* g, Image* theImage, float thePosX, float thePosY, float theScaleX, float theScaleY);
 void					TodDrawImageCelF(Graphics* g, Image* theImageStrip, float thePosX, float thePosY, int theCelCol, int theCelRow);
@@ -123,15 +123,15 @@ void					FixPixelsOnAlphaEdgeForBlending(Image* theImage);
 uint32_t				AverageNearByPixels(MemoryImage* theImage, uint32_t* thePixel, int x, int y);
 void					Tod_SWTri_AddAllDrawTriFuncs();
 
-SexyString				TodReplaceString(const SexyString& theText, const SexyChar* theStringToFind, const SexyString& theStringToSubstitute);
-SexyString				TodReplaceNumberString(const SexyString& theText, const SexyChar* theStringToFind, int theNumber);
+std::string				TodReplaceString(const std::string& theText, const char* theStringToFind, const std::string& theStringToSubstitute);
+std::string				TodReplaceNumberString(const std::string& theText, const char* theStringToFind, int theNumber);
 int						TodSnprintf(char* theBuffer, int theSize, const char* theFormat, ...);
 int						TodVsnprintf(char* theBuffer, int theSize, const char* theFormat, va_list theArgList);
 
 TodAllocator*			FindGlobalAllocator(int theSize);
 void                    FreeGlobalAllocators();
 
-SexyString				TodGetCurrentLevelName();
+std::string				TodGetCurrentLevelName();
 bool					TodHasUsedCheatKeys();
 bool					TodAppCloseRequest();
 

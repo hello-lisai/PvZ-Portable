@@ -19,8 +19,8 @@ public:
 	virtual void		AddedToManager(WidgetManager* theWidgetManager);
 	virtual void		RemovedFromManager(WidgetManager* theWidgetManager);
 	virtual void		Draw(Graphics* g);
-	virtual void		EditWidgetText(int theId, const SexyString& theString);
-	virtual bool		AllowChar(int theId, SexyChar theChar);
+	virtual void		EditWidgetText(int theId, const std::string& theString);
+	virtual bool		AllowChar(int theId, char theChar);
 	bool				ApplyCheat();
 };
 

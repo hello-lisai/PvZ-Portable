@@ -13,7 +13,7 @@ namespace Sexy
 class SexyAppBase;
 class Image;
 
-typedef std::map<SexyChar, int> CharIntMap;
+typedef std::map<char, int> CharIntMap;
 
 class CharData
 {
@@ -29,7 +29,7 @@ public:
 };
 
 class FontData;
-typedef std::map<SexyChar, CharData> CharDataMap;
+typedef std::map<char, CharData> CharDataMap;
 
 class FontLayer
 {
@@ -62,10 +62,10 @@ public:
 	FontLayer(FontData* theFontData);
 	FontLayer(const FontLayer& theFontLayer);
 
-	CharData*				GetCharData(SexyChar theChar);
+	CharData*				GetCharData(char theChar);
 };
 
-typedef std::map<SexyChar, SexyChar> CharMap;
+typedef std::map<char, char> CharMap;
 typedef std::list<FontLayer> FontLayerList;
 typedef std::map<std::string, FontLayer*> FontLayerMap;
 typedef std::list<Rect> RectList;
@@ -103,7 +103,7 @@ public:
 	bool					LoadLegacy(Image* theFontImage, const std::string& theFontDescFileName);
 };
 
-typedef std::map<SexyChar, Rect> CharRectMap;
+typedef std::map<char, Rect> CharRectMap;
 
 class ActiveFontLayer
 {
@@ -150,7 +150,7 @@ public:
 
 public:
 	virtual void			GenerateActiveFontLayers();
-	virtual void			DrawStringEx(Graphics* g, int theX, int theY, const SexyString& theString, const Color& theColor, RectList* theDrawnAreas, int* theWidth);
+	virtual void			DrawStringEx(Graphics* g, int theX, int theY, const std::string& theString, const Color& theColor, RectList* theDrawnAreas, int* theWidth);
 
 public:
 	ImageFont(SexyAppBase* theSexyApp, const std::string& theFontDescFileName);
@@ -162,10 +162,10 @@ public:
 	ImageFont(Image* theFontImage, const std::string& theFontDescFileName);
 	//ImageFont(const ImageFont& theImageFont, Image* theImage);
 	
-	virtual int				CharWidth(SexyChar theChar);
-	virtual int				CharWidthKern(SexyChar theChar, SexyChar thePrevChar);
-	virtual int				StringWidth(const SexyString& theString);
-	virtual void			DrawString(Graphics* g, int theX, int theY, const SexyString& theString, const Color& theColor, const Rect& theClipRect);
+	virtual int				CharWidth(char theChar);
+	virtual int				CharWidthKern(char theChar, char thePrevChar);
+	virtual int				StringWidth(const std::string& theString);
+	virtual void			DrawString(Graphics* g, int theX, int theY, const std::string& theString, const Color& theColor, const Rect& theClipRect);
 
 	virtual _Font*			Duplicate();
 
@@ -179,7 +179,7 @@ public:
 	virtual std::string		GetDefine(const std::string& theName);
 
 	virtual void			Prepare();
-	SexyChar				GetMappedChar(SexyChar theChar);
+	char				GetMappedChar(char theChar);
 };
 
 }

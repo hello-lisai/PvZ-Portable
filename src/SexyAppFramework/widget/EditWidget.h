@@ -23,8 +23,8 @@ public:
 	};
 
 	int						mId;
-	SexyString				mString;
-	SexyString				mPasswordDisplayString;
+	std::string				mString;
+	std::string				mPasswordDisplayString;
 	_Font*					mFont;
 
 	struct WidthCheck
@@ -46,24 +46,24 @@ public:
 	int						mLeftPos;		
 	int						mMaxChars;
 	int						mMaxPixels;
-	SexyChar				mPasswordChar;
+	char				mPasswordChar;
 	
-	SexyString				mUndoString;
+	std::string				mUndoString;
 	int						mUndoCursor;
 	int						mUndoHilitePos;
 	int						mLastModifyIdx;
 
 
 protected:
-	virtual void			ProcessKey(KeyCode theKey, SexyChar theChar);
-	SexyString&			GetDisplayString();
+	virtual void			ProcessKey(KeyCode theKey, char theChar);
+	std::string&			GetDisplayString();
 	virtual void			HiliteWord();
 	void					UpdateCaretPos();
 
 public:
 	virtual void			SetFont(_Font* theFont, _Font* theWidthCheckFont = nullptr);
-	virtual void			SetText(const SexyString& theText, bool leftPosToZero = true);
-	virtual bool			IsPartOfWord(SexyChar theChar);
+	virtual void			SetText(const std::string& theText, bool leftPosToZero = true);
+	virtual bool			IsPartOfWord(char theChar);
 	virtual int				GetCharAt(int x, int y);
 
 	virtual void			Resize(int theX, int theY, int theWidth, int theHeight);
@@ -78,7 +78,7 @@ public:
 	virtual void			FocusCursor(bool bigJump);
 
 	virtual void			KeyDown(KeyCode theKey);
-	virtual void			KeyChar(SexyChar theChar);
+	virtual void			KeyChar(char theChar);
 
 	virtual void			MouseDown(int x, int y, int theClickCount) { Widget::MouseDown(x, y, theClickCount); }
 	virtual void			MouseDown(int x, int y, int theBtnNum, int theClickCount);

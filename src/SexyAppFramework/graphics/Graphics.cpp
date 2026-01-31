@@ -640,7 +640,7 @@ void Graphics::DrawLineAA(int theStartX, int theStartY, int theEndX, int theEndY
 	mDestImage->DrawLineAA(aStartX, aStartY, aEndX, aEndY, mColor, mDrawMode);
 }
 
-void Graphics::DrawString(const SexyString& theString, int theX, int theY)
+void Graphics::DrawString(const std::string& theString, int theX, int theY)
 {
 	if (mFont != nullptr)
 		mFont->DrawString(this, theX, theY, theString, mColor, mClipRect);
@@ -979,7 +979,7 @@ void Graphics::SetScale(float theScaleX, float theScaleY, float theOrigX, float 
 	mScaleOrigY = theOrigY + mTransY;
 }
 
-int Graphics::StringWidth(const SexyString& theString)
+int Graphics::StringWidth(const std::string& theString)
 {
 	return mFont->StringWidth(theString);
 }
@@ -1073,7 +1073,7 @@ void Graphics::DrawImageCel(Image* theImageStrip, const Rect& theDestRect, int t
 	DrawImage(theImageStrip,theDestRect,aSrcRect);
 }
 
-int Graphics::WriteString(const SexyString& theString, int theX, int theY, int theWidth, int theJustification, bool drawString, int theOffset, int theLength, int theOldColor)
+int Graphics::WriteString(const std::string& theString, int theX, int theY, int theWidth, int theJustification, bool drawString, int theOffset, int theLength, int theOldColor)
 {
 	// _Font* aFont = GetFont(); // unused
 	if (theOldColor==-1)
@@ -1098,7 +1098,7 @@ int Graphics::WriteString(const SexyString& theString, int theX, int theY, int t
 		theLength = theOffset + theLength;
 
 
-	SexyString aString;
+	std::string aString;
 	int aXOffset = 0;
 
 	for (int i = theOffset; i < theLength; i++)
@@ -1124,7 +1124,7 @@ int Graphics::WriteString(const SexyString& theString, int theX, int theY, int t
 				{
 					for (int aDigitNum = 0; aDigitNum < 6; aDigitNum++)
 					{
-						SexyChar aChar = theString[i+aDigitNum+1];
+						char aChar = theString[i+aDigitNum+1];
 						int aVal = 0;
 
 						if ((aChar >= __S('0')) && (aChar <= __S('9')))
@@ -1165,7 +1165,7 @@ int Graphics::WriteString(const SexyString& theString, int theX, int theY, int t
 	return aXOffset;
 }
 
-static int WriteWordWrappedHelper(Graphics *g, const SexyString& theString, int theX, int theY, int theWidth, int theJustification, bool drawString, int theOffset, int theLength, int theOldColor, int theMaxChars)
+static int WriteWordWrappedHelper(Graphics *g, const std::string& theString, int theX, int theY, int theWidth, int theJustification, bool drawString, int theOffset, int theLength, int theOldColor, int theMaxChars)
 {
 	if (theOffset+theLength>theMaxChars)
 	{
@@ -1177,11 +1177,11 @@ static int WriteWordWrappedHelper(Graphics *g, const SexyString& theString, int 
 	return g->WriteString(theString,theX,theY,theWidth,theJustification,drawString,theOffset,theLength,theOldColor);
 }
 
-int	Graphics::WriteWordWrapped(const Rect& theRect, const SexyString& theLine, int theLineSpacing, int theJustification, int *theMaxWidth, int theMaxChars, int *theLastWidth)
+int	Graphics::WriteWordWrapped(const Rect& theRect, const std::string& theLine, int theLineSpacing, int theJustification, int *theMaxWidth, int theMaxChars, int *theLastWidth)
 {
 	/*
 	正式版中，删去了 *theLastWidth、theMaxChars 和 *theMaxWidth 参数，此函数形式可以简化为：
-	Graphics::自动换行的文字绘制(const Rect& 绘制区域矩形, const SexyString& 文字内容, int 行距 = -1, int 对齐方式 = -1)
+	Graphics::自动换行的文字绘制(const Rect& 绘制区域矩形, const std::string& 文字内容, int 行距 = -1, int 对齐方式 = -1)
 	当行距 = -1 时，默认使用 Graphics 字体的行距；对齐方式：左对齐 = -1；居中对齐 = 0；右对齐 = 1。
 	*/
 	Color anOrigColor = GetColor();
@@ -1200,12 +1200,12 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const SexyString& theLine, i
 	if (theLineSpacing == -1)
 		theLineSpacing = aFont->GetLineSpacing();
 
-	SexyString aCurString;
+	std::string aCurString;
 	ulong aCurPos = 0;
 	int aLineStartPos = 0;
 	int aCurWidth = 0;
-	SexyChar aCurChar = 0;
-	SexyChar aPrevChar = 0;
+	char aCurChar = 0;
+	char aPrevChar = 0;
 	int aSpacePos = -1;
 	int aMaxWidth = 0;
 	int anIndentX = 0;
@@ -1340,12 +1340,12 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const SexyString& theLine, i
 	return aYOffset + aFont->GetDescent() - theLineSpacing;
 }
 
-int	Graphics::DrawStringColor(const SexyString& theLine, int theX, int theY, int theOldColor)
+int	Graphics::DrawStringColor(const std::string& theLine, int theX, int theY, int theOldColor)
 {
 	return WriteString(theLine, theX, theY, -1, -1,true,0,-1,theOldColor);
 }
 
-int	Graphics::DrawStringWordWrapped(const SexyString& theLine, int theX, int theY, int theWrapWidth, int theLineSpacing, int theJustification, int *theMaxWidth)
+int	Graphics::DrawStringWordWrapped(const std::string& theLine, int theX, int theY, int theWrapWidth, int theLineSpacing, int theJustification, int *theMaxWidth)
 {
 	/*这个函数在正式版中被删得只剩前三个参数了……*/
 	int aYOffset = mFont->GetAscent() - mFont->GetAscentPadding();
@@ -1354,7 +1354,7 @@ int	Graphics::DrawStringWordWrapped(const SexyString& theLine, int theX, int the
 	return WriteWordWrapped(aRect, theLine, theLineSpacing, theJustification, theMaxWidth);
 }
 
-int	Graphics::GetWordWrappedHeight(int theWidth, const SexyString& theLine, int theLineSpacing, int *theMaxWidth)
+int	Graphics::GetWordWrappedHeight(int theWidth, const std::string& theLine, int theLineSpacing, int *theMaxWidth)
 {
 	Graphics aTestG;
 	aTestG.SetFont(mFont);

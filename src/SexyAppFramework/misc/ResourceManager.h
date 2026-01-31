@@ -23,7 +23,7 @@ class SexyAppBase;
 class _Font;
 
 typedef std::map<std::string, std::string>	StringToStringMap;
-typedef std::map<SexyString, SexyString>	XMLParamMap;
+typedef std::map<std::string, std::string>	XMLParamMap;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

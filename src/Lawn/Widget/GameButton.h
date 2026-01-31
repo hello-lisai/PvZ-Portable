@@ -40,7 +40,7 @@ public:
 	bool					mDisabled;						//+0x1A
 	Color					mColors[6];						//+0x1C
 	int						mId;							//+0x7C
-	SexyString				mLabel;							//+0x80
+	std::string				mLabel;							//+0x80
 	int						mLabelJustify;					//+0x9C
 	_Font*					mFont;							//+0xA0
 	Image*					mButtonImage;					//+0xA4
@@ -77,7 +77,7 @@ public:
 	/*inline*/ bool			IsMouseOver();
 	void					Update();
 	/*inline*/ void			Resize(int theX, int theY, int theWidth, int theHeight);
-	/*inline*/ void			SetLabel(const SexyString& theLabel);
+	/*inline*/ void			SetLabel(const std::string& theLabel);
 };
 
 class LawnStoneButton : public DialogButton
@@ -86,7 +86,7 @@ public:
 	LawnStoneButton(Image* theComponentImage, int theId, ButtonListener* theListener) : DialogButton(theComponentImage, theId, theListener) { }
 
 	virtual void			Draw(Graphics* g);
-	/*inline*/ void			SetLabel(const SexyString& theLabel);
+	/*inline*/ void			SetLabel(const std::string& theLabel);
 };
 
 class NewLawnButton : public DialogButton
@@ -106,13 +106,13 @@ public:
 	
     virtual void			Draw(Graphics* g);
 	virtual bool			IsPointVisible(int x, int y);
-    void					SetLabel(const SexyString& theLabel);
+    void					SetLabel(const std::string& theLabel);
 	// @Patoke: user defined
 	void					SetOffset(int theX, int theY);
 };
 
-LawnStoneButton*			MakeButton(int theId, ButtonListener* theListener, const SexyString& theText);
-NewLawnButton*				MakeNewButton(int theId, ButtonListener* theListener, const SexyString& theText, _Font* theFont, Image* theImageNormal, Image* theImageOver, Image* theImageDown);
-void						DrawStoneButton(Graphics* g, int x, int y, int theWidth, int theHeight, bool isDown, bool isHighLighted, const SexyString& theLabel);
+LawnStoneButton*			MakeButton(int theId, ButtonListener* theListener, const std::string& theText);
+NewLawnButton*				MakeNewButton(int theId, ButtonListener* theListener, const std::string& theText, _Font* theFont, Image* theImageNormal, Image* theImageOver, Image* theImageDown);
+void						DrawStoneButton(Graphics* g, int x, int y, int theWidth, int theHeight, bool isDown, bool isHighLighted, const std::string& theLabel);
 
 #endif

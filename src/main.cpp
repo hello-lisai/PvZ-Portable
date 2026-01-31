@@ -13,7 +13,7 @@ extern "C" {
 
 bool (*gAppCloseRequest)();				//[0x69E6A0]
 bool (*gAppHasUsedCheatKeys)();			//[0x69E6A4]
-SexyString (*gGetCurrentLevelName)();
+std::string (*gGetCurrentLevelName)();
 
 //0x44E8F0
 //int WINAPI WinMain(_In_ HINSTANCE /* hInstance */, _In_opt_ HINSTANCE /* hPrevInstance */, _In_ LPSTR /* lpCmdLine */, _In_ int /* nCmdShow */)

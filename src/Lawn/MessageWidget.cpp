@@ -49,9 +49,9 @@ void MessageWidget::ClearLabel()
 
 //0x459010
 // GOTY @Patoke: inlined 0x459715
-void MessageWidget::SetLabel(const SexyString& theNewLabel, MessageStyle theMessageStyle)
+void MessageWidget::SetLabel(const std::string& theNewLabel, MessageStyle theMessageStyle)
 {
-	SexyString aLabel = TodStringTranslate(theNewLabel);
+	std::string aLabel = TodStringTranslate(theNewLabel);
 	TOD_ASSERT(aLabel.length() < MAX_MESSAGE_LENGTH - 1);
 
 	if (mReanimType != ReanimationType::REANIM_NONE && mDuration > 0)
@@ -113,7 +113,7 @@ void MessageWidget::SetLabel(const SexyString& theNewLabel, MessageStyle theMess
 			break;
 
 		default:
-			TOD_ASSERT();
+			TOD_ASSERT(false);
 			break;
 		}
 		
@@ -144,7 +144,7 @@ void MessageWidget::LayoutReanimText()
 			int aLen = aPos - aCurPos;
 			int aOff = aCurPos;
 			aCurPos = aPos + 1;
-			SexyString aLine(&mLabel[aOff], aLen);
+			std::string aLine(&mLabel[aOff], aLen);
 			
 			aLineWidth[aCurLine] = aFont->StringWidth(aLine);
 			aMaxWidth = std::max(aMaxWidth, aLineWidth[aCurLine]);
@@ -265,7 +265,7 @@ void MessageWidget::DrawReanimatedText(Graphics* g, _Font* theFont, const Color&
 
 		SexyMatrix3 aMatrix;
 		Reanimation::MatrixFromTransform(aTransform, aMatrix);
-		SexyString aLetter;
+		std::string aLetter;
 		aLetter.append(1, mLabel[aPos]);
 		TodDrawStringMatrix(g, theFont, aMatrix, aLetter, aFinalColor);
 	}
@@ -302,7 +302,7 @@ _Font* MessageWidget::GetFont()
 		break;
 	}
 
-	TOD_ASSERT();
+	TOD_ASSERT(false);
 	unreachable();
 }
 
@@ -397,7 +397,7 @@ void MessageWidget::Draw(Graphics* g)
 		break;
 
 	default:
-		TOD_ASSERT();
+		TOD_ASSERT(false);
 		break;
 	}
 
@@ -444,11 +444,11 @@ void MessageWidget::Draw(Graphics* g)
 
 		if (mMessageStyle == MessageStyle::MESSAGE_STYLE_HOUSE_NAME)
 		{
-			SexyString aSubStr;
+			std::string aSubStr;
 			if (mApp->IsSurvivalMode() && mApp->mBoard->mChallenge->mSurvivalStage > 0)
 			{
 				int aFlags = mApp->mBoard->GetNumWavesPerSurvivalStage() * mApp->mBoard->mChallenge->mSurvivalStage / mApp->mBoard->GetNumWavesPerFlag();
-				SexyString aFlagStr = mApp->Pluralize(aFlags, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
+				std::string aFlagStr = mApp->Pluralize(aFlags, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
 				aSubStr = TodReplaceString(__S("[FLAGS_COMPLETED]"), __S("{FLAGS}"), aFlagStr);
 			}
 

@@ -11,7 +11,7 @@
 static Color gGameButtonColors[6] = { Color(0, 0, 0), Color(0, 0, 0), Color(0, 0, 0), Color(255, 255, 255), Color(132, 132, 132), Color(212, 212, 212) };
 
 //0x447B00
-void DrawStoneButton(Graphics* g, int x, int y, int theWidth, int theHeight, bool isDown, bool isHighLighted, const SexyString& theLabel)
+void DrawStoneButton(Graphics* g, int x, int y, int theWidth, int theHeight, bool isDown, bool isHighLighted, const std::string& theLabel)
 {
 	Image* aLeftImage = Sexy::IMAGE_BUTTON_LEFT;
 	Image* aMiddleImage = Sexy::IMAGE_BUTTON_MIDDLE;
@@ -256,19 +256,19 @@ void GameButton::Update()
 }
 
 //0x448470
-void GameButton::SetLabel(const SexyString& theLabel)
+void GameButton::SetLabel(const std::string& theLabel)
 {
 	mLabel = TodStringTranslate(theLabel);
 }
 
 //0x4484E0
-void NewLawnButton::SetLabel(const SexyString& theLabel)
+void NewLawnButton::SetLabel(const std::string& theLabel)
 {
 	mLabel = TodStringTranslate(theLabel);
 }
 
 //0x448550
-void LawnStoneButton::SetLabel(const SexyString& theLabel)
+void LawnStoneButton::SetLabel(const std::string& theLabel)
 {
 	mLabel = TodStringTranslate(theLabel);
 }
@@ -284,7 +284,7 @@ void LawnStoneButton::Draw(Graphics* g)
 }
 
 //0x448620
-LawnStoneButton* MakeButton(int theId, ButtonListener* theListener, const SexyString& theText)
+LawnStoneButton* MakeButton(int theId, ButtonListener* theListener, const std::string& theText)
 {
 	LawnStoneButton* aButton = new LawnStoneButton(nullptr, theId, theListener);
 	aButton->SetLabel(theText);
@@ -397,7 +397,7 @@ bool NewLawnButton::IsPointVisible(int x, int y)
 
 //0x448BC0
 // GOTY @Patoke: 0x44B810
-NewLawnButton* MakeNewButton(int theId, ButtonListener* theListener, const SexyString& theText, _Font* theFont, Image* theImageNormal, Image* theImageOver, Image* theImageDown)
+NewLawnButton* MakeNewButton(int theId, ButtonListener* theListener, const std::string& theText, _Font* theFont, Image* theImageNormal, Image* theImageOver, Image* theImageDown)
 {
 	NewLawnButton* aButton = new NewLawnButton(nullptr, theId, theListener);
 	aButton->SetFont(theFont == nullptr ? Sexy::FONT_BRIANNETOD12 : theFont);

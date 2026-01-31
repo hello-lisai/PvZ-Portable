@@ -1,5 +1,6 @@
 #include "ModVal.h"
 #include "Common.h"
+#include <algorithm>
 #include <fstream>
 
 struct ModStorage

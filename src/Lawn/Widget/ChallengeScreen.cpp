@@ -329,7 +329,7 @@ int ChallengeScreen::MoreTrophiesNeeded(int theChallengeIndex)
 			}
 			else
 			{
-				TOD_ASSERT();
+				TOD_ASSERT(false);
 			}
 
 			return aIdxInPage >= aNumTrophies ? aIdxInPage - aNumTrophies + 1 : 0;
@@ -440,7 +440,7 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 			// ▲ 绘制小游戏的名称
 			// ============================================================================================
 			Color aTextColor = aHighLight ? Color(250, 40, 40) : Color(42, 42, 90);
-			SexyString aName = TodStringTranslate(aDef.mChallengeName);
+			std::string aName = TodStringTranslate(aDef.mChallengeName);
 			if (aChallengeButton->mDisabled || (theChallengeIndex == mUnlockChallengeIndex && mUnlockState == UNLOCK_SHAKING))
 			{
 				aName = __S("?");
@@ -455,7 +455,7 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 			{
 				// 先尝试在名称字符串的后半段取空格以将字符串分隔为两行，若后半段中无空格则在整个字符串中寻找空格
 				int aHalfPos = (mPageIndex == CHALLENGE_PAGE_SURVIVAL && !aChallengeButton->mDisabled) ? 7 : (aNameLen / 2 - 1);
-				const SexyChar* aSpacedChar = sexystrchr(aName.c_str() + aHalfPos, __S(' '));
+				const char* aSpacedChar = sexystrchr(aName.c_str() + aHalfPos, __S(' '));
 				if (aSpacedChar == nullptr)
 				{
 					aSpacedChar = sexystrchr(aName.c_str(), __S(' '));
@@ -502,13 +502,13 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 				}
 				else if (mApp->IsEndlessScaryPotter(aDef.mChallengeMode) || mApp->IsEndlessIZombie(aDef.mChallengeMode))
 				{
-					SexyString aAchievement = mApp->Pluralize(aRecord, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
+					std::string aAchievement = mApp->Pluralize(aRecord, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
 					TodDrawString(g, aAchievement, aPosX + 48, aPosY + 48, Sexy::FONT_CONTINUUMBOLD14OUTLINE, Color::White, DS_ALIGN_CENTER);
 					TodDrawString(g, aAchievement, aPosX + 48, aPosY + 48, Sexy::FONT_CONTINUUMBOLD14, Color(255, 0, 0), DS_ALIGN_CENTER);
 				}
 				else if (mApp->IsSurvivalEndless(aDef.mChallengeMode))
 				{
-					SexyString aAchievement = TodReplaceNumberString(__S("[LONGEST_STREAK]"), __S("{STREAK}"), aRecord);
+					std::string aAchievement = TodReplaceNumberString(__S("[LONGEST_STREAK]"), __S("{STREAK}"), aRecord);
 					Rect aRect(aPosX, aPosY + 15, 96, 200);
 					TodDrawStringWrapped(g, aAchievement, aRect, Sexy::FONT_CONTINUUMBOLD14OUTLINE, Color::White, DS_ALIGN_CENTER);
 					TodDrawStringWrapped(g, aAchievement, aRect, Sexy::FONT_CONTINUUMBOLD14, Color(255, 0, 0), DS_ALIGN_CENTER);
@@ -532,7 +532,7 @@ void ChallengeScreen::Draw(Graphics* g)
 	g->SetLinearBlend(true);
 	g->DrawImage(Sexy::IMAGE_CHALLENGE_BACKGROUND, 0, 0);
 
-	SexyString aTitleString = 
+	std::string aTitleString =
 		mPageIndex == CHALLENGE_PAGE_SURVIVAL ? __S("[PICK_AREA]") : 
 		mPageIndex == CHALLENGE_PAGE_PUZZLE ? __S("[SCARY_POTTER]") : __S("[PICK_CHALLENGE]");
 	TodDrawString(g, aTitleString, 400, 58, Sexy::FONT_HOUSEOFTERROR28, Color(220, 220, 220), DS_ALIGN_CENTER);
@@ -541,7 +541,7 @@ void ChallengeScreen::Draw(Graphics* g)
 	int aTrophiesTotal = mPageIndex == CHALLENGE_PAGE_SURVIVAL ? 10 : mPageIndex == CHALLENGE_PAGE_CHALLENGE ? 20 : mPageIndex == CHALLENGE_PAGE_PUZZLE ? 18 : 0;
 	if (aTrophiesTotal > 0)
 	{
-		SexyString aTrophyString = StrFormat(__S("%d/%d"), aTrophiesGot, aTrophiesTotal);
+		std::string aTrophyString = StrFormat(__S("%d/%d"), aTrophiesGot, aTrophiesTotal);
 		TodDrawString(g, aTrophyString, 739, 73, Sexy::FONT_DWARVENTODCRAFT12, Color(255, 240, 0), DS_ALIGN_CENTER);
 	}
 	TodDrawImageScaledF(g, Sexy::IMAGE_TROPHY, 718, 26, 0.5f, 0.5f);
@@ -655,7 +655,7 @@ void ChallengeScreen::UpdateToolTip()
 			mToolTip->mY = aChallengeButton->mY;
 			if (MoreTrophiesNeeded(aChallengeMode) > 0)
 			{
-				SexyString aLabel;
+				std::string aLabel;
 				if (mPageIndex == CHALLENGE_PAGE_PUZZLE)
 				{
 					if (IsScaryPotterLevel(aDef.mChallengeMode))

@@ -2827,7 +2827,7 @@ void Zombie::SummonBackupDancers()
             case 1:     aRow = mRow + 1;    aPosX = mPosX;          break;
             case 2:     aRow = mRow;        aPosX = mPosX - 100;    break;
             case 3:     aRow = mRow;        aPosX = mPosX + 100;    break;
-            default:    TOD_ASSERT();                               break;
+            default:    TOD_ASSERT(false);                               break;
             }
 
             mFollowerZombieID[i] = SummonBackupDancer(aRow, aPosX);
@@ -4749,7 +4749,7 @@ void Zombie::UpdateYuckyFace()
         }
         else
         {
-            TOD_ASSERT();
+            TOD_ASSERT(false);
         }
     }
 }
@@ -5001,11 +5001,11 @@ void Zombie::DrawZombie(Graphics* g, const ZombieDrawPosition& theDrawPos)
     //case ZombieType::ZOMBIE_GARGANTUAR:
     //case ZombieType::ZOMBIE_IMP:
     //case ZombieType::ZOMBIE_BOSS:
-    //    TOD_ASSERT();
+    //    TOD_ASSERT(false);
     //    break;
 
     default:
-        TOD_ASSERT();
+        TOD_ASSERT(false);
         break;
     }
 }
@@ -8853,7 +8853,7 @@ void Zombie::AttachShield()
     }
     else
     {
-        TOD_ASSERT();
+        TOD_ASSERT(false);
     }
 
     aBodyReanim->AssignRenderGroupToTrack(aTrackName, RENDER_GROUP_SHIELD);
@@ -8895,7 +8895,7 @@ void Zombie::DetachShield()
         }
         else
         {
-            TOD_ASSERT();
+            TOD_ASSERT(false);
         }
     }
 
@@ -9646,7 +9646,7 @@ int Zombie::GetBobsledPosition()
         }
     }
 
-    TOD_ASSERT();
+    TOD_ASSERT(false);
 
     unreachable();
 }
@@ -9870,7 +9870,7 @@ void Zombie::BossSpawnAttack()
 #ifdef DO_FIX_BUGS
     default:    aTrackName = "anim_spawn_5";    break;  // 泳池场景放僵尸崩溃的一种妥协的修复方式（不修改动画时）
 #else
-    default:    TOD_ASSERT();                   break;
+    default:    TOD_ASSERT(false);                   break;
 #endif
     }
     PlayZombieReanim(aTrackName, ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
@@ -9939,7 +9939,7 @@ void Zombie::BossStompAttack()
     case 1:     aTrackName = "anim_stomp_2";    break;
     case 2:     aTrackName = "anim_stomp_3";    break;
     case 3:     aTrackName = "anim_stomp_4";    break;
-    default:    TOD_ASSERT();                   break;
+    default:    TOD_ASSERT(false);                   break;
     }
     PlayZombieReanim(aTrackName, ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
     mApp->PlayFoley(FoleyType::FOLEY_HYDRAULIC_SHORT);
@@ -10078,7 +10078,7 @@ void Zombie::BossHeadSpit()
 #ifdef DO_FIX_BUGS
     default:    aTrackName = "anim_head_attack_5";      break;  // 泳池场景吐球的一种妥协的修复方式（不修改动画时）
 #else
-    default:    TOD_ASSERT();                           break;
+    default:    TOD_ASSERT(false);                           break;
 #endif
     }
     PlayZombieReanim(aTrackName, ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
@@ -10532,7 +10532,7 @@ void Zombie::UpdateBoss()
     }
     else
     {
-        TOD_ASSERT();
+        TOD_ASSERT(false);
     }
 }
 
@@ -10742,7 +10742,7 @@ void Zombie::EnableFuture(bool theEnableFuture)
         case 1:     aImage = IMAGE_REANIM_ZOMBIE_HEAD_SUNGLASSES2;      break;
         case 2:     aImage = IMAGE_REANIM_ZOMBIE_HEAD_SUNGLASSES3;      break;
         case 3:     aImage = IMAGE_REANIM_ZOMBIE_HEAD_SUNGLASSES4;      break;
-        default:    TOD_ASSERT();                                       break;
+        default:    TOD_ASSERT(false);                                       break;
         }
         aBodyReanim->SetImageOverride("anim_head1", aImage);
     }

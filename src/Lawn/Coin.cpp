@@ -369,7 +369,7 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
         break;
 
     default:
-        TOD_ASSERT();
+        TOD_ASSERT(false);
         break;
     }
 
@@ -999,7 +999,7 @@ void Coin::Draw(Graphics* g)
     }
     else
     {
-        TOD_ASSERT();
+        TOD_ASSERT(false);
     }
 
     g->SetColorizeImages(true);

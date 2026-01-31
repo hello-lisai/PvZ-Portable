@@ -9,6 +9,7 @@
 #include "misc/Buffer.h"
 #include <mutex>
 #include <thread>
+#include <set>
 #include "graphics/SharedImage.h"
 #include "misc/Ratio.h"
 #include <atomic>
@@ -58,9 +59,8 @@ typedef std::list<Dialog*> DialogList;
 typedef std::vector<std::string> StringVector;
 //typedef std::basic_string<TCHAR> tstring; // string of TCHARs
 
-typedef std::map<std::string, SexyString> StringSexyStringMap;
+typedef std::map<std::string, std::string> StringSexyStringMap;
 typedef std::map<std::string, std::string> StringStringMap;
-typedef std::map<std::string, std::wstring> StringWStringMap;
 typedef std::map<std::string, bool> StringBoolMap;
 typedef std::map<std::string, int> StringIntMap;
 typedef std::map<std::string, double> StringDoubleMap;
@@ -139,8 +139,8 @@ public:
 		
 	std::string				mCompanyName;
 	std::string				mFullCompanyName;
-	std::string				mProdName;	
-	SexyString				mTitle;	
+	std::string				mProdName;
+	std::string				mTitle;
 	std::string				mRegKey;
 	std::string				mResourceDir;
 	std::string				mCustomSaveDir;
@@ -331,7 +331,7 @@ public:
 	bool					mEnableWindowAspect;
 	Ratio					mWindowAspect;
 
-	StringWStringMap		mStringProperties;
+	StringSexyStringMap		mStringProperties;
 	StringBoolMap			mBoolProperties;
 	StringIntMap			mIntProperties;
 	StringDoubleMap			mDoubleProperties;
@@ -392,21 +392,19 @@ public:
 	// Common overrides:
 	virtual MusicInterface*	CreateMusicInterface();
 	virtual void			InitHook();
-	virtual void			ShutdownHook();	
+	virtual void			ShutdownHook();
 	virtual void			PreTerminate();
 	virtual void			LoadingThreadProc();
 	virtual void			WriteToRegistry();
 	virtual void			ReadFromRegistry();
-	virtual Dialog*			NewDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode);		
+	virtual Dialog*			NewDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode);
 	virtual void			PreDisplayHook();
 
 	// Public methods
 	virtual void			BeginPopup();
 	virtual void			EndPopup();
 	virtual int				MsgBox(const std::string &theText, const std::string &theTitle = "Message", int theFlags = 0);
-	virtual int				MsgBox(const std::wstring &theText, const std::wstring &theTitle = L"Message", int theFlags = 0);
 	virtual void			Popup(const std::string& theString);
-	virtual void			Popup(const std::wstring& theString);
 	virtual void			LogScreenSaverError(const std::string &theError);
 	virtual void			SafeDeleteWidget(Widget* theWidget);	
 
@@ -486,7 +484,7 @@ public:
 	virtual void			SwitchScreenMode(bool wantWindowed, bool is3d, bool force = false);
 	virtual void			SetAlphaDisabled(bool isDisabled);
 	
-	virtual Dialog*			DoDialog(int theDialogId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode);
+	virtual Dialog*			DoDialog(int theDialogId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode);
 	virtual Dialog*			GetDialog(int theDialogId);
 	virtual void			AddDialog(int theDialogId, Dialog* theDialog);
 	virtual void			AddDialog(Dialog* theDialog);
@@ -534,15 +532,15 @@ public:
 	int						GetInteger(const std::string& theId, int theDefault);
 	double					GetDouble(const std::string& theId);
 	double					GetDouble(const std::string& theId, double theDefault);
-	SexyString				GetString(const std::string& theId);
-	SexyString				GetString(const std::string& theId, const SexyString& theDefault);
+	std::string				GetString(const std::string& theId);
+	std::string				GetString(const std::string& theId, const std::string& theDefault);
 
 	StringVector			GetStringVector(const std::string& theId);
 
 	void					SetBoolean(const std::string& theId, bool theValue);
 	void					SetInteger(const std::string& theId, int theValue);
 	void					SetDouble(const std::string& theId, double theValue);
-	void					SetString(const std::string& theId, const std::wstring& theValue);
+	void					SetString(const std::string& theId, const std::string& theValue);
 	
 	// Demo access methods
 	bool					PrepareDemoCommand(bool required);
@@ -571,8 +569,8 @@ public:
 	bool					RegistryWriteInteger(const std::string& theValueName, int theValue);
 	bool					RegistryWriteBoolean(const std::string& theValueName, bool theValue);
 	bool					RegistryWriteData(const std::string& theValueName, const uchar* theValue, uint32_t theLength);	
-	bool					RegistryEraseKey(const SexyString& theKeyName);
-	void					RegistryEraseValue(const SexyString& theValueName);
+	bool					RegistryEraseKey(const std::string& theKeyName);
+	void					RegistryEraseValue(const std::string& theValueName);
 
 	// File access methods
 	bool					WriteBufferToFile(const std::string& theFileName, const Buffer* theBuffer);

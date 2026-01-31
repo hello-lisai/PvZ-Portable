@@ -10,10 +10,10 @@
 using namespace Sexy;
 
 
-SexyString Sexy::DIALOG_YES_STRING				= __S("YES");
-SexyString Sexy::DIALOG_NO_STRING				= __S("NO");
-SexyString Sexy::DIALOG_OK_STRING				= __S("OK");
-SexyString Sexy::DIALOG_CANCEL_STRING			= __S("CANCEL");
+std::string Sexy::DIALOG_YES_STRING				= __S("YES");
+std::string Sexy::DIALOG_NO_STRING				= __S("NO");
+std::string Sexy::DIALOG_OK_STRING				= __S("OK");
+std::string Sexy::DIALOG_CANCEL_STRING			= __S("CANCEL");
 
 static int gDialogColors[][3] = 
 {{255, 255, 255},
@@ -25,7 +25,7 @@ static int gDialogColors[][3] =
 {80, 80, 80},
 {255, 255, 255}};
 
-Dialog::Dialog(Image* theComponentImage, Image* theButtonComponentImage, int theId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode)	
+Dialog::Dialog(Image* theComponentImage, Image* theButtonComponentImage, int theId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode)
 {
 	mId = theId;
 	mResult = 0x7FFFFFFF;

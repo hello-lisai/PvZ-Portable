@@ -7,8 +7,8 @@
 
 class DataSync;
 class PlayerInfo;
-typedef std::pair<SexyString, PlayerInfo> ProfilePair;
-typedef std::map<SexyString, PlayerInfo, Sexy::StringLessNoCase> ProfileMap;
+typedef std::pair<std::string, PlayerInfo> ProfilePair;
+typedef std::map<std::string, PlayerInfo, Sexy::StringLessNoCase> ProfileMap;
 
 class ProfileMgr
 {
@@ -23,7 +23,7 @@ protected:
 	inline void			DeleteOldProfiles() { while(mProfileMap.size() > 200) DeleteOldestProfile(); }
 
 public:
-	bool				DeleteProfile(const SexyString& theName);
+	bool				DeleteProfile(const std::string& theName);
 
 protected:
 	/*inline*/ void		DeleteProfile(ProfileMap::iterator theProfile);
@@ -36,10 +36,10 @@ public:
 	void				Load();
 	void				Save();
 	inline int			GetNumProfiles() const { return mProfileMap.size(); }
-	PlayerInfo*			GetProfile(const SexyString& theName);
-	PlayerInfo*			AddProfile(const SexyString& theName);
+	PlayerInfo*			GetProfile(const std::string& theName);
+	PlayerInfo*			AddProfile(const std::string& theName);
 	PlayerInfo*			GetAnyProfile();
-	bool				RenameProfile(const SexyString& theOldName, const SexyString& theNewName);
+	bool				RenameProfile(const std::string& theOldName, const std::string& theNewName);
 	inline ProfileMap&	GetProfileMap() { return mProfileMap; }
 };
 

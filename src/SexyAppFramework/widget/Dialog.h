@@ -12,10 +12,10 @@ class ButtonWidget;
 class DialogButton;
 class _Font;
 
-extern SexyString DIALOG_YES_STRING;
-extern SexyString DIALOG_NO_STRING;
-extern SexyString DIALOG_OK_STRING;
-extern SexyString DIALOG_CANCEL_STRING;
+extern std::string DIALOG_YES_STRING;
+extern std::string DIALOG_NO_STRING;
+extern std::string DIALOG_OK_STRING;
+extern std::string DIALOG_CANCEL_STRING;
 
 typedef std::vector<std::string> StringVector;
 
@@ -57,9 +57,9 @@ public:
 	DialogButton*			mNoButton;
 	int						mNumButtons;
 	
-	SexyString				mDialogHeader;
-	SexyString				mDialogFooter;
-	SexyString				mDialogLines;
+	std::string				mDialogHeader;
+	std::string				mDialogFooter;
+	std::string				mDialogLines;
 
 	int						mButtonMode;
 	_Font*					mHeaderFont;
@@ -86,7 +86,7 @@ public:
 
 public:
 	Dialog(Image* theComponentImage, Image* theButtonComponentImage, 
-		int theId, bool isModal, const SexyString& theDialogHeader, const SexyString& theDialogLines, const SexyString& theDialogFooter, int theButtonMode); //UNICODE
+		int theId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode); //UNICODE
 
 	virtual ~Dialog();
 

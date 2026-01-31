@@ -603,7 +603,7 @@ void GameSelector::Draw(Graphics* g)
 	if (mApp->mPlayerInfo && mApp->mPlayerInfo->mName.size() &&
 		mSelectorState != SelectorAnimState::SELECTOR_OPEN && mSelectorState != SelectorAnimState::SELECTOR_NEW_USER)
 	{
-		SexyString aWelcomeStr = mApp->mPlayerInfo->mName + __S('!');
+		std::string aWelcomeStr = mApp->mPlayerInfo->mName + __S('!');
 
 		int aSignIdx = aSelectorReanim->FindTrackIndex("woodsign1");
 		SexyTransform2D aOverlayMatrix;
