@@ -4,7 +4,7 @@
 #include "SexyAppBase.h"
 #include "MemoryImage.h"
 #include "graphics/GLImage.h"
-#include "misc/AutoCrit.h"
+#include <mutex>
 #include "fcaseopen/fcaseopen.h"
 
 using namespace Sexy;
@@ -1521,7 +1521,7 @@ int ImageFont::CharWidth(SexyChar theChar)
 	return CharWidthKern(theChar, 0);
 }
 
-CritSect gRenderCritSec;
+std::mutex gRenderCritSec;
 static const int POOL_SIZE = 4096;
 static RenderCommand gRenderCommandPool[POOL_SIZE];
 static RenderCommand* gRenderTail[256];
@@ -1529,7 +1529,7 @@ static RenderCommand* gRenderHead[256];
 
 void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const SexyString& theString, const Color& theColor, RectList* theDrawnAreas, int* theWidth)
 {
-	AutoCrit anAutoCrit(gRenderCritSec);
+	std::lock_guard<std::mutex> anAutoCrit(gRenderCritSec);
 
 	int aPoolIdx;
 

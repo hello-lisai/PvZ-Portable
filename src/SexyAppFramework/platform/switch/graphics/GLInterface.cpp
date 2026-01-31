@@ -8,8 +8,7 @@
 #include "graphics/GLInterface.h"
 #include "graphics/GLImage.h"
 #include "SexyAppBase.h"
-#include "misc/AutoCrit.h"
-#include "misc/CritSect.h"
+#include <mutex>
 #include "graphics/Graphics.h"
 #include "graphics/MemoryImage.h"
 
@@ -1315,14 +1314,14 @@ void GLInterface::SetDrawMode(int theDrawMode)
 
 void GLInterface::AddGLImage(GLImage* theGLImage)
 {
-	AutoCrit anAutoCrit(mCritSect);
+	std::lock_guard<std::mutex> anAutoCrit(mCritSect);
 
 	mGLImageSet.insert(theGLImage);
 }
 
 void GLInterface::RemoveGLImage(GLImage* theGLImage)
 {
-	AutoCrit anAutoCrit(mCritSect);
+	std::lock_guard<std::mutex> anAutoCrit(mCritSect);
 
 	GLImageSet::iterator anItr = mGLImageSet.find(theGLImage);
 	if (anItr != mGLImageSet.end())
@@ -1336,7 +1335,7 @@ void GLInterface::Remove3DData(MemoryImage* theImage)
 		delete (TextureData*)theImage->mD3DData;
 		theImage->mD3DData = nullptr;
 
-		AutoCrit aCrit(mCritSect); // Make images thread safe
+		std::lock_guard<std::mutex> aCrit(mCritSect); // Make images thread safe
 		mImageSet.erase(theImage);
 	}
 }
@@ -1504,7 +1503,7 @@ bool GLInterface::CreateImageTexture(MemoryImage *theImage)
 		// The actual purging was deferred
 		wantPurge = theImage->mPurgeBits;
 
-		AutoCrit aCrit(mCritSect); // Make images thread safe
+		std::lock_guard<std::mutex> aCrit(mCritSect); // Make images thread safe
 		mImageSet.insert(theImage);
 	}
 

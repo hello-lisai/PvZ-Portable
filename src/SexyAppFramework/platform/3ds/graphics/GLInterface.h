@@ -3,7 +3,7 @@
 
 #include "Common.h"
 #include "graphics/MemoryImage.h"
-#include "misc/CritSect.h"
+#include <mutex>
 #include "graphics/NativeDisplay.h"
 #include "misc/Rect.h"
 #include "misc/Ratio.h"
@@ -164,7 +164,7 @@ class GLInterface : public NativeDisplay
 public:
 	SexyAppBase*			mApp;
 
-	CritSect				mCritSect;
+	std::mutex				mCritSect;
 	int						mWidth;
 	int						mHeight;
 	int						mDisplayWidth;

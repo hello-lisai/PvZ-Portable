@@ -1,8 +1,7 @@
 #include "Common.h"
 #include "Debug.h"
 
-#include "AutoCrit.h"
-#include "CritSect.h"
+#include <mutex>
 
 #include <time.h>
 #include <stdarg.h>
@@ -32,7 +31,7 @@ static bool gSexyAllocMapValid = false;
 class SexyAllocMap : public std::map<void*,SEXY_ALLOC_INFO>
 {
 public:
-	CritSect mCrit;
+	std::mutex mCrit;
 
 public:
 	SexyAllocMap() { gSexyAllocMapValid = true; }
@@ -113,7 +112,7 @@ void SexyMemAddTrack(void *addr,  int asize,  const char* fname, int lnum)
 	if (!gSexyAllocMapValid)
 		return;
 
-	AutoCrit aCrit(gSexyAllocMap.mCrit);
+	std::lock_guard<std::mutex> aCrit(gSexyAllocMap.mCrit);
 	gShowLeaks = true;
 
 	SEXY_ALLOC_INFO &info = gSexyAllocMap[addr];
@@ -129,7 +128,7 @@ void SexyMemRemoveTrack(void* addr)
 	if (!gSexyAllocMapValid)
 		return;
 
-	AutoCrit aCrit(gSexyAllocMap.mCrit);
+	std::lock_guard<std::mutex> aCrit(gSexyAllocMap.mCrit);
 	SexyAllocMap::iterator anItr = gSexyAllocMap.find(addr);
 	if (anItr != gSexyAllocMap.end())
 		gSexyAllocMap.erase(anItr);
@@ -142,7 +141,7 @@ void SexyDumpUnfreed()
 	if (!gSexyAllocMapValid)
 		return;
 
-	AutoCrit aCrit(gSexyAllocMap.mCrit);
+	std::lock_guard<std::mutex> aCrit(gSexyAllocMap.mCrit);
 	SexyAllocMap::iterator i;
 	int totalSize = 0;
 	char buf[8192];

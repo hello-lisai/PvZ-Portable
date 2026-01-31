@@ -49,7 +49,7 @@ void SharedImageRef::Release()
 	if (mSharedImage != nullptr)
 	{
 		if (--mSharedImage->mRefCount == 0)
-			gSexyAppBase->mCleanupSharedImages = true;
+			gSexyAppBase->mCleanupSharedImages.store(true, std::memory_order_relaxed);
 	}
 	mSharedImage = nullptr;
 }

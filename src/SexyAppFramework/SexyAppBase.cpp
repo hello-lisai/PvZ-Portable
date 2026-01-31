@@ -9,6 +9,7 @@
 #endif
 #include <time.h>
 #include <math.h>
+#include <vector>
 
 #include <SDL.h>
 
@@ -42,7 +43,7 @@
 //#include "graphics/SysFont.h"
 #include "misc/ResourceManager.h"
 #include "sound/SDLMusicInterface.h"
-#include "misc/AutoCrit.h"
+#include <mutex>
 #include "misc/Debug.h"
 #include "paklib/PakInterface.h"
 #include "sound/DummyMusicInterface.h"
@@ -269,7 +270,7 @@ SexyAppBase::SexyAppBase()
 	mAltDown = false;
 	mAllowAltEnter = true;
 	mStepMode = 0;
-	mCleanupSharedImages = false;
+	mCleanupSharedImages.store(false, std::memory_order_relaxed);
 	mStandardWordWrap = true;
 	mbAllowExtendedChars = true;
 	mEnableMaximizeButton = false;
@@ -1332,10 +1333,12 @@ void SexyAppBase::DumpProgramInfo()
 	int aTotalMemory = 0;
 
 	SortedImageMap aSortedImageMap;
-	MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
-	while (anItr != mMemoryImageSet.end())
 	{
-		MemoryImage* aMemoryImage = *anItr;				
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
+		MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
+		while (anItr != mMemoryImageSet.end())
+		{
+			MemoryImage* aMemoryImage = *anItr;				
 
 		int aNumPixels = aMemoryImage->mWidth*aMemoryImage->mHeight;
 
@@ -1375,7 +1378,8 @@ void SexyAppBase::DumpProgramInfo()
 
 		aSortedImageMap.insert(SortedImageMap::value_type(aMemorySize, aMemoryImage));
 
-		++anItr;
+			++anItr;
+		}
 	}
 
 	aDumpStream << "Total Image Allocation: " << CommaSeperate(aTotalMemory).c_str() << " bytes<BR>";
@@ -3630,25 +3634,28 @@ void SexyAppBase::ShowMemoryUsage()
 		mDDInterface->mDD7->GetAvailableVidMem(&aCaps,&aTotal,&aFree);
 	}
 
-	MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
 	typedef std::pair<int,int> FormatUsage;
 	typedef std::map<PixelFormat,FormatUsage> FormatMap;
 	FormatMap aFormatMap;
 	int aTextureMemory = 0;
-	while (anItr != mMemoryImageSet.end())
 	{
-		MemoryImage* aMemoryImage = *anItr;				
-		if (aMemoryImage->mD3DData != nullptr)
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
+		MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
+		while (anItr != mMemoryImageSet.end())
 		{
-			TextureData *aData = (TextureData*)aMemoryImage->mD3DData;
-			aTextureMemory += aData->mTexMemSize;
+			MemoryImage* aMemoryImage = *anItr;				
+			if (aMemoryImage->mD3DData != nullptr)
+			{
+				TextureData *aData = (TextureData*)aMemoryImage->mD3DData;
+				aTextureMemory += aData->mTexMemSize;
 
-			FormatUsage &aUsage = aFormatMap[aData->mPixelFormat];
-			aUsage.first++;
-			aUsage.second += aData->mTexMemSize;
+				FormatUsage &aUsage = aFormatMap[aData->mPixelFormat];
+				aUsage.first++;
+				aUsage.second += aData->mTexMemSize;
+			}
+
+			++anItr;
 		}
-
-		++anItr;
 	}
 
 	std::string aStr;
@@ -3812,36 +3819,53 @@ std::string	SexyAppBase::NotifyCrashHook()
 
 void SexyAppBase::DeleteNativeImageData()
 {
-	MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
-	while (anItr != mMemoryImageSet.end())
+	std::vector<MemoryImage*> imagesToProcess;
 	{
-		MemoryImage* aMemoryImage = *anItr;		
-		aMemoryImage->DeleteNativeData();			
-		++anItr;
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
+		MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
+		while (anItr != mMemoryImageSet.end())
+		{
+			imagesToProcess.push_back(*anItr);
+			++anItr;
+		}
 	}
+
+	for (MemoryImage* img : imagesToProcess)
+		img->DeleteNativeData();
 }
 
 void SexyAppBase::DeleteExtraImageData()
 {
-	AutoCrit anAutoCrit(mGLInterface->mCritSect);
-	MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
-	while (anItr != mMemoryImageSet.end())
+	std::vector<MemoryImage*> imagesToProcess;
 	{
-		MemoryImage* aMemoryImage = *anItr;
-		aMemoryImage->DeleteExtraBuffers();
-		++anItr;
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
+		MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
+		while (anItr != mMemoryImageSet.end())
+		{
+			imagesToProcess.push_back(*anItr);
+			++anItr;
+		}
 	}
+
+	for (MemoryImage* img : imagesToProcess)
+		img->DeleteExtraBuffers();
 }
 
 void SexyAppBase::ReInitImages()
 {
-	MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
-	while (anItr != mMemoryImageSet.end())
+	std::vector<MemoryImage*> imagesToProcess;
 	{
-		MemoryImage* aMemoryImage = *anItr;				
-		aMemoryImage->ReInit();
-		++anItr;
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
+		MemoryImageSet::iterator anItr = mMemoryImageSet.begin();
+		while (anItr != mMemoryImageSet.end())
+		{
+			imagesToProcess.push_back(*anItr);
+			++anItr;
+		}
 	}
+
+	for (MemoryImage* img : imagesToProcess)
+		img->ReInit();
 }
 
 
@@ -5929,16 +5953,18 @@ void SexyAppBase::SetMasterVolume(double theMasterVolume)
 
 void SexyAppBase::AddMemoryImage(MemoryImage* theMemoryImage)
 {
-	AutoCrit anAutoCrit(mGLInterface->mCritSect);
+	std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
 	mMemoryImageSet.insert(theMemoryImage);
 }
 
 void SexyAppBase::RemoveMemoryImage(MemoryImage* theMemoryImage)
 {
-	AutoCrit anAutoCrit(mGLInterface->mCritSect);
-	MemoryImageSet::iterator anItr = mMemoryImageSet.find(theMemoryImage);
-	if (anItr != mMemoryImageSet.end())
-		mMemoryImageSet.erase(anItr);
+	{
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
+		MemoryImageSet::iterator anItr = mMemoryImageSet.find(theMemoryImage);
+		if (anItr != mMemoryImageSet.end())
+			mMemoryImageSet.erase(anItr);
+	}
 
 	Remove3DData(theMemoryImage);
 }
@@ -6034,7 +6060,7 @@ SharedImageRef SexyAppBase::SetSharedImage(const std::string& theFileName, const
 	SharedImageRef aSharedImageRef;
 	
 	{
-		AutoCrit anAutoCrit(mGLInterface->mCritSect);
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
 		aResultPair = mSharedImageMap.try_emplace(SharedImageMap::key_type(anUpperFileName, anUpperVariant));
 		aSharedImageRef = &aResultPair.first->second;
 	}
@@ -6059,7 +6085,7 @@ SharedImageRef SexyAppBase::GetSharedImage(const std::string& theFileName, const
 	SharedImageRef aSharedImageRef;
 
 	{
-		AutoCrit anAutoCrit(mGLInterface->mCritSect);	
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);	
 		aResultPair = mSharedImageMap.try_emplace(SharedImageMap::key_type(anUpperFileName, anUpperVariant));
 		aSharedImageRef = &aResultPair.first->second;
 	}
@@ -6081,28 +6107,34 @@ SharedImageRef SexyAppBase::GetSharedImage(const std::string& theFileName, const
 
 void SexyAppBase::CleanSharedImages()
 {
-	AutoCrit anAutoCrit(mGLInterface->mCritSect);
-
-	if (mCleanupSharedImages)
+	std::vector<GLImage*> imagesToDelete;
 	{
-		// Delete shared images with reference counts of 0
-		// This doesn't occur in ~SharedImageRef because sometimes we can not only access the image
-		//  through the SharedImageRef returned by GetSharedImage, but also by calling GetSharedImage
-		//  again with the same params -- so we can have instances where we do the 'final' deref on
-		//  an image but immediately re-request it via GetSharedImage
-		SharedImageMap::iterator aSharedImageItr = mSharedImageMap.begin();
-		while (aSharedImageItr != mSharedImageMap.end())
-		{
-			SharedImage* aSharedImage = &aSharedImageItr->second;
-			if (aSharedImage->mRefCount == 0)
-			{
-				delete aSharedImage->mImage;
-				mSharedImageMap.erase(aSharedImageItr++);
-			}
-			else
-				++aSharedImageItr;
-		}
+		std::lock_guard<std::mutex> anAutoCrit(mGLInterface->mCritSect);
 
-		mCleanupSharedImages = false;
+		if (mCleanupSharedImages.load(std::memory_order_relaxed))
+		{
+			// Delete shared images with reference counts of 0
+			// This doesn't occur in ~SharedImageRef because sometimes we can not only access the image
+			//  through the SharedImageRef returned by GetSharedImage, but also by calling GetSharedImage
+			//  again with the same params -- so we can have instances where we do the 'final' deref on
+			//  an image but immediately re-request it via GetSharedImage
+			SharedImageMap::iterator aSharedImageItr = mSharedImageMap.begin();
+			while (aSharedImageItr != mSharedImageMap.end())
+			{
+				SharedImage* aSharedImage = &aSharedImageItr->second;
+				if (aSharedImage->mRefCount == 0)
+				{
+					imagesToDelete.push_back(aSharedImage->mImage);
+					mSharedImageMap.erase(aSharedImageItr++);
+				}
+				else
+					++aSharedImageItr;
+			}
+
+			mCleanupSharedImages.store(false, std::memory_order_relaxed);
+		}
 	}
+
+	for (GLImage* img : imagesToDelete)
+		delete img;
 }

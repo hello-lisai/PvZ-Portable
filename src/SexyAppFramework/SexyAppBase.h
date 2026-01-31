@@ -7,9 +7,10 @@
 #include "widget/ButtonListener.h"
 #include "widget/DialogListener.h"
 #include "misc/Buffer.h"
-#include "misc/CritSect.h"
+#include <mutex>
 #include "graphics/SharedImage.h"
 #include "misc/Ratio.h"
+#include <atomic>
 
 /*
 extern HMODULE gDDrawDLL;
@@ -164,7 +165,7 @@ public:
 	HANDLE					mMutex;
 	bool					mOnlyAllowOneCopyToRun;
 	UINT					mNotifyGameMessage;
-	CritSect				mCritSect;	
+	std::mutex				mCritSect;	
 	bool					mBetaValidate;
 	uchar					mAdd8BitMaxTable[512];
 	WidgetManager*			mWidgetManager;
@@ -212,7 +213,7 @@ public:
 	bool					mMuteOnLostFocus;
 	MemoryImageSet			mMemoryImageSet;
 	SharedImageMap			mSharedImageMap;
-	bool					mCleanupSharedImages;
+	std::atomic<bool>			mCleanupSharedImages;
 	
 	int						mNonDrawCount;
 	int						mFrameTime;

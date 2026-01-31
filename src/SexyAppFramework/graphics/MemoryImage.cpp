@@ -1,6 +1,5 @@
 #include "MemoryImage.h"
 
-#include "misc/CritSect.h"
 #include "GLImage.h"
 #include "graphics/GLInterface.h"
 #include "SexyAppBase.h"

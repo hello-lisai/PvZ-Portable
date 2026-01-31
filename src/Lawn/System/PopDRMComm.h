@@ -1,9 +1,6 @@
 #ifndef __POPDRMCOMM_H__
 #define __POPDRMCOMM_H__
 
-#include "misc/CritSect.h"
-using namespace Sexy;
-
 class PopDRMComm
 {
 public:

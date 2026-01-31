@@ -1,7 +1,5 @@
 target_sources(${PROJECT_NAME} PRIVATE
-    "AutoCrit.h"
     "Buffer.h"
-    "CritSect.h"
     "Debug.h"
     "DescParser.h"
     "DirectXErrorString.h"
@@ -25,7 +23,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     
 #   "MiscBuildBase.cpp"
     "Buffer.cpp"
-    "CritSect.cpp"
     "Debug.cpp"
     "DescParser.cpp"
     "DirectXErrorString.cpp"
