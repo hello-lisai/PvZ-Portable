@@ -1,6 +1,7 @@
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
+#include <algorithm>
 #include <filesystem>
 #include "Common.h"
 #include "PakInterface.h"
@@ -17,138 +18,81 @@ enum
 
 PakInterface* gPakInterface = new PakInterface();
 
-static std::string StringToUpper(const std::string& theString)
-{
-	std::string aString;
-
-	for (unsigned i = 0; i < theString.length(); i++)
-		aString += toupper(theString[i]);
-
-	return aString;
-}
-
 PakInterface::PakInterface()
 {
-	//if (GetPakPtr() == nullptr)
-		//*gPakInterfaceP = this;
 }
 
 PakInterface::~PakInterface()
 {
 }
 
-//0x5D84D0
-static void FixFileName(const char* theFileName, char* theUpperName)
+// Normalize path for pak lookup.
+static std::string NormalizePakPath(const char* theFileName)
 {
-	// 检测路径是否为从盘符开始的绝对路径
-	if ((theFileName[0] != 0) && (theFileName[1] == ':'))
-	{
-		char aDir[256];
-		if (!getcwd(aDir, 256))  // 取得当前工作路径
-			aDir[0] = '\0';
-		int aLen = strlen(aDir);
-		aDir[aLen++] = '/';
-		aDir[aLen] = 0;
+	std::filesystem::path filePath(theFileName);
 
-		// 判断 theFileName 文件是否位于当前目录下
-		if (strncasecmp(aDir, theFileName, aLen) == 0)
-			theFileName += aLen;  // 若是，则跳过从盘符到当前目录的部分，转化为相对路径
+	// Make absolute paths relative to resource folder.
+	if (filePath.is_absolute())
+	{
+		const std::string& resourceFolder = Sexy::GetResourceFolder();
+		if (!resourceFolder.empty())
+		{
+			std::filesystem::path resPath(resourceFolder);
+			auto [resEnd, fileIt] = std::mismatch(resPath.begin(), resPath.end(), 
+			                                       filePath.begin(), filePath.end());
+			if (resEnd == resPath.end())
+			{
+				std::filesystem::path relativePath;
+				for (; fileIt != filePath.end(); ++fileIt)
+					relativePath /= *fileIt;
+				filePath = relativePath;
+			}
+		}
 	}
 
-	bool lastSlash = false;
-	const char* aSrc = theFileName;
-	char* aDest = theUpperName;
-
-	for (;;)
-	{
-		char c = *(aSrc++);
-
-		if ((c == '\\') || (c == '/'))
-		{
-			// 统一转为右斜杠，且多个斜杠的情况下只保留一个
-			if (!lastSlash)
-				*(aDest++) = '/';
-			lastSlash = true;
-		}
-		else if ((c == '.') && (lastSlash) && (*aSrc == '.'))
-		{
-			// We have a '/..' on our hands
-			aDest--;
-			while ((aDest > theUpperName + 1) && (*(aDest-1) != '\\'))  // 回退到上一层目录
-				--aDest;
-			aSrc++;
-			// 此处将形如“a\b\..\c”的路径简化为“a\c”
-		}
-		else
-		{
-			*(aDest++) = toupper((uchar) c);
-			if (c == 0)
-				break;
-			lastSlash = false;				
-		}
-	}
+	std::string result = filePath.lexically_normal().generic_string();
+	
+	if (result.size() >= 2 && result[0] == '.' && result[1] == '/')
+		result = result.substr(2);
+	
+	std::transform(result.begin(), result.end(), result.begin(),
+	               [](unsigned char c) { return std::toupper(c); });
+	
+	return result;
 }
 
 bool PakInterface::AddPakFile(const std::string& theFileName)
 {
-	/*
-	HANDLE aFileHandle = CreateFile(theFileName.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
-
-	if (aFileHandle == INVALID_HANDLE_VALUE)
-		return false;
-
-	int aFileSize = GetFileSize(aFileHandle, 0);
-
-	HANDLE aFileMapping = CreateFileMapping(aFileHandle, nullptr, PAGE_READONLY, 0, aFileSize, nullptr);
-	if (aFileMapping == nullptr)
-	{
-		CloseHandle(aFileHandle);
-		return false;
-	}
-
-	void* aPtr = MapViewOfFile(aFileMapping, FILE_MAP_READ, 0, 0, aFileSize);
-	if (aPtr == nullptr)
-	{
-		CloseHandle(aFileMapping);
-		CloseHandle(aFileHandle);
-		return false;
-	}
-	*/
-
 	FILE *aFileHandle = fcaseopen(theFileName.c_str(), "rb");
-    if (!aFileHandle) return false;
+	if (!aFileHandle)
+		return false;
 
-    fseek(aFileHandle, 0, SEEK_END);
-    size_t aFileSize = ftell(aFileHandle);
-    fseek(aFileHandle, 0, SEEK_SET);
+	fseek(aFileHandle, 0, SEEK_END);
+	size_t aFileSize = ftell(aFileHandle);
+	fseek(aFileHandle, 0, SEEK_SET);
 
 	mPakCollectionList.emplace_back(aFileSize);
 	PakCollection* aPakCollection = &mPakCollectionList.back();
-	/*
-	aPakCollection->mFileHandle = aFileHandle;
-	aPakCollection->mMappingHandle = aFileMapping;
-	aPakCollection->mDataPtr = aPtr;
-	*/
 
-	if (fread(aPakCollection->mDataPtr, 1, aFileSize, aFileHandle) != aFileSize) {
-        fclose(aFileHandle);
-        return false;
-    }
-    fclose(aFileHandle);
+	if (fread(aPakCollection->mDataPtr, 1, aFileSize, aFileHandle) != aFileSize)
+	{
+		fclose(aFileHandle);
+		return false;
+	}
+	fclose(aFileHandle);
 
-    {
-        auto *aDataPtr = static_cast<uint8_t *>(aPakCollection->mDataPtr);
-        for (size_t i = 0; i < aFileSize; i++)
-            *aDataPtr++ ^= 0xF7;
-    }
+	auto *aDataPtr = static_cast<uint8_t *>(aPakCollection->mDataPtr);
+	for (size_t i = 0; i < aFileSize; i++)
+		*aDataPtr++ ^= 0xF7;
 
-	PakRecordMap::iterator aRecordItr = mPakRecordMap.insert(PakRecordMap::value_type(StringToUpper(theFileName), PakRecord())).first;
-	PakRecord* aPakRecord = &(aRecordItr->second);
+	std::string aPakKey = NormalizePakPath(theFileName.c_str());
+	auto aRecordItr = mPakRecordMap.emplace(aPakKey, PakRecord()).first;
+	PakRecord* aPakRecord = &aRecordItr->second;
 	aPakRecord->mCollection = aPakCollection;
-	aPakRecord->mFileName = theFileName;
+	aPakRecord->mFileName = aPakKey;
 	aPakRecord->mStartPos = 0;
 	aPakRecord->mSize = aFileSize;
-	
+
 	PFILE* aFP = FOpen(theFileName.c_str(), "rb");
 	if (aFP == nullptr)
 		return false;
@@ -170,7 +114,6 @@ bool PakInterface::AddPakFile(const std::string& theFileName)
 	}
 
 	int aPos = 0;
-
 	for (;;)
 	{
 		uchar aFlags = 0;
@@ -183,24 +126,23 @@ bool PakInterface::AddPakFile(const std::string& theFileName)
 		FRead(&aNameWidth, 1, 1, aFP);
 		FRead(aName, 1, aNameWidth, aFP);
 		aName[aNameWidth] = 0;
+		
 		int aSrcSize = 0;
 		FRead(&aSrcSize, sizeof(int), 1, aFP);
 		int64_t aFileTime;
 		FRead(&aFileTime, sizeof(int64_t), 1, aFP);
 
-		for (int i=0; i<aNameWidth; i++)
+		for (int i = 0; i < aNameWidth; i++)
 		{
 			if (aName[i] == '\\')
-				aName[i] = '/'; // lol
+				aName[i] = '/';
 		}
 
-		char anUpperName[256];
-		FixFileName(aName, anUpperName);
-
-		PakRecordMap::iterator aRecordItr = mPakRecordMap.insert(PakRecordMap::value_type(StringToUpper(aName), PakRecord())).first;
-		PakRecord* aPakRecord = &(aRecordItr->second);
+		std::string aKey = NormalizePakPath(aName);
+		auto aRecordItr = mPakRecordMap.emplace(aKey, PakRecord()).first;
+		PakRecord* aPakRecord = &aRecordItr->second;
 		aPakRecord->mCollection = aPakCollection;
-		aPakRecord->mFileName = anUpperName;
+		aPakRecord->mFileName = aKey;
 		aPakRecord->mStartPos = aPos;
 		aPakRecord->mSize = aSrcSize;
 		aPakRecord->mFileTime = aFileTime;
@@ -210,18 +152,13 @@ bool PakInterface::AddPakFile(const std::string& theFileName)
 
 	int anOffset = FTell(aFP);
 
-	// Now fix file starts
-	aRecordItr = mPakRecordMap.begin();
-	while (aRecordItr != mPakRecordMap.end())
+	for (auto& [key, record] : mPakRecordMap)
 	{
-		PakRecord* aPakRecord = &(aRecordItr->second);
-		if (aPakRecord->mCollection == aPakCollection)
-			aPakRecord->mStartPos += anOffset;
-		++aRecordItr;
+		if (record.mCollection == aPakCollection)
+			record.mStartPos += anOffset;
 	}
 
 	FClose(aFP);
-
 	return true;
 }
 
@@ -230,20 +167,8 @@ PFILE* PakInterface::FOpen(const char* theFileName, const char* anAccess)
 {
 	if ((strcasecmp(anAccess, "r") == 0) || (strcasecmp(anAccess, "rb") == 0) || (strcasecmp(anAccess, "rt") == 0))
 	{
-		char anUpperName[256];
-		FixFileName(theFileName, anUpperName);
-		
-		PakRecordMap::iterator anItr = mPakRecordMap.find(anUpperName);
-		if (anItr != mPakRecordMap.end())
-		{
-			PFILE* aPFP = new PFILE;
-			aPFP->mRecord = &anItr->second;
-			aPFP->mPos = 0;
-			aPFP->mFP = nullptr;
-			return aPFP;
-		}
-
-		anItr = mPakRecordMap.find(theFileName);
+		std::string aKey = NormalizePakPath(theFileName);
+		auto anItr = mPakRecordMap.find(aKey);
 		if (anItr != mPakRecordMap.end())
 		{
 			PFILE* aPFP = new PFILE;
@@ -264,8 +189,10 @@ PFILE* PakInterface::FOpen(const char* theFileName, const char* anAccess)
 	{
 		aFP = fcaseopen(theFileName, anAccess);
 	}
+
 	if (aFP == nullptr)
 		return nullptr;
+
 	PFILE* aPFP = new PFILE;
 	aPFP->mRecord = nullptr;
 	aPFP->mPos = 0;

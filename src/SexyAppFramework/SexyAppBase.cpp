@@ -1114,18 +1114,6 @@ bool SexyAppBase::OpenURL(const std::string& theURL, bool shutdownOnOpen)
 		mIsOpeningURL = true;
 		mOpeningURL = theURL;
 		mOpeningURLTime = SDL_GetTicks();
-
-        /*
-		if ((intptr_t) ShellExecuteA(nullptr, "open", theURL.c_str(), nullptr, nullptr, SW_SHOWNORMAL) > 32)
-		{
-			return true;
-		}
-		else
-		{
-			URLOpenFailed(theURL);
-			return false;
-		}
-        */
 	}
 
 	return true;
@@ -1134,52 +1122,6 @@ bool SexyAppBase::OpenURL(const std::string& theURL, bool shutdownOnOpen)
 std::string SexyAppBase::GetProductVersion(const std::string& thePath)
 {
 	return "0";
-	/*
-	// Dynamically Load Version.dll
-	typedef DWORD (APIENTRY *GetFileVersionInfoSizeFunc)(LPSTR lptstrFilename, LPDWORD lpdwHandle);
-	typedef BOOL (APIENTRY *GetFileVersionInfoFunc)(LPSTR lptstrFilename, DWORD dwHandle, DWORD dwLen, LPVOID lpData);
-	typedef BOOL (APIENTRY *VerQueryValueFunc)(const LPVOID pBlock, LPSTR lpSubBlock, LPVOID * lplpBuffer, PUINT puLen);
-
-	static GetFileVersionInfoSizeFunc aGetFileVersionInfoSizeFunc = nullptr;
-	static GetFileVersionInfoFunc aGetFileVersionInfoFunc = nullptr;
-	static VerQueryValueFunc aVerQueryValueFunc = nullptr;
-
-	if (aGetFileVersionInfoSizeFunc==nullptr)
-	{
-		aGetFileVersionInfoSizeFunc = (GetFileVersionInfoSizeFunc)GetProcAddress(gVersionDLL,"GetFileVersionInfoSizeA");
-		aGetFileVersionInfoFunc = (GetFileVersionInfoFunc)GetProcAddress(gVersionDLL,"GetFileVersionInfoA");
-		aVerQueryValueFunc = (VerQueryValueFunc)GetProcAddress(gVersionDLL,"VerQueryValueA");
-	}
-
-	// Get Product Version
-	std::string aProductVersion;
-	
-	uint aSize = aGetFileVersionInfoSizeFunc((char*) thePath.c_str(), 0);
-	if (aSize > 0)		
-	{
-		uchar* aVersionBuffer = new uchar[aSize];
-		aGetFileVersionInfoFunc((char*) thePath.c_str(), 0, aSize, aVersionBuffer);	
-		char* aBuffer;
-		if (aVerQueryValueFunc(aVersionBuffer, 
-				  (char*)"\\StringFileInfo\\040904B0\\ProductVersion",
-				  (void**) &aBuffer, 
-				  &aSize))
-		{
-			aProductVersion = aBuffer;
-		}
-		else if (aVerQueryValueFunc(aVersionBuffer, 
-				  (char*)"\\StringFileInfo\\040904E4\\ProductVersion", 
-				  (void**) &aBuffer, 
-				  &aSize))
-		{
-			aProductVersion = aBuffer;
-		}
-
-		delete[] aVersionBuffer;	
-	}
-
-	return aProductVersion;
-	*/
 }
 
 void SexyAppBase::WaitForLoadingThread()
@@ -1586,32 +1528,6 @@ bool SexyAppBase::RegistryWrite(const std::string& theValueName, uint32_t theTyp
 		aValueName = theValueName;
 	}
 
-	/*
-	int aResult = RegOpenKeyExA(HKEY_CURRENT_USER, aKeyName.c_str(), 0, KEY_WRITE, &aGameKey);
-	if (aResult != ERROR_SUCCESS)
-	{
-		uint32_t aDisp;
-		aResult = RegCreateKeyExA(HKEY_CURRENT_USER, aKeyName.c_str(), 0, (char *)"Key", REG_OPTION_NON_VOLATILE,
-			KEY_ALL_ACCESS, nullptr, &aGameKey, &aDisp);
-	}
-
-	if (aResult != ERROR_SUCCESS)
-	{
-		if (mRecordingDemoBuffer)
-		{
-			WriteDemoTimingBlock();
-			mDemoBuffer.WriteNumBits(0, 1);
-			mDemoBuffer.WriteNumBits(DEMO_REGISTRY_WRITE, 5);
-			mDemoBuffer.WriteNumBits(0, 1); // failure
-		}
-
-		return false;
-	}
-		
-	RegSetValueExA(aGameKey, aValueName.c_str(), 0, theType, theValue, theLength);
-	RegCloseKey(aGameKey);
-	*/
-
 	if (!regemu::RegistryWrite(aKeyName, aValueName, theType, theValue, theLength))
 	{
 		if (mRecordingDemoBuffer)
@@ -1692,10 +1608,6 @@ bool SexyAppBase::RegistryEraseKey(const SexyString& _theKeyName)
 	
 	std::string aKeyName = RemoveTrailingSlash("SOFTWARE\\" + mRegKey) + "\\" + theKeyName;
 
-	/*
-	int aResult = RegDeleteKeyA(HKEY_CURRENT_USER, aKeyName.c_str());
-	if (aResult != ERROR_SUCCESS)
-	*/
 	if (!regemu::RegistryEraseKey(aKeyName))
 	{
 		if (mRecordingDemoBuffer)
@@ -1741,99 +1653,8 @@ void SexyAppBase::RegistryEraseValue(const SexyString& _theValueName)
 		aValueName = theValueName;
 	}
 
-	/*
-	int aResult = RegOpenKeyExA(HKEY_CURRENT_USER, aKeyName.c_str(), 0, KEY_WRITE, &aGameKey);
-	if (aResult == ERROR_SUCCESS)
-	{		
-		RegDeleteValueA(aGameKey, aValueName.c_str());
-		RegCloseKey(aGameKey);
-	}
-	*/
-
 	regemu::RegistryEraseValue(aKeyName, aValueName);
 }
-
-/*
-bool SexyAppBase::RegistryGetSubKeys(const std::string& theKeyName, StringVector* theSubKeys)
-{
-	theSubKeys->clear();
-
-	if (mRegKey.length() == 0)
-		return false;
-
-	if (mPlayingDemoBuffer)
-	{
-		if (mManualShutdown)
-			return true;
-
-		PrepareDemoCommand(true);
-		mDemoNeedsCommand = true;
-
-		DBG_ASSERTE(!mDemoIsShortCmd);		
-		DBG_ASSERTE(mDemoCmdNum == DEMO_REGISTRY_GETSUBKEYS);
-
-		bool success = mDemoBuffer.ReadNumBits(1, false) != 0;
-		if (!success)
-			return false;
-
-		int aNumKeys = mDemoBuffer.ReadLong();
-
-		for (int i = 0; i < aNumKeys; i++)
-			theSubKeys->push_back(mDemoBuffer.ReadString());
-
-		return true;
-	}
-	else
-	{
-		HKEY aKey;
-		
-		std::string aKeyName = RemoveTrailingSlash(RemoveTrailingSlash("SOFTWARE\\" + mRegKey) + "\\" + theKeyName);	
-		int aResult = RegOpenKeyExA(HKEY_CURRENT_USER, aKeyName.c_str(), 0, KEY_READ, &aKey);
-		
-		if (aResult == ERROR_SUCCESS)
-		{		
-			for (int anIdx = 0; ; anIdx++)
-			{
-				char aStr[1024];
-
-				aResult = RegEnumKeyA(aKey, anIdx, aStr, 1024);
-				if (aResult != ERROR_SUCCESS)
-					break;
-
-				theSubKeys->push_back(aStr);
-			}
-
-			RegCloseKey(aKey);
-
-			if (mRecordingDemoBuffer)
-			{
-				WriteDemoTimingBlock();
-				mDemoBuffer.WriteNumBits(0, 1);
-				mDemoBuffer.WriteNumBits(DEMO_REGISTRY_GETSUBKEYS, 5);
-				mDemoBuffer.WriteNumBits(1, 1); // success
-				mDemoBuffer.WriteLong(theSubKeys->size());
-
-				for (int i = 0; i < (int) theSubKeys->size(); i++)
-					mDemoBuffer.WriteString((*theSubKeys)[i]);				
-			}
-
-			return true;
-		}
-		else
-		{
-			if (mRecordingDemoBuffer)
-			{
-				WriteDemoTimingBlock();
-				mDemoBuffer.WriteNumBits(0, 1);
-				mDemoBuffer.WriteNumBits(DEMO_REGISTRY_GETSUBKEYS, 5);
-				mDemoBuffer.WriteNumBits(0, 1); // failure
-			}
-
-			return false;	
-		}
-	}
-}
-*/
 
 bool SexyAppBase::RegistryRead(const std::string& theValueName, uint32_t* theType, uchar* theValue, uint32_t* theLength)
 {
@@ -1879,8 +1700,6 @@ bool SexyAppBase::RegistryReadKey(const std::string& theValueName, uint32_t* the
 	}
 	else
 	{		
-		//HKEY aGameKey;
-
 		std::string aKeyName = RemoveTrailingSlash("SOFTWARE\\" + mRegKey);
 		std::string aValueName;
 
@@ -1894,30 +1713,6 @@ bool SexyAppBase::RegistryReadKey(const std::string& theValueName, uint32_t* the
 		{
 			aValueName = theValueName;
 		}		
-
-		/*
-		if (RegOpenKeyExA(theKey, aKeyName.c_str(), 0, KEY_READ, &aGameKey) == ERROR_SUCCESS)
-		{
-			if (RegQueryValueExA(aGameKey, aValueName.c_str(), 0, theType, (uchar*) theValue, theLength) == ERROR_SUCCESS)
-			{
-				if (mRecordingDemoBuffer)
-				{
-					WriteDemoTimingBlock();
-					mDemoBuffer.WriteNumBits(0, 1);
-					mDemoBuffer.WriteNumBits(DEMO_REGISTRY_READ, 5);
-					mDemoBuffer.WriteNumBits(1, 1); // success
-					mDemoBuffer.WriteLong(*theType);
-					mDemoBuffer.WriteLong(*theLength);
-					mDemoBuffer.WriteBytes(theValue, *theLength);
-				}
-
-				RegCloseKey(aGameKey);
-				return true;	
-			}
-
-			RegCloseKey(aGameKey);
-		}
-		*/
 
 		if (regemu::RegistryRead(aKeyName, aValueName, (uint32_t*)theType, theValue, (uint32_t*)theLength))
 		{
@@ -5079,8 +4874,6 @@ void SexyAppBase::Init()
 	}
 #endif
 
-	ReadFromRegistry();	
-
 	/*
 	if (CheckForVista())
 	{
@@ -5135,6 +4928,8 @@ void SexyAppBase::Init()
 	{
 		SetAppDataFolder(GetResourcePath("savedata"));
 	}
+
+	ReadFromRegistry();	
 
 	gPakInterface->AddPakFile(GetResourcePath("main.pak"));
 

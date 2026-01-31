@@ -228,7 +228,6 @@ void				MkDir(const std::string& theDir);
 std::string			GetFileName(const std::string& thePath, bool noExtension = false);
 std::string			GetFileDir(const std::string& thePath, bool withSlash = false);
 std::string			RemoveTrailingSlash(const std::string& theDirectory);
-std::string			AddTrailingSlash(const std::string& theDirectory, bool backSlash = false);
 time_t				GetFileDate(const std::string& theFileName);
 std::string			GetCurDir();
 std::string			GetFullPath(const std::string& theRelPath);

@@ -521,7 +521,7 @@ std::string Sexy::GetPathFrom(const std::string& theRelPath, const std::string& 
 {
 	std::filesystem::path relPath(theRelPath);
 	if (relPath.is_absolute() || relPath.has_root_name())
-		return relPath.lexically_normal().string();
+		return relPath.lexically_normal().generic_string();
 
 	std::filesystem::path baseDir;
 	if (!theDir.empty())
@@ -531,10 +531,10 @@ std::string Sexy::GetPathFrom(const std::string& theRelPath, const std::string& 
 		std::error_code ec;
 		baseDir = std::filesystem::current_path(ec);
 		if (ec)
-			return relPath.lexically_normal().string();
+			return relPath.lexically_normal().generic_string();
 	}
 
-	return (baseDir / relPath).lexically_normal().string();
+	return (baseDir / relPath).lexically_normal().generic_string();
 }
 
 bool Sexy::AllowAllAccess(const std::string& theFileName)
@@ -567,14 +567,10 @@ void Sexy::MkDir(const std::string& theDir)
 
 std::string Sexy::GetFileName(const std::string& thePath, bool noExtension)
 {
-	if (!thePath.empty())
-	{
-		char lastChar = thePath[thePath.length() - 1];
-		if (lastChar == '\\' || lastChar == '/')
-			return "";
-	}
-
 	std::filesystem::path path(thePath);
+	if (!path.has_filename())
+		return "";
+
 	if (noExtension)
 		return path.stem().string();
 
@@ -588,41 +584,20 @@ std::string Sexy::GetFileDir(const std::string& thePath, bool withSlash)
 	if (parent.empty())
 		return "";
 
-	std::string result = parent.string();
-	if (withSlash)
-	{
-		char lastChar = result[result.length() - 1];
-		if (lastChar != '/' && lastChar != '\\')
-			result += std::filesystem::path::preferred_separator;
-	}
+	std::string result = parent.generic_string();
+	if (withSlash && !result.empty())
+		result += '/';
 
 	return result;
 }
 
 std::string Sexy::RemoveTrailingSlash(const std::string& theDirectory)
 {
-	int aLen = theDirectory.length();
-	
-	if ((aLen > 0) && ((theDirectory[aLen-1] == '\\') || (theDirectory[aLen-1] == '/')))
-		return theDirectory.substr(0, aLen - 1);
-	else
+	if (theDirectory.empty())
 		return theDirectory;
-}
 
-std::string	Sexy::AddTrailingSlash(const std::string& theDirectory, bool backSlash)
-{
-	if (!theDirectory.empty())
-	{
-		char aChar = theDirectory[theDirectory.length()-1];
-		if (aChar!='\\' && aChar!='/')
-			return theDirectory + (backSlash ? '\\' : '/');
-		else
-			return theDirectory;
-	}
-	else
-		return "";
+	return std::filesystem::path(theDirectory).lexically_normal().generic_string();
 }
-
 
 time_t Sexy::GetFileDate(const std::string& theFileName)
 {
