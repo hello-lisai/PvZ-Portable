@@ -5,6 +5,10 @@
 #include "graphics/GLImage.h"
 #include "widget/WidgetManager.h"
 
+#ifndef SDL_HINT_APP_ID // SDL2 compatibility (already defined in SDL3.2+)
+#define SDL_HINT_APP_ID "SDL_APP_ID"
+#endif
+
 using namespace Sexy;
 
 void SexyAppBase::MakeWindow()
@@ -15,6 +19,9 @@ void SexyAppBase::MakeWindow()
 	}
 	else
 	{
+		// For Wayland's icon support on the game window
+		SDL_SetHint(SDL_HINT_APP_ID, "io.github.wszqkzqk.pvz-portable");
+
 		SDL_Init(SDL_INIT_VIDEO);
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
