@@ -30,7 +30,6 @@
 #  ifdef __GNUC__
 #    define STIN static __inline__
 #  elif _WIN32
-#  pragma warning(disable:4267 4244)
 #    define STIN static __inline
 #  endif
 #else

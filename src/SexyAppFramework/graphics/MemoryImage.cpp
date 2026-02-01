@@ -18,10 +18,6 @@ using namespace Sexy;
 bool gOptimizeSoftwareDrawing = false;
 #endif
 
-
-// Disable macro redefinition warning
-#pragma warning(disable:4005)
-
 MemoryImage::MemoryImage()
 {	
 	mApp = gSexyAppBase;
