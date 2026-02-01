@@ -1,5 +1,9 @@
 # PvZ-Portable
 
+<div align="center">
+  <img src="icon.png" alt="PvZ-Portable"/>
+</div>
+
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/wszqkzqk/PvZ-Portable)
 
 A **cross-platform** community-driven reimplementation of Plants vs. Zombies: Game of the Year Edition, aiming to bring the **100% authentic PvZ experience** to every platform.
