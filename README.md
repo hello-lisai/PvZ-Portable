@@ -1,7 +1,7 @@
 # PvZ-Portable
 
 <div align="center">
-  <img src="icon.png" alt="PvZ-Portable"/>
+  <img src="icon-readme.png" alt="PvZ-Portable" width="450">
 </div>
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/wszqkzqk/PvZ-Portable)
