@@ -52,6 +52,13 @@ END
 
 // IDC_CURSOR1             CURSOR                  "../Cursor13.cur"
 
+// Icon
+//
+
+#ifdef APP_ICON_PATH
+IDI_APP_ICON ICON APP_ICON_PATH
+#endif
+
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
