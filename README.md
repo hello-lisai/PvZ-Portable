@@ -31,7 +31,7 @@ This project is licensed under the **[GNU Lesser General Public License v2.1](LI
 
 ## Features
 
-This is a **fork** of [Patoke](https://github.com/Patoke/re-plants-vs-zombies) and [Headshotnoby](https://github.com/headshot2017/re-plants-vs-zombies)'s PVZ GOTY implementation with the following objectives:
+This project is **based on** [Patoke](https://github.com/Patoke/re-plants-vs-zombies) and [Headshotnoby](https://github.com/headshot2017/re-plants-vs-zombies)'s PvZ GOTY implementation with the following objectives:
 - [x] Replace renderer with SDL + OpenGL
   - Also enable to **resize the window**, which was not possible in the original game
 - [x] Replace Windows code with cross-platform code
@@ -49,7 +49,7 @@ This is a **fork** of [Patoke](https://github.com/Patoke/re-plants-vs-zombies) a
 - [x] Different CPU architectures support (i686, x86_64, aarch64, riscv64, loongarch64, etc.)
 - [x] Unicode path support on all platforms
 
-* Port the game to these platforms:
+This project supports the following platforms:
 
 | Platform        | Data path                    | Status                                                                                 |
 |-----------------|------------------------------|----------------------------------------------------------------------------------------|
