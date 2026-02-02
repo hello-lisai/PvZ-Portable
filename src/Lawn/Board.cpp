@@ -8,7 +8,6 @@
 #include "Widget/LawnDialog.h"
 #include "System/PlayerInfo.h"
 #include "System/PoolEffect.h"
-#include "System/PopDRMComm.h"
 #include "System/TypingCheck.h"
 #include "Widget/StoreScreen.h"
 #include "Widget/AwardScreen.h"
@@ -4842,10 +4841,6 @@ void Board::MouseUp(int x, int y, int theClickCount)
 			}
 			else if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL)
 			{
-				if (mApp->mDRM)
-				{
-					mApp->mDRM->BuyGame();
-				}
 				mApp->DoBackToMain();
 			}
 		}

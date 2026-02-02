@@ -12,7 +12,6 @@
 #include "../System/Music.h"
 #include "SeedChooserScreen.h"
 #include "../../GameConstants.h"
-#include "../System/PopDRMComm.h"
 #include "../../Sexy.TodLib/TodFoley.h"
 #include "../../Sexy.TodLib/TodCommon.h"
 #include "../../Sexy.TodLib/Reanimator.h"
@@ -1140,10 +1139,6 @@ void StoreScreen::MouseDown(int x, int y, int theClickCount)
                 int aResult = mApp->LawnMessageBox(
                     DIALOG_MESSAGE, "[BUY_PVZ_TITLE]", "[BUY_PVZ_BODY]", "[GET_FULL_VERSION_YES_BUTTON]", "[GET_FULL_VERSION_NO_BUTTON]", BUTTONS_YES_NO);
                 mWaitForDialog = false;
-                if (aResult == ID_OK)
-                {
-                    if (mApp->mDRM) mApp->mDRM->BuyGame();
-                }
             }
             else if(!IsItemSoldOut(aItemType) && !IsItemUnavailable(aItemType) && !IsComingSoon(aItemType))
                 PurchaseItem(aItemType);
