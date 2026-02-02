@@ -70,8 +70,6 @@ Note about writable data and caches:
   - `userdata/` — player save files
   - `cache64/` if you use the 64-bit version or `cache32/` if you use the 32-bit version — compiled binary caches (reanimation / compiled definitions)
   - `registry.regemu` — settings/registry emulation
-  - `pvzpinfo.dat` — basic runtime stats
-  - `_screenshots/` — screenshots created by the game
 
 Examples:
 

@@ -499,7 +499,7 @@ DataWriter::DataWriter()
 	mCapacity = 0;
 }
 
-//0x4436A0and 0x4436F0
+//0x4436A0 and 0x4436F0
 DataWriter::~DataWriter()
 {
 	if (mFile)

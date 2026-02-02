@@ -141,7 +141,7 @@ LawnApp::LawnApp()
 	//mBigArrowCursor = LoadCursor(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDC_CURSOR1));
 }
 
-//0x44EDD0and 0x44EDF0
+//0x44EDD0 and 0x44EDF0
 LawnApp::~LawnApp()
 {
 	if (mBoard)

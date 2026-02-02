@@ -208,7 +208,7 @@ Board::Board(LawnApp* theApp)
 	}
 }
 
-//0x408670and 0x408690
+//0x408670 and 0x408690
 Board::~Board()
 {
 	delete mAdvice;
