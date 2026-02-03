@@ -1589,10 +1589,6 @@ void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const std::string&
 	if (theDrawnAreas != nullptr)
 		theDrawnAreas->clear();
 
-
-	/*if (theDrawnArea != nullptr)
-		*theDrawnArea = Rect(0, 0, 0, 0);*/
-
 	if (!mFontData->mInitialized)
 	{
 		if (theWidth != nullptr)
@@ -1720,16 +1716,6 @@ void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const std::string&
 
 			//aRenderCommandMap.insert(RenderCommandMap::value_type(aPriority, aRenderCommand));
 
-			/*int anOldDrawMode = g->GetDrawMode();
-			if (anActiveFontLayer->mBaseFontLayer->mDrawMode != -1)
-				g->SetDrawMode(anActiveFontLayer->mBaseFontLayer->mDrawMode);
-			Color anOrigColor = g->GetColor();
-			g->SetColor(aColor);
-			if (anActiveFontLayer->mScaledImage != nullptr)
-				g->DrawImage(anActiveFontLayer->mScaledImage, anImageX, anImageY, anActiveFontLayer->mScaledCharImageRects[aChar]);
-			g->SetColor(anOrigColor);
-			g->SetDrawMode(anOldDrawMode);*/
-
 			if (theDrawnAreas != nullptr)
 			{
 				//Rect aDestRect = Rect(anImageX, anImageY, anActiveFontLayer->mScaledCharImageRects[(uchar) aChar].mWidth, anActiveFontLayer->mScaledCharImageRects[(uchar) aChar].mHeight);
@@ -1737,30 +1723,6 @@ void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const std::string&
 
 				theDrawnAreas->push_back(aDestRect);
 
-				/*if (theDrawnArea->mWidth == 0)
-					*theDrawnArea = theDestRect;
-				else
-				{
-					if (theDestRect.mX < theDrawnArea->mX)
-					{
-						int aDiff = theDestRect.mX - theDrawnArea->mX;
-						theDrawnArea->mX += aDiff;
-						theDrawnArea->mWidth += aDiff;
-					}
-
-					if (theDestRect.mX + theDestRect.mWidth > theDrawnArea->mX + theDrawnArea->mWidth)
-						theDrawnArea->mWidth = theDestRect.mX + theDestRect.mWidth - theDrawnArea->mX;
-
-					if (theDestRect.mY < theDrawnArea->mY)
-					{
-						int aDiff = theDestRect.mY - theDrawnArea->mY;
-						theDrawnArea->mY += aDiff;
-						theDrawnArea->mHeight += aDiff;
-					}
-
-					if (theDestRect.mY + theDestRect.mHeight > theDrawnArea->mY + theDrawnArea->mHeight)
-						theDrawnArea->mHeight = theDestRect.mY + theDestRect.mHeight - theDrawnArea->mY;
-				}*/
 			}
 
 			aLayerXPos += aCharWidth + aSpacing;
@@ -1799,24 +1761,6 @@ void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const std::string&
 	}
 
 	g->SetColor(anOrigColor);
-
-	/*RenderCommandMap::iterator anItr = aRenderCommandMap.begin();
-	while (anItr != aRenderCommandMap.end())
-	{
-		RenderCommand* aRenderCommand = &anItr->second;
-
-		int anOldDrawMode = g->GetDrawMode();
-		if (aRenderCommand->mMode != -1)
-			g->SetDrawMode(aRenderCommand->mMode);
-		Color anOrigColor = g->GetColor();
-		g->SetColor(aRenderCommand->mColor);
-		if (aRenderCommand->mImage != nullptr)
-			g->DrawImage(aRenderCommand->mImage, aRenderCommand->mDest.mX, aRenderCommand->mDest.mY, aRenderCommand->mSrc);
-		g->SetColor(anOrigColor);
-		g->SetDrawMode(anOldDrawMode);
-
-		++anItr;
-	}*/
 
 	g->SetColorizeImages(colorizeImages);
 }

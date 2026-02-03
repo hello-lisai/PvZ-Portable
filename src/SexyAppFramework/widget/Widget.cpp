@@ -245,11 +245,6 @@ void Widget::ShowFinger(bool on)
 		mWidgetManager->mApp->SetCursor(CURSOR_HAND);
 	else
 		mWidgetManager->mApp->SetCursor(CURSOR_POINTER);
-
-	/*if (on)
-		mWidgetManager->mApplet.setCursor(new Cursor(Cursor.HAND_CURSOR));
-	else
-		mWidgetManager->mApplet.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));*/
 }
 
 void Widget::MouseEnter()

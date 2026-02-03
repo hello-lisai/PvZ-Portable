@@ -1257,9 +1257,6 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const std::string& theLine, 
 				{
 					WriteWordWrappedHelper(this, theLine, theRect.mX + anIndentX, theRect.mY + aYOffset, theRect.mWidth, 
 						theJustification, true, aLineStartPos, aSpacePos-aLineStartPos, anOrigColorInt, theMaxChars);
-
-					/*WriteString(theLine, theRect.mX + anIndentX, theRect.mY + aYOffset, theRect.mWidth, 
-					theJustification, true, aLineStartPos, aSpacePos-aLineStartPos);*/
 				}
 
 				aWrittenWidth = aCurWidth + anIndentX;

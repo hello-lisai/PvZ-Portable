@@ -94,8 +94,8 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef int64_t int64;
 
-typedef std::map<std::string, std::string>		DefinesMap;
-typedef std::vector<char>				CharVector;
+typedef std::map<std::string, std::string> DefinesMap;
+typedef std::vector<char> CharVector;
 
 namespace Sexy
 {

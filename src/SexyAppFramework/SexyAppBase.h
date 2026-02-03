@@ -184,11 +184,8 @@ public:
 	bool					mInitialized;	
 	bool					mProcessInTimer;
 	uint32_t					mTimeLoaded;
-	//HWND					mHWnd;
-	//HWND					mInvisHWnd;
 	bool					mIsScreenSaver;
 	bool					mAllowMonitorPowersave;
-	//WindowsMessageList		mDeferredMessages;
 	bool					mNoDefer;	
 	bool					mFullScreenPageFlip;	
 	bool					mTabletPC;
@@ -199,7 +196,6 @@ public:
 	std::string				mRegisterLink;
 	std::string				mProductVersion;	
 	Image*					mCursorImages[NUM_CURSORS];
-	//HCURSOR					mOverrideCursor;
 	bool					mIsOpeningURL;
 	bool					mShutdownOnURLOpen;
 	std::string				mOpeningURL;

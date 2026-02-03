@@ -1620,23 +1620,6 @@ bool SexyAppBase::DrawDirtyStuff()
 
 		mScreenBltTime = aEndTime - aPreScreenBltTime;
 
-#ifdef _PVZ_DEBUG
-		/*if (mFPSTime >= 5000) // Show FPS about every 5 seconds
-		{
-			uint32_t aTickNow = GetTickCount();
-
-			OutputDebugString(StrFormat("Theoretical FPS: %d\r\n", (int) (mFPSCount * 1000 / mFPSTime)).c_str());
-			OutputDebugString(StrFormat("Actual      FPS: %d\r\n", (mFPSFlipCount * 1000) / max((aTickNow - mFPSStartTick), 1)).c_str());
-			OutputDebugString(StrFormat("Dirty Rate     : %d\r\n", (mFPSDirtyCount * 1000) / max((aTickNow - mFPSStartTick), 1)).c_str());
-
-			mFPSTime = 0;
-			mFPSCount = 0;
-			mFPSFlipCount = 0;
-			mFPSStartTick = aTickNow;
-			mFPSDirtyCount = 0;
-		}*/
-#endif
-
 		if ((mLoadingThreadStarted) && (!mLoadingThreadCompleted))
 		{
 			int aTotalTime = aEndTime - aStartTime;
@@ -1645,10 +1628,6 @@ bool SexyAppBase::DrawDirtyStuff()
 
 			if ((int) (aEndTime - mNextDrawTick) >= 0)			
 				mNextDrawTick = aEndTime;			
-
-			/*char aStr[256];
-			sprintf(aStr, "Next Draw Time: %d\r\n", mNextDrawTick);
-			OutputDebugString(aStr);*/
 		}
 		else
 			mNextDrawTick = aEndTime;
@@ -2246,14 +2225,6 @@ void SexyAppBase::UpdateFTimeAcc()
 
 bool SexyAppBase::Process(bool allowSleep)
 {
-	/*uint32_t aTimeNow = GetTickCount();
-	if (aTimeNow - aLastCheck >= 10000)
-	{
-		OutputDebugString(StrFormat("FUpdates: %d\n", aNumCalls).c_str());
-		aLastCheck = aTimeNow;
-		aNumCalls = 0;
-	}*/
-
 	if (mLoadingFailed)
 		Shutdown();
 	

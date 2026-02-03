@@ -239,12 +239,6 @@ void Dialog::Draw(Graphics* g)
 	//g->SetFont(mLinesFont);	
 	g->SetFont(mLinesFont);
 	g->SetColor(mColors[COLOR_LINES]);
-	
-	/*for (int i = 0; i < mDialogLines.size(); i++)
-	{
-		WriteCenteredLine(g, aCurY, mDialogLines[i]);
-		aCurY += mLinesFont->GetHeight();
-	}*/	
 
 	Rect aRect(mBackgroundInsets.mLeft+mContentInsets.mLeft+2, aCurY, mWidth-mContentInsets.mLeft-mContentInsets.mRight-mBackgroundInsets.mLeft-mBackgroundInsets.mRight-4, 0);
 	aCurY += WriteWordWrapped(g, aRect, mDialogLines, mLinesFont->GetLineSpacing() + mLineSpacingOffset, mTextAlign);	
