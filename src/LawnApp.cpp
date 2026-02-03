@@ -115,7 +115,7 @@ LawnApp::LawnApp()
 	mDebugKeysEnabled = false;
 	mProdName = "io.github.wszqkzqk.pvz-portable";
 	std::string aTitleName = "PvZ Portable";
-	mTitle = StringToSexyStringFast(aTitleName);
+	mTitle = aTitleName;
 	mCustomCursorsEnabled = false;
 	mPlayerInfo = nullptr;
 	mLastLevelStats = new LevelStats();
@@ -371,7 +371,7 @@ void LawnApp::WriteToRegistry()
 {
 	if (mPlayerInfo)
 	{
-		RegistryWriteString("CurUser", SexyStringToStringFast(mPlayerInfo->mName));
+		RegistryWriteString("CurUser", mPlayerInfo->mName);
 		mPlayerInfo->SaveDetails();
 	}
 
@@ -684,8 +684,8 @@ void LawnApp::DoConfirmBackToMain()
 	LawnDialog* aDialog = (LawnDialog*)DoDialog(
 		Dialogs::DIALOG_CONFIRM_BACK_TO_MAIN, 
 		true, 
-		__S("Leave Game?"/*"[LEAVE_GAME]"*/),
-		__S("Do you want to return\nto the main menu?\n\nYour game will be saved."/*"[LEAVE_GAME_HEADER]"*/), 
+		"Leave Game?"/*"[LEAVE_GAME]"*/,
+		"Do you want to return\nto the main menu?\n\nYour game will be saved."/*"[LEAVE_GAME_HEADER]"*/, 
 		"", 
 		Dialog::BUTTONS_YES_NO
 	);
@@ -753,9 +753,9 @@ void LawnApp::DoPauseDialog()
 	LawnDialog* aDialog = (LawnDialog*)DoDialog(
 		Dialogs::DIALOG_PAUSED,
 		true,
-		__S("GAME PAUSED"/*"[RESUME_GAME]"*/),
-		__S("Click to resume game"), 
-		__S("Resume Game"/*"[GAME_PAUSED]"*/), 
+		"GAME PAUSED"/*"[RESUME_GAME]"*/,
+		"Click to resume game", 
+		"Resume Game"/*"[GAME_PAUSED]"*/, 
 		Dialog::BUTTONS_FOOTER
 	);
 
@@ -832,7 +832,7 @@ void LawnApp::FinishUserDialog(bool isYes)
 	{
 		if (isYes)
 		{
-			PlayerInfo* aProfile = mProfileMgr->GetProfile(StringToSexyStringFast(aUserDialog->GetSelName()));
+			PlayerInfo* aProfile = mProfileMgr->GetProfile(aUserDialog->GetSelName());
 			if (aProfile)
 			{
 				mPlayerInfo = aProfile;
@@ -874,9 +874,9 @@ void LawnApp::FinishCreateUserDialog(bool isYes)
 		DoDialog(
 			Dialogs::DIALOG_CREATEUSERERROR,
 			true,
-			__S("Enter Your Name"),
-			__S("Please enter your name to create a new user profile for storing high score data and game progress"),
-			__S("OK"),
+			"Enter Your Name",
+			"Please enter your name to create a new user profile for storing high score data and game progress",
+			"OK",
 			Dialog::BUTTONS_FOOTER
 		);
 	}
@@ -885,9 +885,9 @@ void LawnApp::FinishCreateUserDialog(bool isYes)
 		DoDialog(
 			Dialogs::DIALOG_CREATEUSERERROR,
 			true,
-			__S("Enter Your Name"/*"[ENTER_YOUR_NAME]"*/),
-			__S("Please enter your name to create a new user profile for storing high score data and game progress"/*"[ENTER_NEW_USER]"*/),
-			__S("OK"/*"[DIALOG_BUTTON_OK]"*/),
+			"Enter Your Name"/*"[ENTER_YOUR_NAME]"*/,
+			"Please enter your name to create a new user profile for storing high score data and game progress"/*"[ENTER_NEW_USER]"*/,
+			"OK"/*"[DIALOG_BUTTON_OK]"*/,
 			Dialog::BUTTONS_FOOTER
 		);
 	}
@@ -903,9 +903,9 @@ void LawnApp::FinishCreateUserDialog(bool isYes)
 			DoDialog(
 				Dialogs::DIALOG_CREATEUSERERROR,
 				true,
-				__S("Name Conflict"/*"[NAME_CONFLICT]"*/),
-				__S("The name you entered is already being used.  Please enter a unique player name"/*"[ENTER_UNIQUE_PLAYER_NAME]"*/),
-				__S("OK"/*"[DIALOG_BUTTON_OK]"*/),
+				"Name Conflict"/*"[NAME_CONFLICT]"*/,
+				"The name you entered is already being used.  Please enter a unique player name"/*"[ENTER_UNIQUE_PLAYER_NAME]"*/,
+				"OK"/*"[DIALOG_BUTTON_OK]"*/,
 				Dialog::BUTTONS_FOOTER
 			);
 		}
@@ -934,11 +934,11 @@ void LawnApp::DoConfirmDeleteUserDialog(const std::string& theName)
 	DoDialog(
 		Dialogs::DIALOG_CONFIRMDELETEUSER, 
 		true, 
-		__S("Are You Sure"/*"[ARE_YOU_SURE]"*/), 
-		// StrFormat(TodStringTranslate(__S("[DELETE_USER_WARNING]")).c_str(), StringToSexyStringFast(theName))
+		"Are You Sure"/*"[ARE_YOU_SURE]"*/, 
+		// StrFormat(TodStringTranslate("[DELETE_USER_WARNING]").c_str(), theName)
 		// @Patoke: didn't access this as 'const char*'
-		StrFormat(__S("This will permanently remove '%s' from the player roster!")/**/, theName.c_str()),
-		__S(""), 
+		StrFormat("This will permanently remove '%s' from the player roster!"/**/, theName.c_str()),
+		"", 
 		Dialog::BUTTONS_YES_NO
 	);
 }
@@ -956,7 +956,7 @@ void LawnApp::FinishConfirmDeleteUserDialog(bool isYes)
 	if (!isYes)
 		return;
 
-	std::string aCurName = mPlayerInfo ? mPlayerInfo->mName : __S("");
+	std::string aCurName = mPlayerInfo ? mPlayerInfo->mName : "";
 	std::string aName = aUserDialog->GetSelName();
 	if (aName == aCurName)
 	{
@@ -1025,9 +1025,9 @@ void LawnApp::FinishRenameUserDialog(bool isYes)
 		DoDialog(
 			Dialogs::DIALOG_RENAMEUSERERROR,
 			true,
-			__S("Name Conflict"/*"[NAME_CONFLICT]"*/),
-			__S("The name you entered is already being used.  Please enter a unique player name"/*"[ENTER_UNIQUE_PLAYER_NAME]"*/),
-			__S("OK"/*"[DIALOG_BUTTON_OK]"*/),
+			"Name Conflict"/*"[NAME_CONFLICT]"*/,
+			"The name you entered is already being used.  Please enter a unique player name"/*"[ENTER_UNIQUE_PLAYER_NAME]"*/,
+			"OK"/*"[DIALOG_BUTTON_OK]"*/,
 			Dialog::BUTTONS_FOOTER
 		);
 		return;
@@ -1104,16 +1104,16 @@ void LawnApp::FinishTimesUpDialog()
 // GOTY @Patoke: 0x5282E0
 void LawnApp::DoConfirmSellDialog(const std::string& theMessage)
 {
-	Dialog* aConfirmDialog = DoDialog(Dialogs::DIALOG_ZEN_SELL, true, __S("[ZEN_SELL_HEADER]"), theMessage, __S(""), Dialog::BUTTONS_YES_NO);
-	aConfirmDialog->mYesButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_YES]"));
-	aConfirmDialog->mNoButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_NO]"));
+	Dialog* aConfirmDialog = DoDialog(Dialogs::DIALOG_ZEN_SELL, true, "[ZEN_SELL_HEADER]", theMessage, "", Dialog::BUTTONS_YES_NO);
+	aConfirmDialog->mYesButton->mLabel = TodStringTranslate("[DIALOG_BUTTON_YES]");
+	aConfirmDialog->mNoButton->mLabel = TodStringTranslate("[DIALOG_BUTTON_NO]");
 }
 
 void LawnApp::DoConfirmPurchaseDialog(const std::string& theMessage)
 {
-	LawnDialog* aComfirmDialog = (LawnDialog*)DoDialog(Dialogs::DIALOG_STORE_PURCHASE, true, __S("买下这个物品？"), theMessage, __S(""), Dialog::BUTTONS_YES_NO);
-	aComfirmDialog->mLawnYesButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_YES]"));
-	aComfirmDialog->mLawnNoButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_NO]"));
+	LawnDialog* aComfirmDialog = (LawnDialog*)DoDialog(Dialogs::DIALOG_STORE_PURCHASE, true, "买下这个物品？", theMessage, "", Dialog::BUTTONS_YES_NO);
+	aComfirmDialog->mLawnYesButton->mLabel = TodStringTranslate("[DIALOG_BUTTON_YES]");
+	aComfirmDialog->mLawnNoButton->mLabel = TodStringTranslate("[DIALOG_BUTTON_NO]");
 }
 
 //0x451580
@@ -1123,9 +1123,9 @@ Dialog* LawnApp::NewDialog(int theDialogId, bool isModal, const std::string& the
 		this, 
 		theDialogId, 
 		isModal, 
-		SexyStringToStringFast(theDialogHeader), 
-		SexyStringToStringFast(theDialogLines), 
-		SexyStringToStringFast(theDialogFooter), 
+		theDialogHeader, 
+		theDialogLines, 
+		theDialogFooter, 
 		theButtonMode
 	);
 
@@ -1254,7 +1254,7 @@ void LawnApp::Init()
 	// GOTY @Patoke: 0x60C590
 	//if (!gSexyCache->Connected() &&
 	//	gLawnApp->mTodCheatKeys &&
-	//	MessageBox(gLawnApp->mHWnd, __S("Start SexyCache now?"), __S("SexyCache"), MB_YESNO) == IDYES &&
+	//	MessageBox(gLawnApp->mHWnd, "Start SexyCache now?", "SexyCache", MB_YESNO) == IDYES &&
 	//	WinExec("SexyCache.exe", SW_MINIMIZE) >= 32)
 	//{
 	//  // GOTY @Patoke: 0x60C490
@@ -1298,7 +1298,7 @@ void LawnApp::Init()
 	std::string aCurUser;
 	if (mPlayerInfo == nullptr && RegistryReadString("CurUser", &aCurUser))
 	{
-		mPlayerInfo = mProfileMgr->GetProfile(StringToSexyStringFast(aCurUser));
+		mPlayerInfo = mProfileMgr->GetProfile(aCurUser);
 	}
 	if (mPlayerInfo == nullptr)
 	{
@@ -1853,7 +1853,7 @@ void LawnApp::URLOpenFailed(const std::string& theURL)
 		theURL + 
 		"\n\nFor your convenience, this URL has already been copied to your clipboard.";
 
-	DoDialog(Dialogs::DIALOG_OPENURL_WAIT, true, __S("Open Browser"), __S("OK"), StringToSexyStringFast(aString), Dialog::BUTTONS_FOOTER);
+	DoDialog(Dialogs::DIALOG_OPENURL_WAIT, true, "Open Browser", "OK", aString, Dialog::BUTTONS_FOOTER);
 }
 
 //0x452EE0
@@ -1869,9 +1869,9 @@ bool LawnApp::OpenURL(const std::string& theURL, bool shutdownOnOpen)
 	DoDialog(
 		Dialogs::DIALOG_OPENURL_WAIT, 
 		true, 
-		__S("Opening Browser"), 
-		__S("Opening Browser"), 
-		__S(""), 
+		"Opening Browser", 
+		"Opening Browser", 
+		"", 
 		Dialog::BUTTONS_NONE
 	);
 
@@ -1884,10 +1884,10 @@ bool LawnApp::OpenURL(const std::string& theURL, bool shutdownOnOpen)
 // GOTY @Patoke: 0x4564F0
 void LawnApp::ConfirmQuit()
 {
-	std::string aBody = TodStringTranslate(__S("[QUIT_MESSAGE]"));
-	std::string aHeader = TodStringTranslate(__S("[QUIT_HEADER]"));
-	LawnDialog* aDialog = (LawnDialog*)DoDialog(Dialogs::DIALOG_QUIT, true, aHeader, aBody, __S(""), Dialog::BUTTONS_OK_CANCEL);
-	aDialog->mLawnYesButton->mLabel = TodStringTranslate(__S("[QUIT_BUTTON]"));
+	std::string aBody = TodStringTranslate("[QUIT_MESSAGE]");
+	std::string aHeader = TodStringTranslate("[QUIT_HEADER]");
+	LawnDialog* aDialog = (LawnDialog*)DoDialog(Dialogs::DIALOG_QUIT, true, aHeader, aBody, "", Dialog::BUTTONS_OK_CANCEL);
+	aDialog->mLawnYesButton->mLabel = TodStringTranslate("[QUIT_BUTTON]");
 	CenterDialog(aDialog, aDialog->mWidth, aDialog->mHeight);
 }
 
@@ -2522,7 +2522,7 @@ void LawnApp::RemoveParticle(ParticleSystemID theParticleID)
 //0x453D20
 bool LawnApp::AdvanceCrazyDaveText()
 {
-	std::string aMessageName = StrFormat(__S("[CRAZY_DAVE_%d]"), mCrazyDaveMessageIndex + 1);
+	std::string aMessageName = StrFormat("[CRAZY_DAVE_%d]", mCrazyDaveMessageIndex + 1);
 	if (!TodStringListExists(aMessageName))
 	{
 		return false;
@@ -2535,11 +2535,11 @@ bool LawnApp::AdvanceCrazyDaveText()
 //0x453DC0
 std::string LawnApp::GetCrazyDaveText(int theMessageIndex)
 {
-	std::string aMessage = StrFormat(__S("[CRAZY_DAVE_%d]"), theMessageIndex);
-	aMessage = TodReplaceString(aMessage, __S("{PLAYER_NAME}"), mPlayerInfo->mName);
-	aMessage = TodReplaceString(aMessage, __S("{MONEY}"), GetMoneyString(mPlayerInfo->mCoins));
+	std::string aMessage = StrFormat("[CRAZY_DAVE_%d]", theMessageIndex);
+	aMessage = TodReplaceString(aMessage, "{PLAYER_NAME}", mPlayerInfo->mName);
+	aMessage = TodReplaceString(aMessage, "{MONEY}", GetMoneyString(mPlayerInfo->mCoins));
 	int aCost = StoreScreen::GetItemCost(StoreItem::STORE_ITEM_PACKET_UPGRADE);
-	aMessage = TodReplaceString(aMessage, __S("{UPGRADE_COST}"), GetMoneyString(aCost));
+	aMessage = TodReplaceString(aMessage, "{UPGRADE_COST}", GetMoneyString(aCost));
 	return aMessage;
 }
 
@@ -2715,7 +2715,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 	Reanimation* aCrazyDaveReanim = ReanimationGet(mCrazyDaveReanimID);
 
 	bool doHanding = false;
-	if (theMessage.find(__S("{HANDING}")) != std::string::npos)
+	if (theMessage.find("{HANDING}") != std::string::npos)
 	{
 		doHanding = true;
 	}
@@ -2725,7 +2725,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 	}
 
 	bool doSound = true;
-	if (theMessage.find(__S("{NO_SOUND}")) != std::string::npos)
+	if (theMessage.find("{NO_SOUND}") != std::string::npos)
 	{
 		doSound = false;
 	}
@@ -2738,11 +2738,11 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 	bool isControlWord = false;
 	for (size_t i = 0; i < theMessage.size(); i++)
 	{
-		if (theMessage[i] == __S('{'))
+		if (theMessage[i] == '{')
 		{
 			isControlWord = true;
 		}
-		else if (theMessage[i] == __S('}'))
+		else if (theMessage[i] == '}')
 		{
 			isControlWord = false;
 		}
@@ -2752,7 +2752,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 		}
 	}
 
-	aCrazyDaveReanim->SetImageOverride(__S("Dave_mouths"), nullptr);
+	aCrazyDaveReanim->SetImageOverride("Dave_mouths", nullptr);
 
 	if (mCrazyDaveState != CrazyDaveState::CRAZY_DAVE_TALKING || doSound)
 	{
@@ -2762,11 +2762,11 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			if (doSound)
 			{
-				if (theMessage.find(__S("{SHORT_SOUND}")) != std::string::npos)
+				if (theMessage.find("{SHORT_SOUND}") != std::string::npos)
 				{
 					PlayFoley(FoleyType::FOLEY_CRAZY_DAVE_SHORT);
 				}
-				else if (theMessage.find(__S("{SCREAM}")) != std::string::npos)
+				else if (theMessage.find("{SCREAM}") != std::string::npos)
 				{
 					PlayFoley(FoleyType::FOLEY_CRAZY_DAVE_SCREAM);
 				}
@@ -2778,7 +2778,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 			
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHAKE}")) != std::string::npos)
+		else if (theMessage.find("{SHAKE}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_crazy", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 50, 12.0f);
 
@@ -2789,7 +2789,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_TALKING;
 		}
-		else if (theMessage.find(__S("{SCREAM}")) != std::string::npos)
+		else if (theMessage.find("{SCREAM}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_smalltalk", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 50, 12.0f);
 
@@ -2800,7 +2800,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_TALKING;
 		}
-		else if (theMessage.find(__S("{SCREAM2}")) != std::string::npos)
+		else if (theMessage.find("{SCREAM2}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_mediumtalk", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 50, 12.0f);
 
@@ -2811,7 +2811,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_WALLNUT}")) != std::string::npos)
+		else if (theMessage.find("{SHOW_WALLNUT}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2833,7 +2833,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_HAMMER}")) != std::string::npos)
+		else if (theMessage.find("{SHOW_HAMMER}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2855,7 +2855,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_FERTILIZER}")) != std::string::npos)
+		else if (theMessage.find("{SHOW_FERTILIZER}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2874,7 +2874,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_TREE_FOOD}")) != std::string::npos)
+		else if (theMessage.find("{SHOW_TREE_FOOD}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -2893,7 +2893,7 @@ void LawnApp::CrazyDaveTalkMessage(const std::string& theMessage)
 
 			mCrazyDaveState = CrazyDaveState::CRAZY_DAVE_HANDING_TALKING;
 		}
-		else if (theMessage.find(__S("{SHOW_MONEYBAG}")) != std::string::npos)
+		else if (theMessage.find("{SHOW_MONEYBAG}") != std::string::npos)
 		{
 			aCrazyDaveReanim->PlayReanim("anim_talk_handing", ReanimLoopType::REANIM_LOOP, 50, 12.0f);
 
@@ -3093,9 +3093,9 @@ void LawnApp::DrawCrazyDave(Graphics* g)
 
 		std::string aBubbleText = mCrazyDaveMessageText;
 		Rect aRect(aPosX + 25, aPosY + 6, 233, 144);
-		if (aBubbleText.find(__S("{SHAKE}")) != std::string::npos)
+		if (aBubbleText.find("{SHAKE}") != std::string::npos)
 		{
-			aBubbleText = TodReplaceString(aBubbleText, __S("{SHAKE}"), __S(""));
+			aBubbleText = TodReplaceString(aBubbleText, "{SHAKE}", "");
 			aRect.mX += rand() % 2;
 			aRect.mY += rand() % 2;
 		}
@@ -3105,16 +3105,16 @@ void LawnApp::DrawCrazyDave(Graphics* g)
 		{
 			clickToContinue = false;
 		}
-		else if (aBubbleText.find(__S("{NO_CLICK}")) != std::string::npos)
+		else if (aBubbleText.find("{NO_CLICK}") != std::string::npos)
 		{
-			aBubbleText = TodReplaceString(aBubbleText, __S("{NO_CLICK}"), __S(""));
+			aBubbleText = TodReplaceString(aBubbleText, "{NO_CLICK}", "");
 			clickToContinue = false;
 		}
 
 		TodDrawStringWrapped(g, aBubbleText, aRect, FONT_BRIANNETOD16, Color::Black, DrawStringJustification::DS_ALIGN_CENTER_VERTICAL_MIDDLE);
 		if (clickToContinue)
 		{
-			TodDrawString(g, __S("click to continue"), aPosX + 139, aPosY + 140, FONT_PICO129, Color::Black, DrawStringJustification::DS_ALIGN_CENTER);
+			TodDrawString(g, "click to continue", aPosX + 139, aPosY + 140, FONT_PICO129, Color::Black, DrawStringJustification::DS_ALIGN_CENTER);
 		}
 	}
 
@@ -3330,10 +3330,10 @@ std::string LawnApp::Pluralize(int theCount, const char* theSingular, const char
 {
 	if (theCount == 1)
 	{
-		return TodReplaceNumberString(theSingular, __S("{COUNT}"), theCount);
+		return TodReplaceNumberString(theSingular, "{COUNT}", theCount);
 	}
 
-	return TodReplaceNumberString(thePlural, __S("{COUNT}"), theCount);
+	return TodReplaceNumberString(thePlural, "{COUNT}", theCount);
 }
 
 //0x455BA0
@@ -3394,15 +3394,15 @@ std::string LawnApp::GetMoneyString(int theAmount)
 	int aValue = theAmount * 10;
 	if (aValue > 999999)
 	{
-		return StrFormat(__S("$%d,%03d,%03d"), aValue / 1000000, (aValue - aValue / 1000000 * 1000000) / 1000, aValue - aValue / 1000 * 1000);
+		return StrFormat("$%d,%03d,%03d", aValue / 1000000, (aValue - aValue / 1000000 * 1000000) / 1000, aValue - aValue / 1000 * 1000);
 	}
 	else if (aValue > 9999)
 	{
-		return StrFormat(__S("$%d,%03d"), aValue / 1000, aValue - aValue / 1000 * 1000);
+		return StrFormat("$%d,%03d", aValue / 1000, aValue - aValue / 1000 * 1000);
 	}
 	else
 	{
-		return StrFormat(__S("$%d"), aValue);
+		return StrFormat("$%d", aValue);
 	}
 }
 
@@ -3411,31 +3411,31 @@ std::string LawnGetCurrentLevelName()
 {
 	if (gLawnApp == nullptr)
 	{
-		return __S("Before App");
+		return "Before App";
 	}
 	if (gLawnApp->mGameScene == GameScenes::SCENE_LOADING)
 	{
-		return __S("Game Loading");
+		return "Game Loading";
 	}
 	if (gLawnApp->mGameScene == GameScenes::SCENE_MENU)
 	{
-		return __S("Game Selector");
+		return "Game Selector";
 	}
 	if (gLawnApp->mGameScene == GameScenes::SCENE_AWARD)
 	{
-		return __S("Award Screen");
+		return "Award Screen";
 	}
 	if (gLawnApp->mGameScene == GameScenes::SCENE_CHALLENGE)
 	{
-		return __S("Challenge Screen");
+		return "Challenge Screen";
 	}
 	if (gLawnApp->mGameScene == GameScenes::SCENE_CREDIT)
 	{
-		return __S("Credits");
+		return "Credits";
 	}
 	if (gLawnApp->mBoard == nullptr)
 	{
-		return __S("Not Playing");
+		return "Not Playing";
 	}
 
 	if (gLawnApp->IsFirstTimeAdventureMode())
@@ -3444,7 +3444,7 @@ std::string LawnGetCurrentLevelName()
 	}
 	if (gLawnApp->IsAdventureMode())
 	{
-		return StrFormat(__S("F%d"), gLawnApp->GetStageString(gLawnApp->mBoard->mLevel).c_str());
+		return StrFormat("F%d", gLawnApp->GetStageString(gLawnApp->mBoard->mLevel).c_str());
 	}
 
 	return gLawnApp->GetCurrentChallengeDef().mChallengeName;

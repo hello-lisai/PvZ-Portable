@@ -13,9 +13,9 @@ MessageWidget::MessageWidget(LawnApp* theApp)
 {
 	mApp = theApp;
 	mDuration = 0;
-	mLabel[0] = __S('\0');
+	mLabel[0] = '\0';
 	mMessageStyle = MessageStyle::MESSAGE_STYLE_OFF;
-	mLabelNext[0] = __S('\0');
+	mLabelNext[0] = '\0';
 	mMessageStyleNext = MessageStyle::MESSAGE_STYLE_OFF;
 	mSlideOffTime = 100;
 	memset(mTextReanimID, (int)ReanimationID::REANIMATIONID_NULL, MAX_MESSAGE_LENGTH);
@@ -131,13 +131,13 @@ void MessageWidget::LayoutReanimText()
 	float aMaxWidth = 0;
 	int aCurLine = 0, aCurPos = 0;
 	_Font* aFont = GetFont();
-	int aLabelLen = sexystrlen(mLabel);
+	int aLabelLen = strlen(mLabel);
 	mSlideOffTime = aLabelLen + 100;
 
 	float aLineWidth[MAX_REANIM_LINES];
 	for (int aPos = 0; aPos <= aLabelLen; aPos++)
 	{
-		if (aPos == aLabelLen || mLabel[aPos] == __S('\n'))
+		if (aPos == aLabelLen || mLabel[aPos] == '\n')
 		{
 			TOD_ASSERT(aCurLine < MAX_REANIM_LINES);
 
@@ -165,7 +165,7 @@ void MessageWidget::LayoutReanimText()
 		mTextReanimID[aPos] = mApp->ReanimationGetID(aReanimText);
 
 		aCurPosX += aFont->CharWidth(mLabel[aPos]);  // 坐标调整至下一个文字的位置
-		if (mLabel[aPos] == __S('\n'))  // 换行处理
+		if (mLabel[aPos] == '\n')  // 换行处理
 		{
 			aCurLine++;
 			TOD_ASSERT(aCurLine < MAX_REANIM_LINES);
@@ -196,7 +196,7 @@ void MessageWidget::Update()
 		}
 	}
 
-	int aLabelLen = sexystrlen(mLabel);
+	int aLabelLen = strlen(mLabel);
 	// 以下遍历每个文字的动画，设置其动画速率并更新其动画
 	for (int aPos = 0; aPos < aLabelLen; aPos++)
 	{
@@ -235,7 +235,7 @@ void MessageWidget::Update()
 //0x459710
 void MessageWidget::DrawReanimatedText(Graphics* g, _Font* theFont, const Color& theColor, float thePosY)
 {
-	int aLabelLen = sexystrlen(mLabel);
+	int aLabelLen = strlen(mLabel);
 	for (int aPos = 0; aPos < aLabelLen; aPos++)
 	{
 		Reanimation* aTextReanim = mApp->ReanimationTryToGet(mTextReanimID[aPos]);
@@ -448,8 +448,8 @@ void MessageWidget::Draw(Graphics* g)
 			if (mApp->IsSurvivalMode() && mApp->mBoard->mChallenge->mSurvivalStage > 0)
 			{
 				int aFlags = mApp->mBoard->GetNumWavesPerSurvivalStage() * mApp->mBoard->mChallenge->mSurvivalStage / mApp->mBoard->GetNumWavesPerFlag();
-				std::string aFlagStr = mApp->Pluralize(aFlags, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
-				aSubStr = TodReplaceString(__S("[FLAGS_COMPLETED]"), __S("{FLAGS}"), aFlagStr);
+				std::string aFlagStr = mApp->Pluralize(aFlags, "[ONE_FLAG]", "[COUNT_FLAGS]");
+				aSubStr = TodReplaceString("[FLAGS_COMPLETED]", "{FLAGS}", aFlagStr);
 			}
 
 			if (aSubStr.size() > 0)

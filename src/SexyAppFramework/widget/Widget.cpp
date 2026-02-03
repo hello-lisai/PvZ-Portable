@@ -245,11 +245,6 @@ void Widget::ShowFinger(bool on)
 		mWidgetManager->mApp->SetCursor(CURSOR_HAND);
 	else
 		mWidgetManager->mApp->SetCursor(CURSOR_POINTER);
-
-	/*if (on)
-		mWidgetManager->mApplet.setCursor(new Cursor(Cursor.HAND_CURSOR));
-	else
-		mWidgetManager->mApplet.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));*/
 }
 
 void Widget::MouseEnter()
@@ -261,12 +256,6 @@ void Widget::MouseLeave()
 {
 	
 }
-
-/*
-void Widget::MouseMove(int x, int y)
-{
-}
-*/
 
 void Widget::MouseMove(int,int){}
 void Widget::MouseDrag(int,int){}
@@ -298,12 +287,6 @@ void Widget::MouseUp(int x, int y, int theLastDownButtonId)
 
 
 void Widget::MouseUp(int, int, int, int){}
-
-/*
-void Widget::MouseDrag(int x, int y)
-{
-}
-*/
 
 void Widget::MouseWheel(int){}
 

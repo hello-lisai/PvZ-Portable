@@ -18,7 +18,7 @@ public:
 	GLInterface*			mGLInterface;
 
 public:
-	virtual void			FillScanLinesWithCoverage(Span* theSpans, int theSpanCount, const Color& theColor, int theDrawMode, const BYTE* theCoverage, int theCoverX, int theCoverY, int theCoverWidth, int theCoverHeight);
+	virtual void			FillScanLinesWithCoverage(Span* theSpans, int theSpanCount, const Color& theColor, int theDrawMode, const uint8_t* theCoverage, int theCoverX, int theCoverY, int theCoverWidth, int theCoverHeight);
 
 	static bool				Check3D(GLImage *theImage);
 	static bool				Check3D(Image *theImage);

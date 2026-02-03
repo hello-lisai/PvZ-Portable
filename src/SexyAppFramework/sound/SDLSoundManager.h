@@ -55,7 +55,6 @@ public:
 	virtual void			SetMasterVolume(double theVolume);
 
 	virtual void			Flush();
-	virtual void			SetCooperativeWindow(HWND theHWnd);
 	virtual void			StopAllSounds();
 	virtual int				GetFreeSoundId();
 	virtual int				GetNumSounds();

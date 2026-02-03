@@ -693,14 +693,14 @@ void Coin::UpdateCollected()
                 if (mType == CoinType::COIN_PRESENT_MINIGAMES)
                 {
                     // 注：此处的 theMessageStyle 参数，原版中为 MESSAGE_STYLE_HINT_TALL_UNLOCKMESSAGE，内测版中为 MESSAGE_STYLE_HINT_TALL_8SECONDS
-                    mBoard->DisplayAdvice(__S("[UNLOCKED_MINIGAMES]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_UNLOCKMESSAGE, AdviceType::ADVICE_UNLOCKED_MODE);
+                    mBoard->DisplayAdvice("[UNLOCKED_MINIGAMES]", MessageStyle::MESSAGE_STYLE_HINT_TALL_UNLOCKMESSAGE, AdviceType::ADVICE_UNLOCKED_MODE);
                 }
                 else if (mType == CoinType::COIN_PRESENT_PUZZLE_MODE)
                 {
-                    mBoard->DisplayAdvice(__S("[UNLOCKED_PUZZLE_MODE]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_UNLOCKMESSAGE, AdviceType::ADVICE_UNLOCKED_MODE);
+                    mBoard->DisplayAdvice("[UNLOCKED_PUZZLE_MODE]", MessageStyle::MESSAGE_STYLE_HINT_TALL_UNLOCKMESSAGE, AdviceType::ADVICE_UNLOCKED_MODE);
                 }
                 else { // @Patoke: add case
-                    mBoard->DisplayAdvice(__S("[UNLOCKED_SURVIVAL_MODE]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_UNLOCKMESSAGE, AdviceType::ADVICE_UNLOCKED_MODE);
+                    mBoard->DisplayAdvice("[UNLOCKED_SURVIVAL_MODE]", MessageStyle::MESSAGE_STYLE_HINT_TALL_UNLOCKMESSAGE, AdviceType::ADVICE_UNLOCKED_MODE);
                 }
             }
             else if (mBoard->mHelpIndex != AdviceType::ADVICE_UNLOCKED_MODE || !mBoard->mAdvice->IsBeingDisplayed())
@@ -1070,12 +1070,12 @@ void Coin::Collect()
 
         if (mApp->mZenGarden->IsZenGardenFull(false))
         {
-            mBoard->DisplayAdvice(__S("[DIALOG_ZEN_GARDEN_FULL]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_NONE);
+            mBoard->DisplayAdvice("[DIALOG_ZEN_GARDEN_FULL]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_NONE);
         }
         else
         {
             mBoard->mPottedPlantsCollected++;
-            mBoard->DisplayAdvice(__S("[ADVICE_FOUND_PLANT]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_NONE);
+            mBoard->DisplayAdvice("[ADVICE_FOUND_PLANT]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_NONE);
             mApp->AddTodParticle(mPosX + 30.0f, mPosY + 30.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_PRESENT_PICKUP);
             mApp->mZenGarden->AddPottedPlant(&mPottedPlantSpec);
         }
@@ -1143,7 +1143,7 @@ void Coin::Collect()
 
         if (mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_CHOCOLATE] < PURCHASE_COUNT_OFFSET)
         {
-            mBoard->DisplayAdvice(__S("[ADVICE_FOUND_CHOCOLATE]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
+            mBoard->DisplayAdvice("[ADVICE_FOUND_CHOCOLATE]", MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
             mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_CHOCOLATE] = PURCHASE_COUNT_OFFSET + 1;
         }
         else
@@ -1288,7 +1288,7 @@ void Coin::Collect()
     AttachmentDetachCrossFadeParticleType(mAttachmentID, ParticleEffect::PARTICLE_COIN_PICKUP_ARROW, nullptr);
     if (mApp->IsFirstTimeAdventureMode() && mBoard && mBoard->mLevel == 11 && (mType == CoinType::COIN_GOLD || mType == CoinType::COIN_SILVER))
     {
-        mBoard->DisplayAdvice(__S("[ADVICE_CLICKED_ON_COIN]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_CLICKED_ON_COIN);
+        mBoard->DisplayAdvice("[ADVICE_CLICKED_ON_COIN]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_CLICKED_ON_COIN);
     }
 }
 

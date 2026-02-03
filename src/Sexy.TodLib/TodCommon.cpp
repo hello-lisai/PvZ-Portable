@@ -95,7 +95,7 @@ void Tod_SWTri_AddAllDrawTriFuncs()
 //0x5114E0
 std::string TodGetCurrentLevelName()
 {
-	return __S("Unknown level");
+	return "Unknown level";
 }
 
 //0x511510
@@ -1290,7 +1290,7 @@ std::string TodReplaceNumberString(const std::string& theText, const char* theSt
 	size_t aPos = aFinalString.find(theStringToFind);
 	if (aPos != std::string::npos)
 	{
-		std::string aNumberString = StrFormat(__S("%d"), theNumber);
+		std::string aNumberString = StrFormat("%d", theNumber);
 		aFinalString.replace(aPos, strlen(theStringToFind), aNumberString);
 	}
 

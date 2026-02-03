@@ -500,7 +500,7 @@ void GameSelector::SyncProfile(bool theShowLoading)
 	{
 		mLoading = true;
 
-		mApp->DoDialog(Dialogs::DIALOG_MESSAGE, true, __S("Loading..."), __S(""), __S(""), Dialog::BUTTONS_NONE);
+		mApp->DoDialog(Dialogs::DIALOG_MESSAGE, true, "Loading...", "", "", Dialog::BUTTONS_NONE);
 		mApp->DrawDirtyStuff();
 		mApp->PreloadForUser();
 		mApp->KillDialog(Dialogs::DIALOG_MESSAGE);
@@ -603,7 +603,7 @@ void GameSelector::Draw(Graphics* g)
 	if (mApp->mPlayerInfo && mApp->mPlayerInfo->mName.size() &&
 		mSelectorState != SelectorAnimState::SELECTOR_OPEN && mSelectorState != SelectorAnimState::SELECTOR_NEW_USER)
 	{
-		std::string aWelcomeStr = mApp->mPlayerInfo->mName + __S('!');
+		std::string aWelcomeStr = mApp->mPlayerInfo->mName + '!';
 
 		int aSignIdx = aSelectorReanim->FindTrackIndex("woodsign1");
 		SexyTransform2D aOverlayMatrix;
@@ -710,9 +710,9 @@ void GameSelector::DrawOverlay(Graphics* g)
 		g->SetColor(Color(200, 200, 200));
 
 		if (gIsPartnerBuild)
-			g->DrawString(__S("PRESS/PARTNER PREVIEW BUILD: DO NOT DISTRIBUTE"), 27, 594);
+			g->DrawString("PRESS/PARTNER PREVIEW BUILD: DO NOT DISTRIBUTE", 27, 594);
 		else
-			g->DrawString(__S("BETA BUILD: DO NOT DISTRIBUTE"), 27, 594);
+			g->DrawString("BETA BUILD: DO NOT DISTRIBUTE", 27, 594);
 	}
 
 	// @Minerscale: Trophy needs to draw in the DrawOverlay
@@ -752,14 +752,14 @@ void GameSelector::UpdateTooltip()
 		{
 			if (mApp->EarnedGoldTrophy())
 			{
-				mToolTip->SetLabel(LawnApp::Pluralize(mApp->mPlayerInfo->mFinishedAdventure, __S("[GOLD_SUNFLOWER_TOOLTIP]"), __S("[GOLD_SUNFLOWER_TOOLTIP_PLURAL]")));
+				mToolTip->SetLabel(LawnApp::Pluralize(mApp->mPlayerInfo->mFinishedAdventure, "[GOLD_SUNFLOWER_TOOLTIP]", "[GOLD_SUNFLOWER_TOOLTIP_PLURAL]"));
 				mToolTip->mX = 32;
 				mToolTip->mY = 510;
 				mToolTip->mVisible = true;
 			}
 			else
 			{
-				mToolTip->SetLabel(__S("[SILVER_SUNFLOWER_TOOLTIP]"));
+				mToolTip->SetLabel("[SILVER_SUNFLOWER_TOOLTIP]");
 				mToolTip->mX = 20;
 				mToolTip->mY = 495;
 				mToolTip->mVisible = true;
@@ -921,10 +921,10 @@ void GameSelector::Update()
 				mApp->WriteCurrentUserConfig();
 				mApp->LawnMessageBox(
 					Dialogs::DIALOG_MESSAGE, 
-					__S("[ADVENTURE_COMPLETE_HEADER]"), 
-					__S("[ADVENTURE_COMPLETE_BODY]"), 
-					__S("[DIALOG_BUTTON_OK]"), 
-					__S(""), 
+					"[ADVENTURE_COMPLETE_HEADER]", 
+					"[ADVENTURE_COMPLETE_BODY]", 
+					"[DIALOG_BUTTON_OK]", 
+					"", 
 					Dialog::BUTTONS_FOOTER
 				);
 			}
@@ -1167,7 +1167,7 @@ void GameSelector::KeyChar(char theChar)
 
 	if ((gIsPartnerBuild || mApp->mDebugKeysEnabled) && theChar == 'u' && mApp->mPlayerInfo)
 	{
-		TodTraceAndLog(__S("Selector cheat key '%c'"), theChar);
+		TodTraceAndLog("Selector cheat key '%c'", theChar);
 
 		mApp->mPlayerInfo->mFinishedAdventure = 2;
 		mApp->mPlayerInfo->AddCoins(50000);
@@ -1188,7 +1188,7 @@ void GameSelector::KeyChar(char theChar)
 
 	if (mApp->mDebugKeysEnabled)
 	{
-		TodTraceAndLog(__S("Selector cheat key '%c'"), theChar);
+		TodTraceAndLog("Selector cheat key '%c'", theChar);
 		if (theChar == 'c' || theChar == 'C')
 		{
 			mMinigamesLocked = false;
@@ -1250,10 +1250,10 @@ void GameSelector::ClickedAdventure()
 	{
 		if (mApp->LawnMessageBox(
 			Dialogs::DIALOG_MESSAGE,
-			__S("[REPLAY_LEVEL_HEADER]"),
-			__S("[REPLAY_LEVEL_BODY]"),
-			__S("[DIALOG_BUTTON_YES]"),
-			__S("[DIALOG_BUTTON_NO]"),
+			"[REPLAY_LEVEL_HEADER]",
+			"[REPLAY_LEVEL_BODY]",
+			"[DIALOG_BUTTON_YES]",
+			"[DIALOG_BUTTON_NO]",
 			Dialog::BUTTONS_YES_NO) == Dialog::ID_NO)
 			return;
 
@@ -1302,17 +1302,17 @@ void GameSelector::ButtonDepress(int theId)
 {
 	if (theId == GameSelector::GameSelector_Minigame && mMinigamesLocked)
 	{
-		mApp->LawnMessageBox(Dialogs::DIALOG_MESSAGE, __S("[MODE_LOCKED]"), __S("[MINIGAME_LOCKED_MESSAGE]"), __S("[DIALOG_BUTTON_OK]"), __S(""), Dialog::BUTTONS_FOOTER);
+		mApp->LawnMessageBox(Dialogs::DIALOG_MESSAGE, "[MODE_LOCKED]", "[MINIGAME_LOCKED_MESSAGE]", "[DIALOG_BUTTON_OK]", "", Dialog::BUTTONS_FOOTER);
 		return;
 	}
 	if (theId == GameSelector::GameSelector_Puzzle && mPuzzleLocked)
 	{
-		mApp->LawnMessageBox(Dialogs::DIALOG_MESSAGE, __S("[MODE_LOCKED]"), __S("[PUZZLE_LOCKED_MESSAGE]"), __S("[DIALOG_BUTTON_OK]"), __S(""), Dialog::BUTTONS_FOOTER);
+		mApp->LawnMessageBox(Dialogs::DIALOG_MESSAGE, "[MODE_LOCKED]", "[PUZZLE_LOCKED_MESSAGE]", "[DIALOG_BUTTON_OK]", "", Dialog::BUTTONS_FOOTER);
 		return;
 	}
 	if (theId == GameSelector::GameSelector_Survival && mSurvivalLocked)
 	{
-		mApp->LawnMessageBox(Dialogs::DIALOG_MESSAGE, __S("[MODE_LOCKED]"), __S("[SURVIVAL_LOCKED_MESSAGE]"), __S("[DIALOG_BUTTON_OK]"), __S(""), Dialog::BUTTONS_FOOTER);
+		mApp->LawnMessageBox(Dialogs::DIALOG_MESSAGE, "[MODE_LOCKED]", "[SURVIVAL_LOCKED_MESSAGE]", "[DIALOG_BUTTON_OK]", "", Dialog::BUTTONS_FOOTER);
 		return;
 	}
 
@@ -1394,14 +1394,14 @@ void GameSelector::AddPreviewProfiles()
 {
 	PlayerInfo* aProfile;
 
-	aProfile = mApp->mProfileMgr->AddProfile(__S("2 Night"));
+	aProfile = mApp->mProfileMgr->AddProfile("2 Night");
 	if (aProfile)
 	{
 		aProfile->mLevel = 11;
 		aProfile->SaveDetails();
 	}
 
-	aProfile = mApp->mProfileMgr->AddProfile(__S("3 Pool"));
+	aProfile = mApp->mProfileMgr->AddProfile("3 Pool");
 	if (aProfile)
 	{
 		aProfile->mLevel = 21;
@@ -1411,7 +1411,7 @@ void GameSelector::AddPreviewProfiles()
 		aProfile->SaveDetails();
 	}
 
-	aProfile = mApp->mProfileMgr->AddProfile(__S("4 Fog"));
+	aProfile = mApp->mProfileMgr->AddProfile("4 Fog");
 	if (aProfile)
 	{
 		aProfile->mLevel = 31;
@@ -1423,7 +1423,7 @@ void GameSelector::AddPreviewProfiles()
 		aProfile->SaveDetails();
 	}
 
-	aProfile = mApp->mProfileMgr->AddProfile(__S("5 Roof"));
+	aProfile = mApp->mProfileMgr->AddProfile("5 Roof");
 	if (aProfile)
 	{
 		aProfile->mLevel = 41;
@@ -1436,7 +1436,7 @@ void GameSelector::AddPreviewProfiles()
 		aProfile->SaveDetails();
 	}
 
-	aProfile = mApp->mProfileMgr->AddProfile(__S("Complete"));
+	aProfile = mApp->mProfileMgr->AddProfile("Complete");
 	if (aProfile)
 	{
 		aProfile->mLevel = 1;
@@ -1451,7 +1451,7 @@ void GameSelector::AddPreviewProfiles()
 		aProfile->SaveDetails();
 	}
 
-	aProfile = mApp->mProfileMgr->AddProfile(__S("Full Unlock"));
+	aProfile = mApp->mProfileMgr->AddProfile("Full Unlock");
 	if (aProfile)
 	{
 		aProfile->mLevel = 1;

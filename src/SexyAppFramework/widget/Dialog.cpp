@@ -10,10 +10,10 @@
 using namespace Sexy;
 
 
-std::string Sexy::DIALOG_YES_STRING				= __S("YES");
-std::string Sexy::DIALOG_NO_STRING				= __S("NO");
-std::string Sexy::DIALOG_OK_STRING				= __S("OK");
-std::string Sexy::DIALOG_CANCEL_STRING			= __S("CANCEL");
+std::string Sexy::DIALOG_YES_STRING				= "YES";
+std::string Sexy::DIALOG_NO_STRING				= "NO";
+std::string Sexy::DIALOG_OK_STRING				= "OK";
+std::string Sexy::DIALOG_CANCEL_STRING			= "CANCEL";
 
 static int gDialogColors[][3] = 
 {{255, 255, 255},
@@ -239,12 +239,6 @@ void Dialog::Draw(Graphics* g)
 	//g->SetFont(mLinesFont);	
 	g->SetFont(mLinesFont);
 	g->SetColor(mColors[COLOR_LINES]);
-	
-	/*for (int i = 0; i < mDialogLines.size(); i++)
-	{
-		WriteCenteredLine(g, aCurY, mDialogLines[i]);
-		aCurY += mLinesFont->GetHeight();
-	}*/	
 
 	Rect aRect(mBackgroundInsets.mLeft+mContentInsets.mLeft+2, aCurY, mWidth-mContentInsets.mLeft-mContentInsets.mRight-mBackgroundInsets.mLeft-mBackgroundInsets.mRight-4, 0);
 	aCurY += WriteWordWrapped(g, aRect, mDialogLines, mLinesFont->GetLineSpacing() + mLineSpacingOffset, mTextAlign);	
@@ -404,9 +398,3 @@ void Dialog::ButtonDepress(int theId)
 		mDialogListener->DialogButtonDepress(mId, theId);
 	}
 }
-
-/*
-void Dialog::ButtonDownTick(int theId)
-{	
-}
-*/

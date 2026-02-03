@@ -118,14 +118,14 @@ void TodLogString(const char* theMsg)
 	std::ofstream f(Sexy::PathFromU8(gLogFileName), std::ios::app | std::ios::binary);
 	if (!f)
 	{
-		fprintf(stderr, __S("Failed to open log file '%s'\n"), gLogFileName);
+		fprintf(stderr, "Failed to open log file '%s'\n", gLogFileName);
 		return;
 	}
 
 	f.write(theMsg, (std::streamsize)strlen(theMsg));
 	if (!f)
 	{
-		fprintf(stderr, __S("Failed to write to log file\n"));
+		fprintf(stderr, "Failed to write to log file\n");
 	}
 #endif
 }

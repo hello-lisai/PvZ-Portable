@@ -10,9 +10,9 @@ NewUserDialog::NewUserDialog(LawnApp* theApp, bool isRename) : LawnDialog(
 	isRename ? Dialogs::DIALOG_RENAMEUSER : Dialogs::DIALOG_CREATEUSER, 
 	true, 
 	// @Patoke: these locals don't exist
-	isRename ? __S("RENAME USER") : __S("NEW USER"), 
-	__S("Please enter your name:"), 
-	__S("[DIALOG_BUTTON_OK]"), 
+	isRename ? "RENAME USER" : "NEW USER", 
+	"Please enter your name:", 
+	"[DIALOG_BUTTON_OK]", 
 	Dialog::BUTTONS_OK_CANCEL)
 {
 	mApp = theApp;
@@ -73,31 +73,31 @@ void NewUserDialog::EditWidgetText(int theId, const std::string& theString)
 //0x45D9F0
 bool NewUserDialog::AllowChar(int, char theChar)
 {
-	return sexyisalnum(theChar) || theChar == __S(' ');
+	return isalnum(theChar) || theChar == ' ';
 }
 
 //0x45DA20
 std::string NewUserDialog::GetName()
 {
 	std::string aString;
-	char aLastChar = __S(' ');
+	char aLastChar = ' ';
 
 	for (size_t i = 0; i < mNameEditWidget->mString.size(); i++)
 	{
 		char aChar = mNameEditWidget->mString[i];
-		if (aChar != __S(' '))
+		if (aChar != ' ')
 		{
 			aString.append(1, aChar);
 		}
 		else if (aChar != aLastChar)
 		{
-			aString.append(1, __S(' '));
+			aString.append(1, ' ');
 		}
 
 		aLastChar = aChar;
 	}
 
-	if (aString.size() && aString[aString.size() - 1] == __S(' '))
+	if (aString.size() && aString[aString.size() - 1] == ' ')
 	{
 		aString.resize(aString.size() - 1);
 	}

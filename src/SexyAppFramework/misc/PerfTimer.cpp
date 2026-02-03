@@ -10,18 +10,7 @@ using namespace Sexy;
 inline int QueryCounters(int64_t *lpPerformanceCount)
 {
 	(void)lpPerformanceCount;
-	// Argh fuck it just hope it never happens
 	unreachable();
-	// returns TSC only
-	/*
-	asm (
-		"mov ebx, dword ptr [lpPerformanceCount]"
-		"rdtsc"
-		"	mov dword ptr [ebx], eax"
-		"	mov dword ptr [ebx+4], edx"
-	);
-	return 1;
-	*/
 	return 1;
 }
 
@@ -30,19 +19,7 @@ inline int QueryCounters(int64_t *lpPerformanceCount)
 inline int DeltaCounters(int64_t *lpPerformanceCount)
 {
 	(void)lpPerformanceCount;
-	// Argh fuck it just hope it never happens
 	unreachable();
-	/*
-	asm (
-		"mov ebx, dword ptr [lpPerformanceCount]"
-		"rdtsc"
-		"	sub eax, dword ptr [ebx]"
-		"	sbb edx, dword ptr [ebx+4]"
-		"	mov dword ptr [ebx],   eax"
-		"		mov dword ptr [ebx+4], edx"
-	);
-	return 1;
-	*/
 	return 1;
 }
 
@@ -50,26 +27,6 @@ inline int DeltaCounters(int64_t *lpPerformanceCount)
 ///////////////////////////////////////////////////////////////////////////////
 static int64_t CalcCPUSpeed()
 {
-	/*
-	int aPriority = GetThreadPriority(GetCurrentThread());
-	SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
-	int64_t	goal, current, period;
-	int64_t Ticks;
-
-	if( !QueryPerformanceFrequency( &period ) ) return 0;
-
-	QueryPerformanceCounter(&goal);
-	goal.QuadPart+=period.QuadPart/100;
-	QueryCounters( &Ticks );
-	do
-	{
-		QueryPerformanceCounter(&current);
-	} while(current.QuadPart<goal.QuadPart);
-	DeltaCounters( &Ticks );
-
-	SetThreadPriority(GetCurrentThread(),aPriority);
-	return( Ticks * 100 );		// Hz
-	*/
 	return 0;
 }
 

@@ -46,7 +46,7 @@ void StoreScreenOverlay::Draw(Graphics* g)
 }
 
 //0x489DA0
-StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STORE, true, __S("Store"), __S(""), __S(""), BUTTONS_NONE)
+StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STORE, true, "Store", "", "", BUTTONS_NONE)
 {
 	mApp = theApp;
     mClip = false;
@@ -74,7 +74,7 @@ StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STOR
 
     mBackButton = new NewLawnButton(nullptr, StoreScreen::StoreScreen_Back, this);
     mBackButton->mDoFinger = true;
-    mBackButton->SetLabel(__S("[STORE_MAIN_MENU_BUTTON]"));
+    mBackButton->SetLabel("[STORE_MAIN_MENU_BUTTON]");
     Image* aMenuImage = Sexy::IMAGE_STORE_MAINMENUBUTTON;
     mBackButton->mButtonImage = aMenuImage;
     mBackButton->mOverImage = Sexy::IMAGE_STORE_MAINMENUBUTTONHIGHLIGHT;
@@ -90,7 +90,7 @@ StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STOR
 
     mPrevButton = new NewLawnButton(nullptr, StoreScreen::StoreScreen_Prev, this);
     mPrevButton->mDoFinger = true;
-    mPrevButton->SetLabel(__S(""));
+    mPrevButton->SetLabel("");
     Image* aPrevImage = Sexy::IMAGE_STORE_PREVBUTTON;
     mPrevButton->mButtonImage = aPrevImage;
     mPrevButton->mOverImage = Sexy::IMAGE_STORE_PREVBUTTONHIGHLIGHT;
@@ -101,7 +101,7 @@ StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STOR
 
     mNextButton = new NewLawnButton(nullptr, StoreScreen::StoreScreen_Next, this);
     mNextButton->mDoFinger = true;
-    mNextButton->SetLabel(__S(""));
+    mNextButton->SetLabel("");
     Image* aNextImage = Sexy::IMAGE_STORE_NEXTBUTTON;
     mNextButton->mButtonImage = aNextImage;
     mNextButton->mOverImage = Sexy::IMAGE_STORE_NEXTBUTTONHIGHLIGHT;
@@ -302,7 +302,7 @@ void StoreScreen::DrawItemIcon(Graphics* g, int theItemPosition, StoreItem theIt
             g->SetColorizeImages(false);
         }
 
-        std::string aSlotText = TodReplaceNumberString(__S("[STORE_UPGRADE_SLOTS]"), __S("{SLOTS}"), mApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE] + 7);
+        std::string aSlotText = TodReplaceNumberString("[STORE_UPGRADE_SLOTS]", "{SLOTS}", mApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE] + 7);
         Rect aRect(aPosX, aPosY + 6, 55, 70);
         TodDrawStringWrapped(g, aSlotText, aRect, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_CENTER_VERTICAL_MIDDLE);
     }
@@ -357,7 +357,7 @@ void StoreScreen::DrawItemIcon(Graphics* g, int theItemPosition, StoreItem theIt
     else if (theItemType == STORE_ITEM_FERTILIZER)
     {
         g->DrawImage(Sexy::IMAGE_FERTILIZER, aPosX - 11, aPosY - 2);
-        TodDrawString(g, __S("x5"), aPosX + 56, aPosY + 62, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
+        TodDrawString(g, "x5", aPosX + 56, aPosY + 62, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
     }
     else if (theItemType == STORE_ITEM_PHONOGRAPH)
     {
@@ -366,7 +366,7 @@ void StoreScreen::DrawItemIcon(Graphics* g, int theItemPosition, StoreItem theIt
     else if (theItemType == STORE_ITEM_BUG_SPRAY)
     {
         g->DrawImage(Sexy::IMAGE_BUG_SPRAY, aPosX - 12, aPosY + 3);
-        TodDrawString(g, __S("x5"), aPosX + 56, aPosY + 62, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
+        TodDrawString(g, "x5", aPosX + 56, aPosY + 62, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
     }
     else if (theItemType == STORE_ITEM_GARDENING_GLOVE)
     {
@@ -412,12 +412,12 @@ void StoreScreen::DrawItem(Graphics* g, int theItemPosition, StoreItem theItemTy
         {
             aRect.mX -= 4;
         }
-        TodDrawStringWrapped(g, __S("[COMING_SOON]"), aRect, Sexy::FONT_HOUSEOFTERROR16, Color(255, 0, 0), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
+        TodDrawStringWrapped(g, "[COMING_SOON]", aRect, Sexy::FONT_HOUSEOFTERROR16, Color(255, 0, 0), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
     }
     else if (IsItemSoldOut(theItemType))
     {
         Rect aRect(aPosX, aPosY, 50, 70);
-        TodDrawStringWrapped(g, __S("[SOLD_OUT]"), aRect, Sexy::FONT_HOUSEOFTERROR16, Color(255, 0, 0), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
+        TodDrawStringWrapped(g, "[SOLD_OUT]", aRect, Sexy::FONT_HOUSEOFTERROR16, Color(255, 0, 0), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
     }
     else if (mMouseOverItem == theItemType)
     {
@@ -502,7 +502,7 @@ void StoreScreen::Draw(Graphics* g)
             }
         }
 
-        std::string aPageString = TodReplaceNumberString(TodReplaceNumberString(__S("[STORE_PAGE]"), __S("{PAGE}"), mPage), __S("{NUM_PAGES}"), aNumPages);
+        std::string aPageString = TodReplaceNumberString(TodReplaceNumberString("[STORE_PAGE]", "{PAGE}", mPage), "{NUM_PAGES}", aNumPages);
         TodDrawString(g, aPageString, STORESCREEN_PAGESTRING_X, STORESCREEN_COINBANK_Y, Sexy::FONT_BRIANNETOD12, Color(80, 80, 80), DS_ALIGN_CENTER);
     }
 }
@@ -918,9 +918,9 @@ void StoreScreen::PurchaseItem(StoreItem theStoreItem)
     {
         // @Patoke: fix locals
         Dialog* aDialog = mApp->DoDialog(DIALOG_NOT_ENOUGH_MONEY, true,
-            __S("Not enough money"), 
-            __S("You can't afford this item yet. Earn more coins by killing zombies!"), 
-            __S("[DIALOG_BUTTON_OK]"), BUTTONS_FOOTER);
+            "Not enough money", 
+            "You can't afford this item yet. Earn more coins by killing zombies!", 
+            "[DIALOG_BUTTON_OK]", BUTTONS_FOOTER);
         mWaitForDialog = true;
         aDialog->WaitForResult(true);
         mWaitForDialog = false;
@@ -930,13 +930,13 @@ void StoreScreen::PurchaseItem(StoreItem theStoreItem)
         LawnDialog* aComfirmDialog = (LawnDialog*)mApp->DoDialog(
             DIALOG_STORE_PURCHASE, 
             true, 
-            __S("Buy this item?"), 
-            __S("Are you sure you want to buy this item?"), 
-            __S(""), 
+            "Buy this item?", 
+            "Are you sure you want to buy this item?", 
+            "", 
             BUTTONS_YES_NO
         );
-        aComfirmDialog->mLawnYesButton->SetLabel(__S("[DIALOG_BUTTON_YES]"));
-        aComfirmDialog->mLawnNoButton->SetLabel(__S("[DIALOG_BUTTON_NO]"));
+        aComfirmDialog->mLawnYesButton->SetLabel("[DIALOG_BUTTON_YES]");
+        aComfirmDialog->mLawnNoButton->SetLabel("[DIALOG_BUTTON_NO]");
 
         mWaitForDialog = true;
         int aComfirmResult = aComfirmDialog->WaitForResult(true);
@@ -948,8 +948,8 @@ void StoreScreen::PurchaseItem(StoreItem theStoreItem)
             if (theStoreItem == STORE_ITEM_PACKET_UPGRADE)
             {
                 ++mApp->mPlayerInfo->mPurchases[theStoreItem];
-                std::string aDialogLines = StrFormat(__S("Now you can choose to take %d seeds with you per level!"), 6 + mApp->mPlayerInfo->mPurchases[theStoreItem]);
-                Dialog* aDialog = mApp->DoDialog(DIALOG_UPGRADED, true, __S("More slots!"), aDialogLines, __S("[DIALOG_BUTTON_OK]"), BUTTONS_FOOTER);
+                std::string aDialogLines = StrFormat("Now you can choose to take %d seeds with you per level!", 6 + mApp->mPlayerInfo->mPurchases[theStoreItem]);
+                Dialog* aDialog = mApp->DoDialog(DIALOG_UPGRADED, true, "More slots!", aDialogLines, "[DIALOG_BUTTON_OK]", BUTTONS_FOOTER);
 
                 mWaitForDialog = true;
                 aDialog->WaitForResult(true);
@@ -996,13 +996,13 @@ void StoreScreen::PurchaseItem(StoreItem theStoreItem)
                 LawnDialog* aDialog = (LawnDialog*)mApp->DoDialog(
                     DIALOG_STORE_PURCHASE, 
                     true, 
-                    __S("[VISIT_TREE_HEADER]"), 
-                    __S("[VISIT_TREE_BODY]"), 
-                    __S(""), 
+                    "[VISIT_TREE_HEADER]", 
+                    "[VISIT_TREE_BODY]", 
+                    "", 
                     BUTTONS_YES_NO
                 );
-                aDialog->mLawnYesButton->SetLabel(__S("[DIALOG_BUTTON_YES]"));
-                aDialog->mLawnNoButton->SetLabel(__S("[DIALOG_BUTTON_NO]"));
+                aDialog->mLawnYesButton->SetLabel("[DIALOG_BUTTON_YES]");
+                aDialog->mLawnNoButton->SetLabel("[DIALOG_BUTTON_NO]");
 
                 mWaitForDialog = true;
                 int aResult = aDialog->WaitForResult(true);
@@ -1167,6 +1167,6 @@ void StoreScreen::SetupForIntro(int theDialogIndex)
 {
     mStartDialog = theDialogIndex;
     mHatchOpen = false;
-    mBackButton->mLabel = TodStringTranslate(__S("[STORE_NEXT_LEVEL_BUTTON]"));
+    mBackButton->mLabel = TodStringTranslate("[STORE_NEXT_LEVEL_BUTTON]");
     EnableButtons(false);
 }

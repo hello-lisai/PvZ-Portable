@@ -17,19 +17,19 @@ using namespace Sexy;
 
 //0x45C050
 NewOptionsDialog::NewOptionsDialog(LawnApp* theApp, bool theFromGameSelector) : 
-	Dialog(nullptr, nullptr, Dialogs::DIALOG_NEWOPTIONS, true, __S("Options"), __S(""), __S(""), Dialog::BUTTONS_NONE)
+	Dialog(nullptr, nullptr, Dialogs::DIALOG_NEWOPTIONS, true, "Options", "", "", Dialog::BUTTONS_NONE)
 {
     mApp = theApp;
     mFromGameSelector = theFromGameSelector;
     SetColor(Dialog::COLOR_BUTTON_TEXT, Color(255, 255, 100));
-    mAlmanacButton = MakeButton(NewOptionsDialog::NewOptionsDialog_Almanac, this, __S("[VIEW_ALMANAC_BUTTON]"));
-    mRestartButton = MakeButton(NewOptionsDialog::NewOptionsDialog_Restart, this, __S("[RESTART_LEVEL]"));
-    mBackToMainButton = MakeButton(NewOptionsDialog::NewOptionsDialog_MainMenu, this, __S("[MAIN_MENU_BUTTON]"));
+    mAlmanacButton = MakeButton(NewOptionsDialog::NewOptionsDialog_Almanac, this, "[VIEW_ALMANAC_BUTTON]");
+    mRestartButton = MakeButton(NewOptionsDialog::NewOptionsDialog_Restart, this, "[RESTART_LEVEL]");
+    mBackToMainButton = MakeButton(NewOptionsDialog::NewOptionsDialog_MainMenu, this, "[MAIN_MENU_BUTTON]");
 
     mBackToGameButton = MakeNewButton(
         Dialog::ID_OK, 
         this, 
-        __S("[BACK_TO_GAME]"), 
+        "[BACK_TO_GAME]", 
         nullptr, 
         IMAGE_OPTIONS_BACKTOGAMEBUTTON0, 
         IMAGE_OPTIONS_BACKTOGAMEBUTTON0, 
@@ -60,10 +60,10 @@ NewOptionsDialog::NewOptionsDialog(LawnApp* theApp, bool theFromGameSelector) :
     if (mFromGameSelector)
     {
         mRestartButton->SetVisible(false);
-        mBackToGameButton->SetLabel(__S("[DIALOG_BUTTON_OK]"));
+        mBackToGameButton->SetLabel("[DIALOG_BUTTON_OK]");
         if (mApp->HasFinishedAdventure() && !mApp->IsTrialStageLocked())
         {
-            mBackToMainButton->SetLabel(__S("[CREDITS]"));
+            mBackToMainButton->SetLabel("[CREDITS]");
         }
         else
         {
@@ -184,10 +184,10 @@ void NewOptionsDialog::Draw(Sexy::Graphics* g)
     }
     Sexy::Color aTextColor(107, 109, 145);
 
-    TodDrawString(g, __S("Music"), 186, 140 + aMusicOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
-    TodDrawString(g, __S("Sound FX"), 186, 167 + aSfxOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
-    TodDrawString(g, __S("3D Acceleration"), 274, 197 + a3DAccelOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
-    TodDrawString(g, __S("Full Screen"), 274, 229 + aFullScreenOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
+    TodDrawString(g, "Music", 186, 140 + aMusicOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
+    TodDrawString(g, "Sound FX", 186, 167 + aSfxOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
+    TodDrawString(g, "3D Acceleration", 274, 197 + a3DAccelOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
+    TodDrawString(g, "Full Screen", 274, 229 + aFullScreenOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
 }
 
 //0x45CF50
@@ -222,11 +222,11 @@ void NewOptionsDialog::CheckboxChecked(int theId, bool checked)
             mApp->DoDialog(
                 Dialogs::DIALOG_COLORDEPTH_EXP, 
                 true, 
-                __S("No Windowed Mode"), 
-                __S( "Windowed mode is only available if your desktop was running in either\n"
+                "No Windowed Mode", 
+                "Windowed mode is only available if your desktop was running in either\n"
                     "16 bit or 32 bit color mode when you started the game.\n\n"
-                    "If you'd like to run in Windowed mode then you need to quit the game and switch your desktop to 16 or 32 bit color mode."), 
-                __S("OK"), 
+                    "If you'd like to run in Windowed mode then you need to quit the game and switch your desktop to 16 or 32 bit color mode.", 
+                "OK", 
                 Dialog::BUTTONS_FOOTER
             );
 
@@ -243,12 +243,12 @@ void NewOptionsDialog::CheckboxChecked(int theId, bool checked)
                 mApp->DoDialog(
                     Dialogs::DIALOG_INFO,
                     true,
-                    __S("Not Supported"),
-                    __S( "Hardware Acceleration cannot be enabled on this computer.\n\n"
+                    "Not Supported",
+                    "Hardware Acceleration cannot be enabled on this computer.\n\n"
                         "Your video card does not\n"
                         "meet the minimum requirements\n"
-                        "for this game."),
-                    __S("OK"),
+                        "for this game.",
+                    "OK",
                     Dialog::BUTTONS_FOOTER
                 );
             }
@@ -257,10 +257,10 @@ void NewOptionsDialog::CheckboxChecked(int theId, bool checked)
                 mApp->DoDialog(
                     Dialogs::DIALOG_INFO,
                     true,
-                    __S("Warning"),
-                    __S( "Your video card may not fully support this feature.\n\n"
-                        "If you experience slower performance, please disable Hardware Acceleration.\n"),
-                    __S("OK"),
+                    "Warning",
+                    "Your video card may not fully support this feature.\n\n"
+                        "If you experience slower performance, please disable Hardware Acceleration.\n",
+                    "OK",
                     Dialog::BUTTONS_FOOTER
                 );
             }
@@ -340,28 +340,28 @@ void NewOptionsDialog::ButtonDepress(int theId)
             std::string aDialogMessage;
             if (mApp->IsPuzzleMode())
             {
-                aDialogTitle = __S("[RESTART_PUZZLE_HEADER]");
-                aDialogMessage = __S("[RESTART_PUZZLE_BODY]");
+                aDialogTitle = "[RESTART_PUZZLE_HEADER]";
+                aDialogMessage = "[RESTART_PUZZLE_BODY]";
             }
             else if (mApp->IsChallengeMode())
             {
-                aDialogTitle = __S("[RESTART_CHALLENGE_HEADER]");
-                aDialogMessage = __S("[RESTART_CHALLENGE_BODY]");
+                aDialogTitle = "[RESTART_CHALLENGE_HEADER]";
+                aDialogMessage = "[RESTART_CHALLENGE_BODY]";
             }
             else if (mApp->IsSurvivalMode())
             {
-                aDialogTitle = __S("[RESTART_SURVIVAL_HEADER]");
-                aDialogMessage = __S("[RESTART_SURVIVAL_BODY]");
+                aDialogTitle = "[RESTART_SURVIVAL_HEADER]";
+                aDialogMessage = "[RESTART_SURVIVAL_BODY]";
             }
             else
             {
-                aDialogTitle = __S("[RESTART_LEVEL_HEADER]");
-                aDialogMessage = __S("[RESTART_LEVEL_BODY]");
+                aDialogTitle = "[RESTART_LEVEL_HEADER]";
+                aDialogMessage = "[RESTART_LEVEL_BODY]";
             }
 
-            LawnDialog* aDialog = (LawnDialog*)mApp->DoDialog(Dialogs::DIALOG_CONFIRM_RESTART, true, aDialogTitle, aDialogMessage, __S(""), Dialog::BUTTONS_YES_NO);
-            aDialog->mLawnYesButton->mLabel = TodStringTranslate(__S("[RESTART_LEVEL]"));
-            aDialog->mLawnNoButton->mLabel = TodStringTranslate(__S("[DIALOG_BUTTON_CANCEL]"));
+            LawnDialog* aDialog = (LawnDialog*)mApp->DoDialog(Dialogs::DIALOG_CONFIRM_RESTART, true, aDialogTitle, aDialogMessage, "", Dialog::BUTTONS_YES_NO);
+            aDialog->mLawnYesButton->mLabel = TodStringTranslate("[RESTART_LEVEL]");
+            aDialog->mLawnNoButton->mLabel = TodStringTranslate("[DIALOG_BUTTON_CANCEL]");
             
             if (aDialog->WaitForResult(true) == Dialog::ID_YES)
             {

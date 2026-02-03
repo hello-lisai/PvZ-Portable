@@ -161,7 +161,7 @@ void GameButton::Draw(Graphics* g)
 			DrawButtonImage(g, mButtonImage, mNormalRect, 0, 0);
 
 		g->SetColor(mColors[isHighLighted ? GameButton::COLOR_LABEL_HILITE : GameButton::COLOR_LABEL]);
-		g->DrawString(StringToSexyStringFast(mLabel), aFontX, aFontY);
+		g->DrawString(mLabel, aFontX, aFontY);
 
 		if (isHighLighted && mOverOverlayImage)
 		{
@@ -180,7 +180,7 @@ void GameButton::Draw(Graphics* g)
 			DrawButtonImage(g, mButtonImage, mNormalRect, 1, 1);
 		
 		g->SetColor(mColors[GameButton::COLOR_LABEL_HILITE]);
-		g->DrawString(StringToSexyStringFast(mLabel), aFontX + 1, aFontY + 1);
+		g->DrawString(mLabel, aFontX + 1, aFontY + 1);
 
 		if (isHighLighted && mOverOverlayImage)
 		{

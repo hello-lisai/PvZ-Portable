@@ -901,15 +901,15 @@ void CutScene::StartLevelIntro()
 		{
 			if (mBoard->mBackground == BackgroundType::BACKGROUND_1_DAY || mBoard->mBackground == BackgroundType::BACKGROUND_2_NIGHT)
 			{
-				aHouseMessage = TodStringTranslate(__S("[PLAYERS_HOUSE]"));
+				aHouseMessage = TodStringTranslate("[PLAYERS_HOUSE]");
 			}
 			else if (mBoard->mBackground == BackgroundType::BACKGROUND_3_POOL || mBoard->mBackground == BackgroundType::BACKGROUND_4_FOG)
 			{
-				aHouseMessage = TodStringTranslate(__S("[PLAYERS_BACKYARD]"));
+				aHouseMessage = TodStringTranslate("[PLAYERS_BACKYARD]");
 			}
 			else if (mBoard->mBackground == BackgroundType::BACKGROUND_5_ROOF || mBoard->mBackground == BackgroundType::BACKGROUND_6_BOSS)
 			{
-				aHouseMessage = TodStringTranslate(__S("[PLAYERS_ROOF]"));
+				aHouseMessage = TodStringTranslate("[PLAYERS_ROOF]");
 			}
 			else
 			{
@@ -922,7 +922,7 @@ void CutScene::StartLevelIntro()
 		}
 	}
 
-	aHouseMessage = TodReplaceString(aHouseMessage, __S("{PLAYER}"), mApp->mPlayerInfo->mName);
+	aHouseMessage = TodReplaceString(aHouseMessage, "{PLAYER}", mApp->mPlayerInfo->mName);
 	if (!aHouseMessage.empty())
 	{
 		mBoard->DisplayAdvice(aHouseMessage, MessageStyle::MESSAGE_STYLE_HOUSE_NAME, AdviceType::ADVICE_NONE);
@@ -1563,14 +1563,14 @@ void CutScene::UpdateZombiesWon()
 		if (mApp->IsSurvivalMode())
 		{
 			int aFlagsCompleted = mBoard->GetSurvivalFlagsCompleted();
-			std::string aFlagsStr = mApp->Pluralize(aFlagsCompleted, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
-			std::string aStr = TodReplaceString(__S("[SURVIVAL_DEATH_MESSAGE]"), __S("{FLAGS}"), aFlagsStr);
+			std::string aFlagsStr = mApp->Pluralize(aFlagsCompleted, "[ONE_FLAG]", "[COUNT_FLAGS]");
+			std::string aStr = TodReplaceString("[SURVIVAL_DEATH_MESSAGE]", "{FLAGS}", aFlagsStr);
 			GameOverDialog* aDialog = new GameOverDialog(aStr, true);
 			mApp->AddDialog(Dialogs::DIALOG_GAME_OVER, aDialog);
 		}
 		else
 		{
-			GameOverDialog* aDialog = new GameOverDialog(__S(""), false);
+			GameOverDialog* aDialog = new GameOverDialog("", false);
 			mApp->AddDialog(Dialogs::DIALOG_GAME_OVER, aDialog);
 		}
 	}
@@ -1662,10 +1662,10 @@ void CutScene::AdvanceCrazyDaveDialog(bool theJustSkipping)
 	{
 		int aCost = StoreScreen::GetItemCost(StoreItem::STORE_ITEM_PACKET_UPGRADE);
 		int aNumPackets = mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_PACKET_UPGRADE];
-		std::string aBodyString = TodReplaceNumberString(__S("[UPGRADE_DIALOG_BODY]"), __S("{SLOTS}"), aNumPackets + 1);
+		std::string aBodyString = TodReplaceNumberString("[UPGRADE_DIALOG_BODY]", "{SLOTS}", aNumPackets + 1);
 		std::string aAmountString = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
 		// 创建询问是否升级卡槽格数的对话
-		Dialog* aDialog = mApp->DoDialog(Dialogs::DIALOG_PURCHASE_PACKET_SLOT, true, aAmountString, aBodyString, __S(""), Dialog::BUTTONS_YES_NO);
+		Dialog* aDialog = mApp->DoDialog(Dialogs::DIALOG_PURCHASE_PACKET_SLOT, true, aAmountString, aBodyString, "", Dialog::BUTTONS_YES_NO);
 		aDialog->mX += 120;
 		aDialog->mY += 130;
 		mBoard->ShowCoinBank(100);
@@ -1750,10 +1750,10 @@ void CutScene::KeyDown(KeyCode theKey)
 
 			int aResult = mApp->LawnMessageBox(
 				Dialogs::DIALOG_MESSAGE, 
-				__S("[UPSELL_PAUSE_HEADER]"), 
-				__S("[UPSELL_PAUSE_BODY]"), 
-				__S("[UPSELL_RESUME_BUTTON]"), 
-				__S("[MAIN_MENU_BUTTON]"), 
+				"[UPSELL_PAUSE_HEADER]", 
+				"[UPSELL_PAUSE_BODY]", 
+				"[UPSELL_RESUME_BUTTON]", 
+				"[MAIN_MENU_BUTTON]", 
 				Dialog::BUTTONS_YES_NO
 			);
 			if (aResult == Dialog::ID_NO)
@@ -1782,11 +1782,11 @@ void CutScene::KeyDown(KeyCode theKey)
 int CutScene::ParseDelayTimeFromMessage()
 {
 	std::string aCrazyDaveText = mApp->GetCrazyDaveText(mCrazyDaveLastTalkIndex);
-	size_t anIndex = aCrazyDaveText.find(__S("{DELAY_"));
+	size_t anIndex = aCrazyDaveText.find("{DELAY_");
 	if (anIndex != std::string::npos)
 	{
-		std::string aDelayTimeStr = aCrazyDaveText.substr(anIndex + 7, aCrazyDaveText.find(__S("}")) - anIndex - 7);
-		mCrazyDaveCountDown = sexyatoi(aDelayTimeStr.c_str());
+		std::string aDelayTimeStr = aCrazyDaveText.substr(anIndex + 7, aCrazyDaveText.find("}") - anIndex - 7);
+		mCrazyDaveCountDown = atoi(aDelayTimeStr.c_str());
 		return mCrazyDaveCountDown;
 	}
 	return 100;
@@ -1796,11 +1796,11 @@ int CutScene::ParseDelayTimeFromMessage()
 int CutScene::ParseTalkTimeFromMessage()
 {
 	std::string aCrazyDaveText = mApp->GetCrazyDaveText(mCrazyDaveLastTalkIndex);
-	int anIndex = aCrazyDaveText.find(__S("{TIME_"));
+	int anIndex = aCrazyDaveText.find("{TIME_");
 	if (anIndex != -1)
 	{
-		std::string aTalkTimeStr = aCrazyDaveText.substr(anIndex + 6, aCrazyDaveText.find(__S("}")) - anIndex - 6);
-		mCrazyDaveCountDown = sexyatoi(aTalkTimeStr.c_str());
+		std::string aTalkTimeStr = aCrazyDaveText.substr(anIndex + 6, aCrazyDaveText.find("}") - anIndex - 6);
+		mCrazyDaveCountDown = atoi(aTalkTimeStr.c_str());
 		return mCrazyDaveCountDown;
 	}
 	return 100;
@@ -2351,7 +2351,7 @@ void CutScene::DrawIntro(Graphics* g)
 
 		TodDrawString(
 			g, 
-			__S("[INTRO_PRESENTS]"), 
+			"[INTRO_PRESENTS]", 
 			BOARD_WIDTH / 2 - mBoard->mX, 
 			310 - mBoard->mY, 
 			FONT_BRIANNETOD16,

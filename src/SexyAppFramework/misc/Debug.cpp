@@ -79,7 +79,7 @@ void SexyTraceFmt(const char* fmt ...)
 
 	va_list argList;
 	va_start(argList, fmt);
-	std::string result = SexyStringToStringFast(vformat(fmt, argList));
+	std::string result = VFormat(fmt, argList);
 	va_end(argList);
 
 	
@@ -238,7 +238,7 @@ void OutputDebug(const char* fmt ...)
 {
 	va_list argList;
     va_start(argList, fmt);
-    std::string result = SexyStringToStringFast(vformat(fmt, argList));
+	std::string result = VFormat(fmt, argList);
     va_end(argList);
 
 	printf("%s", result.c_str());

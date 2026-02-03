@@ -10,7 +10,7 @@
 
 //0x482B00
 ImitaterDialog::ImitaterDialog() : 
-	LawnDialog(gLawnApp, Dialogs::DIALOG_IMITATER, true, __S("[CHOOSE_SEED_TO_COPY]"), __S(""), __S("[DIALOG_BUTTON_OK]"), Dialog::BUTTONS_YES_NO)
+	LawnDialog(gLawnApp, Dialogs::DIALOG_IMITATER, true, "[CHOOSE_SEED_TO_COPY]", "", "[DIALOG_BUTTON_OK]", Dialog::BUTTONS_YES_NO)
 {
 	CalcSize(IMITATER_DIALOG_WIDTH - mWidth, IMITATER_DIALOG_HEIGHT - mHeight);
 	mToolTip = new ToolTipWidget();
@@ -113,22 +113,22 @@ void ImitaterDialog::ShowToolTip()
 		uint aRecFlags = mApp->mSeedChooserScreen->SeedNotRecommendedToPick(aSeedType);
 		if (mApp->mSeedChooserScreen->SeedNotAllowedToPick(aSeedType))  // 如果不能携带
 		{
-			mToolTip->SetWarningText(__S("[NOT_ALLOWED_ON_THIS_LEVEL]"));
+			mToolTip->SetWarningText("[NOT_ALLOWED_ON_THIS_LEVEL]");
 		}
 		else if (aRecFlags)  // 如果不推荐携带
 		{
 			if (TestBit(aRecFlags, NotRecommend::NOT_RECOMMENDED_NOCTURNAL))
 			{
-				mToolTip->SetWarningText(__S("[NOCTURNAL_WARNING]"));
+				mToolTip->SetWarningText("[NOCTURNAL_WARNING]");
 			}
 			else
 			{
-				mToolTip->SetWarningText(__S("[NOT_RECOMMEND_FOR_LEVEL]"));
+				mToolTip->SetWarningText("[NOT_RECOMMEND_FOR_LEVEL]");
 			}
 		}
 		else
 		{
-			mToolTip->SetWarningText(__S(""));
+			mToolTip->SetWarningText("");
 		}
 		mToolTip->SetTitle(Plant::GetNameString(SeedType::SEED_IMITATER, aSeedType));
 		mToolTip->SetLabel(Plant::GetToolTip(aSeedType));

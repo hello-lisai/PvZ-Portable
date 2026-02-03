@@ -115,27 +115,6 @@ bool SexyAppBase::ProcessDeferredMessages(bool singleMessage)
 
 			case SDL_KEYDOWN:
 				mLastUserInputTick = mLastTimerTime;
-
-				/*
-				if (wParam==VK_RETURN && uMsg==WM_SYSKEYDOWN && !mForceFullscreen && !mForceWindowed && mAllowAltEnter)
-				{
-					SwitchScreenMode(!mIsWindowed);
-					ClearKeysDown();
-					break;
-				}
-				else if ((wParam == 'D') && (mWidgetManager != nullptr) && (mWidgetManager->mKeyDown[KEYCODE_CONTROL]) && (mWidgetManager->mKeyDown[KEYCODE_MENU]))
-				{
-					PlaySoundA("c:\\windows\\media\\Windows XP Menu Command.wav", nullptr, SND_ASYNC);
-					mDebugKeysEnabled = !mDebugKeysEnabled;
-				}
-
-				if (mDebugKeysEnabled)
-				{
-					if (DebugKeyDown(wParam))
-						break;
-				}
-				*/
-
 				mWidgetManager->KeyDown((KeyCode)event.key.keysym.sym);
 				break;
 
@@ -148,15 +127,6 @@ bool SexyAppBase::ProcessDeferredMessages(bool singleMessage)
 				mLastUserInputTick = mLastTimerTime;
 				mWidgetManager->KeyChar((char)event.text.text[0]);
 				break;
-
-			/*
-			case WM_MOUSEWHEEL:
-				{
-					char aZDelta = ((short)HIWORD(wParam)) / 120;
-					mWidgetManager->MouseWheel(aZDelta);
-				}
-				break;
-			*/
 		}
 	}
 

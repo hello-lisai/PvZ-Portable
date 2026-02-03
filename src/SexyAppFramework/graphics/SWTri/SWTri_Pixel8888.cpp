@@ -81,10 +81,5 @@
 			
 			*pix = ((finalAlpha-1)<<24) | tr | tg | tb;
 		}
-		// Not sure  of use case
-		/*
-		else
-			_asm nop;
-		*/
 	}
 	#endif

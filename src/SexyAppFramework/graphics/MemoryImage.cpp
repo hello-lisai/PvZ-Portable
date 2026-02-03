@@ -772,12 +772,6 @@ void MemoryImage::NormalDrawLineAA(double theStartX, double theStartY, double th
 	BitsChanged();
 }
 
-/*
-void MemoryImage::AdditiveDrawLineAA(double theStartX, double theStartY, double theEndX, double theEndY, const Color& theColor)
-{
-}
-*/
-
 void MemoryImage::DrawLineAA(double theStartX, double theStartY, double theEndX, double theEndY, const Color& theColor, int theDrawMode)
 {
 	if (theStartY == theEndY)
@@ -1828,7 +1822,7 @@ void MemoryImage::BltTrianglesTexHelper(Image *theTexture, const TriVertex theVe
 
 }
 
-void MemoryImage::FillScanLinesWithCoverage(Span* theSpans, int theSpanCount, const Color& theColor, int theDrawMode, const BYTE* theCoverage, int theCoverX, int theCoverY, int theCoverWidth, int theCoverHeight)
+void MemoryImage::FillScanLinesWithCoverage(Span* theSpans, int theSpanCount, const Color& theColor, int theDrawMode, const uint8_t* theCoverage, int theCoverX, int theCoverY, int theCoverWidth, int theCoverHeight)
 {
 	(void)theDrawMode;(void)theCoverHeight;
 	uint32_t* theBits = GetBits();
@@ -1840,7 +1834,7 @@ void MemoryImage::FillScanLinesWithCoverage(Span* theSpans, int theSpanCount, co
 		int y = aSpan->mY - theCoverY;
 
 		uint32_t* aDestPixels = &theBits[aSpan->mY*mWidth + aSpan->mX];
-		const BYTE* aCoverBits = &theCoverage[y*theCoverWidth+x];
+		const uint8_t* aCoverBits = &theCoverage[y*theCoverWidth+x];
 		for (int w = 0; w < aSpan->mWidth; ++w)
 		{
 			int cover = *aCoverBits++ + 1;
