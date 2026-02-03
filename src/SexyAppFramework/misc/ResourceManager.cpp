@@ -170,28 +170,28 @@ bool ResourceManager::ParseCommonResource(XMLElement &theElement, BaseRes *theRe
 {
 	mHadAlreadyDefinedError = false;
 
-	const std::string &aPath = theElement.mAttributes[__S("path")];
+	const std::string &aPath = theElement.mAttributes["path"];
 	if (aPath.empty())
 		return Fail("No path specified.");
 
 	theRes->mXMLAttributes = theElement.mAttributes;
 	theRes->mFromProgram = false;
-	if (aPath[0]==__S('!'))
+	if (aPath[0]=='!')
 	{
-		theRes->mPath = SexyStringToStringFast(aPath);
-		if (aPath==__S("!program"))
+		theRes->mPath = aPath;
+		if (aPath=="!program")
 			theRes->mFromProgram = true;
 	}
 	else
-		theRes->mPath = mDefaultPath + SexyStringToStringFast(aPath);
+		theRes->mPath = mDefaultPath + aPath;
 
 	
 	std::string anId;
-	XMLParamMap::iterator anItr = theElement.mAttributes.find(__S("id"));
+	XMLParamMap::iterator anItr = theElement.mAttributes.find("id");
 	if (anItr == theElement.mAttributes.end())
 		anId = mDefaultIdPrefix + GetFileName(theRes->mPath,true);
 	else
-		anId = mDefaultIdPrefix + SexyStringToStringFast(anItr->second);
+		anId = mDefaultIdPrefix + anItr->second;
 
 	theRes->mResGroup = mCurResGroup;
 	theRes->mId = anId;
@@ -237,13 +237,13 @@ bool ResourceManager::ParseSoundResource(XMLElement &theElement)
 	
 	XMLParamMap::iterator anItr;
 
-	anItr = theElement.mAttributes.find(__S("volume"));
+	anItr = theElement.mAttributes.find("volume");
 	if (anItr != theElement.mAttributes.end())
-		sexysscanf(anItr->second.c_str(),__S("%lf"),&aRes->mVolume);
+		sscanf(anItr->second.c_str(),"%lf",&aRes->mVolume);
 
-	anItr = theElement.mAttributes.find(__S("pan"));
+	anItr = theElement.mAttributes.find("pan");
 	if (anItr != theElement.mAttributes.end())
-		sexysscanf(anItr->second.c_str(),__S("%d"),&aRes->mPanning);
+		sscanf(anItr->second.c_str(),"%d",&aRes->mPanning);
 
 	return true;
 }
@@ -257,8 +257,8 @@ static void ReadIntVector(const std::string &theVal, std::vector<int> &theVector
 	std::string::size_type aPos = 0;
 	while (true)
 	{
-		theVector.push_back(sexyatoi(theVal.c_str()+aPos));
-		aPos = theVal.find_first_of(__S(','),aPos);
+		theVector.push_back(atoi(theVal.c_str()+aPos));
+		aPos = theVal.find_first_of(',',aPos);
 		if (aPos==std::string::npos)
 			break;
 
@@ -290,56 +290,56 @@ bool ResourceManager::ParseImageResource(XMLElement &theElement)
 		}
 	}
 	
-	aRes->mPalletize = theElement.mAttributes.find(__S("nopal")) == theElement.mAttributes.end();
-	aRes->mA4R4G4B4 = theElement.mAttributes.find(__S("a4r4g4b4")) != theElement.mAttributes.end();
-	aRes->mDDSurface = theElement.mAttributes.find(__S("ddsurface")) != theElement.mAttributes.end();
-	aRes->mPurgeBits = (theElement.mAttributes.find(__S("nobits")) != theElement.mAttributes.end()) ||
-		((mApp->Is3DAccelerated()) && (theElement.mAttributes.find(__S("nobits3d")) != theElement.mAttributes.end())) ||
-		((!mApp->Is3DAccelerated()) && (theElement.mAttributes.find(__S("nobits2d")) != theElement.mAttributes.end()));
-	aRes->mA8R8G8B8 = theElement.mAttributes.find(__S("a8r8g8b8")) != theElement.mAttributes.end();
-	aRes->mMinimizeSubdivisions = theElement.mAttributes.find(__S("minsubdivide")) != theElement.mAttributes.end();
-	aRes->mAutoFindAlpha = theElement.mAttributes.find(__S("noalpha")) == theElement.mAttributes.end();	
+	aRes->mPalletize = theElement.mAttributes.find("nopal") == theElement.mAttributes.end();
+	aRes->mA4R4G4B4 = theElement.mAttributes.find("a4r4g4b4") != theElement.mAttributes.end();
+	aRes->mDDSurface = theElement.mAttributes.find("ddsurface") != theElement.mAttributes.end();
+	aRes->mPurgeBits = (theElement.mAttributes.find("nobits") != theElement.mAttributes.end()) ||
+		((mApp->Is3DAccelerated()) && (theElement.mAttributes.find("nobits3d") != theElement.mAttributes.end())) ||
+		((!mApp->Is3DAccelerated()) && (theElement.mAttributes.find("nobits2d") != theElement.mAttributes.end()));
+	aRes->mA8R8G8B8 = theElement.mAttributes.find("a8r8g8b8") != theElement.mAttributes.end();
+	aRes->mMinimizeSubdivisions = theElement.mAttributes.find("minsubdivide") != theElement.mAttributes.end();
+	aRes->mAutoFindAlpha = theElement.mAttributes.find("noalpha") == theElement.mAttributes.end();	
 
 	XMLParamMap::iterator anItr;
-	anItr = theElement.mAttributes.find(__S("alphaimage"));
+	anItr = theElement.mAttributes.find("alphaimage");
 	if (anItr != theElement.mAttributes.end())
-		aRes->mAlphaImage = mDefaultPath + SexyStringToStringFast(anItr->second);
+		aRes->mAlphaImage = mDefaultPath + anItr->second;
 
 	aRes->mAlphaColor = 0xFFFFFF;
-	anItr = theElement.mAttributes.find(__S("alphacolor"));
+	anItr = theElement.mAttributes.find("alphacolor");
 	if (anItr != theElement.mAttributes.end())
-		sexysscanf(anItr->second.c_str(),__S("%x"),&aRes->mAlphaColor);
+		sscanf(anItr->second.c_str(),"%x",&aRes->mAlphaColor);
 
-	anItr = theElement.mAttributes.find(__S("variant"));
+	anItr = theElement.mAttributes.find("variant");
 	if (anItr != theElement.mAttributes.end())
-		aRes->mVariant = SexyStringToStringFast(anItr->second);
+		aRes->mVariant = anItr->second;
 
-	anItr = theElement.mAttributes.find(__S("alphagrid"));
+	anItr = theElement.mAttributes.find("alphagrid");
 	if (anItr != theElement.mAttributes.end())
-		aRes->mAlphaGridImage = mDefaultPath + SexyStringToStringFast(anItr->second);
+		aRes->mAlphaGridImage = mDefaultPath + anItr->second;
 
-	anItr = theElement.mAttributes.find(__S("rows"));
+	anItr = theElement.mAttributes.find("rows");
 	if (anItr != theElement.mAttributes.end())
-		aRes->mRows = sexyatoi(anItr->second.c_str());
+		aRes->mRows = atoi(anItr->second.c_str());
 	else
 		aRes->mRows = 1;
 
-	anItr = theElement.mAttributes.find(__S("cols"));
+	anItr = theElement.mAttributes.find("cols");
 	if (anItr != theElement.mAttributes.end())
-		aRes->mCols = sexyatoi(anItr->second.c_str());
+		aRes->mCols = atoi(anItr->second.c_str());
 	else
 		aRes->mCols = 1;
 
-	anItr = theElement.mAttributes.find(__S("anim"));
+	anItr = theElement.mAttributes.find("anim");
 	AnimType anAnimType = AnimType_None;
 	if (anItr != theElement.mAttributes.end())
 	{
 		const char *aType = anItr->second.c_str();
 
-		if (strcasecmp(aType,__S("none"))==0) anAnimType = AnimType_None;
-		else if (strcasecmp(aType,__S("once"))==0) anAnimType = AnimType_Once;
-		else if (strcasecmp(aType,__S("loop"))==0) anAnimType = AnimType_Loop;
-		else if (strcasecmp(aType,__S("pingpong"))==0) anAnimType = AnimType_PingPong;
+		if (strcasecmp(aType,"none")==0) anAnimType = AnimType_None;
+		else if (strcasecmp(aType,"once")==0) anAnimType = AnimType_Once;
+		else if (strcasecmp(aType,"loop")==0) anAnimType = AnimType_Loop;
+		else if (strcasecmp(aType,"pingpong")==0) anAnimType = AnimType_PingPong;
 		else 
 		{
 			Fail("Invalid animation type.");
@@ -352,23 +352,23 @@ bool ResourceManager::ParseImageResource(XMLElement &theElement)
 		int aNumCels = std::max(aRes->mRows,aRes->mCols);
 		int aBeginDelay = 0, anEndDelay = 0;
 
-		anItr = theElement.mAttributes.find(__S("framedelay"));
+		anItr = theElement.mAttributes.find("framedelay");
 		if (anItr != theElement.mAttributes.end())
-			aRes->mAnimInfo.mFrameDelay = sexyatoi(anItr->second.c_str());
+			aRes->mAnimInfo.mFrameDelay = atoi(anItr->second.c_str());
 
-		anItr = theElement.mAttributes.find(__S("begindelay"));
+		anItr = theElement.mAttributes.find("begindelay");
 		if (anItr != theElement.mAttributes.end())
-			aBeginDelay = sexyatoi(anItr->second.c_str());
+			aBeginDelay = atoi(anItr->second.c_str());
 
-		anItr = theElement.mAttributes.find(__S("enddelay"));
+		anItr = theElement.mAttributes.find("enddelay");
 		if (anItr != theElement.mAttributes.end())
-			anEndDelay = sexyatoi(anItr->second.c_str());
+			anEndDelay = atoi(anItr->second.c_str());
 
-		anItr = theElement.mAttributes.find(__S("perframedelay"));
+		anItr = theElement.mAttributes.find("perframedelay");
 		if (anItr != theElement.mAttributes.end())
 			ReadIntVector(anItr->second,aRes->mAnimInfo.mPerFrameDelay);
 
-		anItr = theElement.mAttributes.find(__S("framemap"));
+		anItr = theElement.mAttributes.find("framemap");
 		if (anItr != theElement.mAttributes.end())
 			ReadIntVector(anItr->second,aRes->mAnimInfo.mFrameMap);
 
@@ -408,31 +408,31 @@ bool ResourceManager::ParseFontResource(XMLElement &theElement)
 
 
 	XMLParamMap::iterator anItr;
-	anItr = theElement.mAttributes.find(__S("image"));
+	anItr = theElement.mAttributes.find("image");
 	if (anItr != theElement.mAttributes.end())
-		aRes->mImagePath = SexyStringToStringFast(anItr->second);
+		aRes->mImagePath = anItr->second;
 
-	anItr = theElement.mAttributes.find(__S("tags"));
+	anItr = theElement.mAttributes.find("tags");
 	if (anItr != theElement.mAttributes.end())
-		aRes->mTags = SexyStringToStringFast(anItr->second);
+		aRes->mTags = anItr->second;
 
 	if (strncmp(aRes->mPath.c_str(),"!sys:",5)==0)
 	{
 		aRes->mSysFont = true;
 		aRes->mPath = aRes->mPath.substr(5);
 
-		anItr = theElement.mAttributes.find(__S("size"));
+		anItr = theElement.mAttributes.find("size");
 		if (anItr==theElement.mAttributes.end())
 			return Fail("SysFont needs point size");
 
-		aRes->mSize = sexyatoi(anItr->second.c_str());
+		aRes->mSize = atoi(anItr->second.c_str());
 		if (aRes->mSize<=0)
 			return Fail("SysFont needs point size");
 			
-		aRes->mBold = theElement.mAttributes.find(__S("bold"))!=theElement.mAttributes.end();
-		aRes->mItalic = theElement.mAttributes.find(__S("italic"))!=theElement.mAttributes.end();
-		aRes->mShadow = theElement.mAttributes.find(__S("shadow"))!=theElement.mAttributes.end();
-		aRes->mUnderline = theElement.mAttributes.find(__S("underline"))!=theElement.mAttributes.end();
+		aRes->mBold = theElement.mAttributes.find("bold")!=theElement.mAttributes.end();
+		aRes->mItalic = theElement.mAttributes.find("italic")!=theElement.mAttributes.end();
+		aRes->mShadow = theElement.mAttributes.find("shadow")!=theElement.mAttributes.end();
+		aRes->mUnderline = theElement.mAttributes.find("underline")!=theElement.mAttributes.end();
 	}
 	else
 		aRes->mSysFont = false;
@@ -445,13 +445,13 @@ bool ResourceManager::ParseFontResource(XMLElement &theElement)
 bool ResourceManager::ParseSetDefaults(XMLElement &theElement)
 {
 	XMLParamMap::iterator anItr;
-	anItr = theElement.mAttributes.find(__S("path"));
+	anItr = theElement.mAttributes.find("path");
 	if (anItr != theElement.mAttributes.end())
-		mDefaultPath = RemoveTrailingSlash(SexyStringToStringFast(anItr->second)) + '/';
+		mDefaultPath = RemoveTrailingSlash(anItr->second) + '/';
 
-	anItr = theElement.mAttributes.find(__S("idprefix"));
+	anItr = theElement.mAttributes.find("idprefix");
 	if (anItr != theElement.mAttributes.end())
-		mDefaultIdPrefix = RemoveTrailingSlash(SexyStringToStringFast(anItr->second));	
+		mDefaultIdPrefix = RemoveTrailingSlash(anItr->second);	
 
 	return true;
 }
@@ -468,7 +468,7 @@ bool ResourceManager::ParseResources()
 		
 		if (aXMLElement.mType == XMLElement::TYPE_START)
 		{
-			if (aXMLElement.mValue == __S("Image"))
+			if (aXMLElement.mValue == "Image")
 			{
 				if (!ParseImageResource(aXMLElement))
 					return false;
@@ -479,7 +479,7 @@ bool ResourceManager::ParseResources()
 				if (aXMLElement.mType != XMLElement::TYPE_END)
 					return Fail("Unexpected element found.");
 			}
-			else if (aXMLElement.mValue == __S("Sound"))
+			else if (aXMLElement.mValue == "Sound")
 			{
 				if (!ParseSoundResource(aXMLElement))
 					return false;
@@ -490,7 +490,7 @@ bool ResourceManager::ParseResources()
 				if (aXMLElement.mType != XMLElement::TYPE_END)
 					return Fail("Unexpected element found.");
 			}
-			else if (aXMLElement.mValue == __S("Font"))
+			else if (aXMLElement.mValue == "Font")
 			{
 				if (!ParseFontResource(aXMLElement))
 					return false;
@@ -501,7 +501,7 @@ bool ResourceManager::ParseResources()
 				if (aXMLElement.mType != XMLElement::TYPE_END)
 					return Fail("Unexpected element found.");
 			}
-			else if (aXMLElement.mValue == __S("SetDefaults"))
+			else if (aXMLElement.mValue == "SetDefaults")
 			{
 				if (!ParseSetDefaults(aXMLElement))
 					return false;
@@ -514,13 +514,13 @@ bool ResourceManager::ParseResources()
 			}
 			else
 			{
-				Fail("Invalid Section '" + SexyStringToStringFast(aXMLElement.mValue) + "'");
+				Fail("Invalid Section '" + aXMLElement.mValue + "'");
 				return false;
 			}
 		}
 		else if (aXMLElement.mType == XMLElement::TYPE_ELEMENT)
 		{
-			Fail("Element Not Expected '" + SexyStringToStringFast(aXMLElement.mValue) + "'");
+			Fail("Element Not Expected '" + aXMLElement.mValue + "'");
 			return false;
 		}		
 		else if (aXMLElement.mType == XMLElement::TYPE_END)
@@ -544,9 +544,9 @@ bool ResourceManager::DoParseResources()
 
 			if (aXMLElement.mType == XMLElement::TYPE_START)
 			{
-				if (aXMLElement.mValue == __S("Resources"))
+				if (aXMLElement.mValue == "Resources")
 				{
-					mCurResGroup = SexyStringToStringFast(aXMLElement.mAttributes[__S("id")]);
+					mCurResGroup = aXMLElement.mAttributes["id"];
 					mCurResGroupList = &mResGroupMap[mCurResGroup];
 
 					if (mCurResGroup.empty())
@@ -560,20 +560,20 @@ bool ResourceManager::DoParseResources()
 				}
 				else 
 				{
-					Fail("Invalid Section '" + SexyStringToStringFast(aXMLElement.mValue) + "'");
+					Fail("Invalid Section '" + aXMLElement.mValue + "'");
 					break;
 				}
 			}
 			else if (aXMLElement.mType == XMLElement::TYPE_ELEMENT)
 			{
-				Fail("Element Not Expected '" + SexyStringToStringFast(aXMLElement.mValue) + "'");
+				Fail("Element Not Expected '" + aXMLElement.mValue + "'");
 				break;
 			}
 		}
 	}
 
 	if (mXMLParser->HasFailed())
-		Fail(SexyStringToStringFast(mXMLParser->GetErrorText()));
+		Fail(mXMLParser->GetErrorText());
 
 	delete mXMLParser;
 	mXMLParser = nullptr;
@@ -593,11 +593,11 @@ bool ResourceManager::ParseResourcesFile(const std::string& theFilename)
 	while (!mXMLParser->HasFailed())
 	{
 		if (!mXMLParser->NextElement(&aXMLElement))
-			Fail(SexyStringToStringFast(mXMLParser->GetErrorText()));
+			Fail(mXMLParser->GetErrorText());
 
 		if (aXMLElement.mType == XMLElement::TYPE_START)
 		{
-			if (aXMLElement.mValue != __S("ResourceManifest"))
+			if (aXMLElement.mValue != "ResourceManifest")
 				break;
 			else
 				return DoParseResources();
@@ -758,18 +758,6 @@ bool ResourceManager::DoLoadImage(ImageRes *theRes)
 		SEXY_PERF_END("ResourceManager:DDSurface");
 	}	
 
-	/*
-	if (theRes->mPalletize)
-	{
-		SEXY_PERF_BEGIN("ResourceManager:Palletize");
-		if (aGLImage->mSurface==nullptr)
-			aGLImage->Palletize();
-		else
-			aGLImage->mWantPal = true;
-		SEXY_PERF_END("ResourceManager:Palletize");
-	}
-	*/
-
 	if (theRes->mA4R4G4B4)
 		aGLImage->mD3DFlags |= D3DImageFlag_UseA4R4G4B4;
 
@@ -858,18 +846,7 @@ bool ResourceManager::DoLoadFont(FontRes* theRes)
 
 	if (theRes->mSysFont)
 	{
-		/*
-		bool bold = theRes->mBold, simulateBold = false;
-		if (Sexy::CheckFor98Mill())
-		{
-			simulateBold = bold;
-			bold = false;
-		}
-		aFont = new SysFont(theRes->mPath,theRes->mSize,bold,theRes->mItalic,theRes->mUnderline);
-		SysFont* aSysFont = (SysFont*)aFont;
-		aSysFont->mDrawShadow = theRes->mShadow;
-		aSysFont->mSimulateBold = simulateBold;
-		*/
+		// System fonts not supported
 	}
 	else if (theRes->mImagePath.empty())	
 	{

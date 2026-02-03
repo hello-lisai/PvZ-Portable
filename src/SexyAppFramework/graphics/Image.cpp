@@ -240,7 +240,7 @@ void Image::FillScanLines(Span* theSpans, int theSpanCount, const Color& theColo
 }
 
 
-void Image::FillScanLinesWithCoverage(Span*, int, const Color&, int, const BYTE*, int, int, int, int){}
+void Image::FillScanLinesWithCoverage(Span*, int, const Color&, int, const uint8_t*, int, int, int, int){}
 bool Image::PolyFill3D(const Point*, int, const Rect*, const Color&,int ,int, int)
 {
 	return false;

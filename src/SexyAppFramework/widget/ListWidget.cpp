@@ -53,7 +53,7 @@ std::string ListWidget::GetSortKey(int theIdx)
 	std::string aString = mLines[theIdx];
 	
 	while (aString.length() < (ulong) mMaxNumericPlaces) 
-		aString = __S("0") + aString;
+		aString = "0" + aString;
 
 	if (mSortFromChild) 
 		return mChild->GetSortKey(theIdx) + aString;
@@ -65,7 +65,7 @@ std::string ListWidget::GetSortKey(int theIdx)
 			return aString + mChild->GetSortKey(theIdx);
 	}
 
-	return __S("");
+	return "";
 }
 	
 void ListWidget::Sort(bool ascending) 
@@ -154,7 +154,7 @@ int ListWidget::AddLine(const std::string& theLine, bool alphabetical)
 	if (alphabetical) 
 	{	
 		for (int i = 0;	i < (int) mLines.size(); i++) 		
-			if (sexystrcmp(theLine.c_str(), mLines[i].c_str()) < 0) 
+			if (strcmp(theLine.c_str(), mLines[i].c_str()) < 0) 
 			{
 				anIdx = i;
 						
@@ -168,7 +168,7 @@ int ListWidget::AddLine(const std::string& theLine, bool alphabetical)
 					if (aListWidget == this)
 						aListWidget->mLines.insert(aListWidget->mLines.begin() + i, theLine);
 					else 
-						aListWidget->mLines.insert(aListWidget->mLines.begin() + i, __S("-"));
+						aListWidget->mLines.insert(aListWidget->mLines.begin() + i, "-");
 					
 					aListWidget->mLineColors.insert(aListWidget->mLineColors.begin() + i, mColors[COLOR_TEXT]);
 					aListWidget->MarkDirty();
@@ -195,7 +195,7 @@ int ListWidget::AddLine(const std::string& theLine, bool alphabetical)
 			if (aListWidget==this) 
 				aListWidget->mLines.push_back(theLine);
 			else 
-				aListWidget->mLines.push_back(__S("-"));
+				aListWidget->mLines.push_back("-");
 						
 			aListWidget->mLineColors.push_back(mColors[COLOR_TEXT]);
 			aListWidget->MarkDirty();
@@ -225,7 +225,7 @@ int ListWidget::GetLineCount()
 int ListWidget::GetLineIdx(const std::string& theLine)
 {	
 	for (ulong i = 0; i < mLines.size(); i++)	
-		if (sexystrcmp(mLines[i].c_str(), theLine.c_str()) == 0)
+		if (strcmp(mLines[i].c_str(), theLine.c_str()) == 0)
 			return i;
 	
 	return -1;

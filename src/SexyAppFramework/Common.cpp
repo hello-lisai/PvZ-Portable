@@ -15,7 +15,6 @@
 
 #include "misc/PerfTimer.h"
 
-//HINSTANCE Sexy::gHInstance;
 bool Sexy::gDebug = false;
 static Sexy::MTRand gMTRand;
 namespace Sexy
@@ -384,10 +383,6 @@ std::string Sexy::XMLDecodeString(const std::string& theString)
 	if (theString.find('&') == std::string::npos)
 		return theString;
 
-	// unused
-	//int aUTF8Len = 0;
-	//int aUTF8CurVal = 0;
-
 	for (size_t i = 0; i < theString.length(); i++)
 	{
 		char c = theString[i];
@@ -448,38 +443,29 @@ std::string Sexy::XMLEncodeString(const std::string& theString)
 		else
 			hasSpace = false;
 
-		/*if ((uchar) c >= 0x80)
+		switch (c)
 		{
-			// Convert to UTF
-			aNewString += (char) (0xC0 | ((c >> 6) & 0xFF));
-			aNewString += (char) (0x80 | (c & 0x3F));
-		}
-		else*/
-		{		
-			switch (c)
-			{
-			case '<':
-				aNewString += "&lt;";
-				break;
-			case '&':		
-				aNewString += "&amp;";
-				break;
-			case '>':
-				aNewString += "&gt;";
-				break;
-			case '"':
-				aNewString += "&quot;";
-				break;
-			case '\'':
-				aNewString += "&apos;";
-				break;
-			case '\n':
-				aNewString += "&cr;";
-				break;
-			default:
-				aNewString += c;
-				break;
-			}
+		case '<':
+			aNewString += "&lt;";
+			break;
+		case '&':		
+			aNewString += "&amp;";
+			break;
+		case '>':
+			aNewString += "&gt;";
+			break;
+		case '"':
+			aNewString += "&quot;";
+			break;
+		case '\'':
+			aNewString += "&apos;";
+			break;
+		case '\n':
+			aNewString += "&cr;";
+			break;
+		default:
+			aNewString += c;
+			break;
 		}
 	}
 
@@ -548,7 +534,7 @@ bool Sexy::StrPrefixNoCase(const char *theStr, const char *thePrefix, int maxLen
 void Sexy::SMemR(void*& _Src, void* _Dst, size_t _Size)
 {
 	memcpy(_Dst, _Src, _Size);
-	_Src = (void*)((size_t)_Src + _Size);
+	_Src = (void*)((uintptr_t)_Src + _Size);
 }
 
 void Sexy::SMemRStr(void*& _Src, std::string& theString)

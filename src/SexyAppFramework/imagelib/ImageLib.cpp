@@ -133,13 +133,6 @@ Image* GetPNGImage(const std::string& theFileName)
 		row_pointers[i] = (png_bytep)(aBits + i*width);
 	}
 	png_read_image(png_ptr, row_pointers);
-    /*
-	unsigned long* anAddr = aBits;
-	for (unsigned int i = 0; i < height; i++)
-	{
-		png_read_rows(png_ptr, (png_bytepp) &anAddr, nullptr, 1);
-		anAddr += width;
-	}*/
 
 	/* read rest of file, and get additional chunks in info_ptr - REQUIRED */
 	png_read_end(png_ptr, info_ptr);
@@ -165,41 +158,41 @@ Image* GetTGAImage(const std::string& theFileName)
 	if (aTGAFile == nullptr)
 		return nullptr;
 
-	BYTE aHeaderIDLen;
-	p_fread(&aHeaderIDLen, sizeof(BYTE), 1, aTGAFile);
+	uint8_t aHeaderIDLen;
+	p_fread(&aHeaderIDLen, sizeof(uint8_t), 1, aTGAFile);
 
-	BYTE aColorMapType;
-	p_fread(&aColorMapType, sizeof(BYTE), 1, aTGAFile);
+	uint8_t aColorMapType;
+	p_fread(&aColorMapType, sizeof(uint8_t), 1, aTGAFile);
 	
-	BYTE anImageType;
-	p_fread(&anImageType, sizeof(BYTE), 1, aTGAFile);
+	uint8_t anImageType;
+	p_fread(&anImageType, sizeof(uint8_t), 1, aTGAFile);
 
-	WORD aFirstEntryIdx;
-	p_fread(&aFirstEntryIdx, sizeof(WORD), 1, aTGAFile);
+	uint16_t aFirstEntryIdx;
+	p_fread(&aFirstEntryIdx, sizeof(uint16_t), 1, aTGAFile);
 
-	WORD aColorMapLen;
-	p_fread(&aColorMapLen, sizeof(WORD), 1, aTGAFile);
+	uint16_t aColorMapLen;
+	p_fread(&aColorMapLen, sizeof(uint16_t), 1, aTGAFile);
 
-	BYTE aColorMapEntrySize;
-	p_fread(&aColorMapEntrySize, sizeof(BYTE), 1, aTGAFile);	
+	uint8_t aColorMapEntrySize;
+	p_fread(&aColorMapEntrySize, sizeof(uint8_t), 1, aTGAFile);	
 
-	WORD anXOrigin;
-	p_fread(&anXOrigin, sizeof(WORD), 1, aTGAFile);
+	uint16_t anXOrigin;
+	p_fread(&anXOrigin, sizeof(uint16_t), 1, aTGAFile);
 
-	WORD aYOrigin;
-	p_fread(&aYOrigin, sizeof(WORD), 1, aTGAFile);
+	uint16_t aYOrigin;
+	p_fread(&aYOrigin, sizeof(uint16_t), 1, aTGAFile);
 
-	WORD anImageWidth;
-	p_fread(&anImageWidth, sizeof(WORD), 1, aTGAFile);	
+	uint16_t anImageWidth;
+	p_fread(&anImageWidth, sizeof(uint16_t), 1, aTGAFile);	
 
-	WORD anImageHeight;
-	p_fread(&anImageHeight, sizeof(WORD), 1, aTGAFile);	
+	uint16_t anImageHeight;
+	p_fread(&anImageHeight, sizeof(uint16_t), 1, aTGAFile);	
 
-	BYTE aBitCount = 32;
-	p_fread(&aBitCount, sizeof(BYTE), 1, aTGAFile);	
+	uint8_t aBitCount = 32;
+	p_fread(&aBitCount, sizeof(uint8_t), 1, aTGAFile);	
 
-	BYTE anImageDescriptor = 8 | (1<<5);
-	p_fread(&anImageDescriptor, sizeof(BYTE), 1, aTGAFile);
+	uint8_t anImageDescriptor = 8 | (1<<5);
+	p_fread(&anImageDescriptor, sizeof(uint8_t), 1, aTGAFile);
 
 	if ((aBitCount != 32) ||
 		(anImageDescriptor != (8 | (1<<5))))
@@ -975,41 +968,41 @@ bool ImageLib::WriteTGAImage(const std::string& theFileName, Image* theImage)
 	if (aTGAFile == nullptr)
 		return false;
 
-	BYTE aHeaderIDLen = 0;
-	fwrite(&aHeaderIDLen, sizeof(BYTE), 1, aTGAFile);
+	uint8_t aHeaderIDLen = 0;
+	fwrite(&aHeaderIDLen, sizeof(uint8_t), 1, aTGAFile);
 
-	BYTE aColorMapType = 0;
-	fwrite(&aColorMapType, sizeof(BYTE), 1, aTGAFile);
+	uint8_t aColorMapType = 0;
+	fwrite(&aColorMapType, sizeof(uint8_t), 1, aTGAFile);
 	
-	BYTE anImageType = 2;
-	fwrite(&anImageType, sizeof(BYTE), 1, aTGAFile);
+	uint8_t anImageType = 2;
+	fwrite(&anImageType, sizeof(uint8_t), 1, aTGAFile);
 
-	WORD aFirstEntryIdx = 0;
-	fwrite(&aFirstEntryIdx, sizeof(WORD), 1, aTGAFile);
+	uint16_t aFirstEntryIdx = 0;
+	fwrite(&aFirstEntryIdx, sizeof(uint16_t), 1, aTGAFile);
 
-	WORD aColorMapLen = 0;
-	fwrite(&aColorMapLen, sizeof(WORD), 1, aTGAFile);
+	uint16_t aColorMapLen = 0;
+	fwrite(&aColorMapLen, sizeof(uint16_t), 1, aTGAFile);
 
-	BYTE aColorMapEntrySize = 0;
-	fwrite(&aColorMapEntrySize, sizeof(BYTE), 1, aTGAFile);	
+	uint8_t aColorMapEntrySize = 0;
+	fwrite(&aColorMapEntrySize, sizeof(uint8_t), 1, aTGAFile);	
 
-	WORD anXOrigin = 0;
-	fwrite(&anXOrigin, sizeof(WORD), 1, aTGAFile);
+	uint16_t anXOrigin = 0;
+	fwrite(&anXOrigin, sizeof(uint16_t), 1, aTGAFile);
 
-	WORD aYOrigin = 0;
-	fwrite(&aYOrigin, sizeof(WORD), 1, aTGAFile);
+	uint16_t aYOrigin = 0;
+	fwrite(&aYOrigin, sizeof(uint16_t), 1, aTGAFile);
 
-	WORD anImageWidth = theImage->mWidth;
-	fwrite(&anImageWidth, sizeof(WORD), 1, aTGAFile);	
+	uint16_t anImageWidth = theImage->mWidth;
+	fwrite(&anImageWidth, sizeof(uint16_t), 1, aTGAFile);	
 
-	WORD anImageHeight = theImage->mHeight;
-	fwrite(&anImageHeight, sizeof(WORD), 1, aTGAFile);	
+	uint16_t anImageHeight = theImage->mHeight;
+	fwrite(&anImageHeight, sizeof(uint16_t), 1, aTGAFile);	
 
-	BYTE aBitCount = 32;
-	fwrite(&aBitCount, sizeof(BYTE), 1, aTGAFile);	
+	uint8_t aBitCount = 32;
+	fwrite(&aBitCount, sizeof(uint8_t), 1, aTGAFile);	
 
-	BYTE anImageDescriptor = 8 | (1<<5);
-	fwrite(&anImageDescriptor, sizeof(BYTE), 1, aTGAFile);
+	uint8_t anImageDescriptor = 8 | (1<<5);
+	fwrite(&anImageDescriptor, sizeof(uint8_t), 1, aTGAFile);
 
 	fwrite(theImage->mBits, 4, theImage->mWidth*theImage->mHeight, aTGAFile);
 

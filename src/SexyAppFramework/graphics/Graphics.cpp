@@ -367,7 +367,7 @@ void Graphics::PolyFillAA(const Point *theVertexList, int theNumVertices, bool c
 	Span aSpans[MAX_TEMP_SPANS];
 	int aSpanPos = 0;
 
-	static BYTE aCoverageBuffer[256*256];
+	static uint8_t aCoverageBuffer[256*256];
 	int aCoverWidth = 256, aCoverHeight = 256; 
 	int aCoverLeft, aCoverRight, aCoverTop, aCoverBottom;
 
@@ -387,12 +387,12 @@ void Graphics::PolyFillAA(const Point *theVertexList, int theNumVertices, bool c
 			aCoverBottom = std::max(aCoverBottom, aPt->mY);
 		}
 	}
-	BYTE* coverPtr = aCoverageBuffer;
+	uint8_t* coverPtr = aCoverageBuffer;
 	if ((aCoverRight-aCoverLeft+1) > aCoverWidth || (aCoverBottom-aCoverTop+1) > aCoverHeight)
 	{
 		aCoverWidth = aCoverRight-aCoverLeft+1;
 		aCoverHeight = aCoverBottom-aCoverTop+1;
-		coverPtr = new BYTE[aCoverWidth*aCoverHeight];
+		coverPtr = new uint8_t[aCoverWidth*aCoverHeight];
 	}
 	memset(coverPtr, 0, aCoverWidth*aCoverHeight);
 
@@ -478,7 +478,7 @@ void Graphics::PolyFillAA(const Point *theVertexList, int theNumVertices, bool c
 				aSpan->mX = xl;
 				aSpan->mWidth = xr - xl + 1;
 
-				BYTE* coverRow = coverPtr + (y - aCoverTop) * aCoverWidth;
+				uint8_t* coverRow = coverPtr + (y - aCoverTop) * aCoverWidth;
 				if (xr == xl)
 				{
 					coverRow[xl-aCoverLeft] = std::min(255, coverRow[xl-aCoverLeft] + ((lErr*rErr)>>8));
@@ -1107,17 +1107,17 @@ int Graphics::WriteString(const std::string& theString, int theX, int theY, int 
 		{
 			if (i+1<theLength && theString[i+1] == '^') // literal '^'
 			{
-				aString += __S('^');
+				aString += '^';
 				i++;
 			}
 			else if (i>theLength-8) // badly formatted color specification
 				break;
 			else // change color instruction
 			{
-				DWORD aColor = 0;
-				if (theString[i+1]==__S('o'))
+				uint32_t aColor = 0;
+				if (theString[i+1]=='o')
 				{
-					if (sexystrncmp(theString.c_str()+i+1, __S("oldclr"), 6) == 0)
+					if (strncmp(theString.c_str()+i+1, "oldclr", 6) == 0)
 						aColor = theOldColor;
 				}
 				else
@@ -1127,12 +1127,12 @@ int Graphics::WriteString(const std::string& theString, int theX, int theY, int 
 						char aChar = theString[i+aDigitNum+1];
 						int aVal = 0;
 
-						if ((aChar >= __S('0')) && (aChar <= __S('9')))
-							aVal = aChar - __S('0');
-						else if ((aChar >= __S('A')) && (aChar <= __S('F')))
-							aVal = (aChar - __S('A')) + 10;
-						else if ((aChar >= __S('a')) && (aChar <= __S('f')))
-							aVal = (aChar - __S('a')) + 10;
+						if ((aChar >= '0') && (aChar <= '9'))
+							aVal = aChar - '0';
+						else if ((aChar >= 'A') && (aChar <= 'F'))
+							aVal = (aChar - 'A') + 10;
+						else if ((aChar >= 'a') && (aChar <= 'f'))
+							aVal = (aChar - 'a') + 10;
 
 						aColor += (aVal << ((5 - aDigitNum) * 4));
 					}				
@@ -1148,7 +1148,7 @@ int Graphics::WriteString(const std::string& theString, int theX, int theY, int 
 
 				aXOffset += GetFont()->StringWidth(aString);
 
-				aString = __S("");
+				aString = "";
 			}
 		}
 		else
@@ -1219,11 +1219,11 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const std::string& theLine, 
 	while (aCurPos < theLine.length())
 	{	
 		aCurChar = theLine[aCurPos];
-		if(aCurChar==__S('^') && mWriteColoredString) // Handle special color modifier
+		if(aCurChar=='^' && mWriteColoredString) // Handle special color modifier
 		{
 			if(aCurPos+1<theLine.length())
 			{
-				if(theLine[aCurPos+1]==__S('^'))
+				if(theLine[aCurPos+1]=='^')
 					aCurPos++; // literal '^' -> just skip the extra '^'
 				else 
 				{
@@ -1232,9 +1232,9 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const std::string& theLine, 
 				}
 			}
 		}
-		else if(aCurChar==__S(' '))
+		else if(aCurChar==' ')
 			aSpacePos = aCurPos;
-		else if(aCurChar==__S('\n'))
+		else if(aCurChar=='\n')
 		{
 			aCurWidth = theRect.mWidth+1; // force word wrap
 			aSpacePos = aCurPos;
@@ -1268,9 +1268,9 @@ int	Graphics::WriteWordWrapped(const Rect& theRect, const std::string& theLine, 
 					break;
 
 				aCurPos = aSpacePos+1;
-				if (aCurChar != __S('\n'))
+				if (aCurChar != '\n')
 				{
-					while (aCurPos<theLine.length() && theLine[aCurPos]==__S(' '))
+					while (aCurPos<theLine.length() && theLine[aCurPos]==' ')
 						aCurPos++;
 				}
 				aLineStartPos = aCurPos;

@@ -185,16 +185,6 @@ void EditWidget::UpdateCaretPos()
 void EditWidget::GotFocus()
 {
 	Widget::GotFocus();
-	/*
-	if (mWidgetManager && mWidgetManager->mApp->mTabletPC)
-	{
-		SexyAppBase *anApp = mWidgetManager->mApp;
-
-		CreateCaret(anApp->mHWnd,nullptr,0,0);
-		UpdateCaretPos();
-		ShowCaret(anApp->mHWnd);
-	}
-	*/
 
 	mShowingCursor = true;
 	mBlinkAcc = 0;
@@ -209,14 +199,6 @@ void EditWidget::GotFocus()
 void EditWidget::LostFocus()
 {
 	Widget::LostFocus();
-
-	/*
-	if (mWidgetManager && mWidgetManager->mApp->mTabletPC)
-	{
-		HideCaret(mWidgetManager->mApp->mHWnd);
-		DestroyCaret();
-	}
-	*/
 
 	mWidgetManager->mApp->StopTextInput();
 	mShowingCursor = false;	
@@ -273,11 +255,11 @@ void EditWidget::EnforceMaxPixels()
 
 bool EditWidget::IsPartOfWord(char theChar)
 {
-	return (((theChar >= __S('A')) && (theChar <= __S('Z'))) ||
-			((theChar >= __S('a')) && (theChar <= __S('z'))) ||
-			((theChar >= __S('0')) && (theChar <= __S('9'))) ||
+	return (((theChar >= 'A') && (theChar <= 'Z')) ||
+			((theChar >= 'a') && (theChar <= 'z')) ||
+			((theChar >= '0') && (theChar <= '9')) ||
 			(((unsigned int)theChar >= (unsigned int)(L'?')) && ((unsigned int)theChar <= (unsigned int)(L'ÿ'))) ||
-			(theChar == __S('_')));
+			(theChar == '_'));
 }
 
 void EditWidget::ProcessKey(KeyCode theKey, char theChar)

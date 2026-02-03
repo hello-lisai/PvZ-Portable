@@ -517,23 +517,9 @@ void WidgetContainer::UpdateAll(ModalFlags* theFlags)
 	mUpdateIteratorModified = true; // prevent incrementing iterator off the end of the list
 }
 
-/*
-void WidgetContainer::UpdateF(float theFrac)
-{
-}
-*/
-
 void WidgetContainer::UpdateFAll(ModalFlags* theFlags, float theFrac)
 {
 	AutoModalFlags anAutoModalFlags(theFlags, mWidgetFlagsMod);
-
-	// Can update?
-	/*
-	if (theFlags->GetFlags() & WIDGETFLAGS_UPDATE)
-	{			
-		UpdateF(theFrac);		
-	}
-	*/
 	
 	mUpdateIterator = mWidgets.begin();
 	while (mUpdateIterator != mWidgets.end())

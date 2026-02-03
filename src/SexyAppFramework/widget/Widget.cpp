@@ -262,12 +262,6 @@ void Widget::MouseLeave()
 	
 }
 
-/*
-void Widget::MouseMove(int x, int y)
-{
-}
-*/
-
 void Widget::MouseMove(int,int){}
 void Widget::MouseDrag(int,int){}
 
@@ -298,12 +292,6 @@ void Widget::MouseUp(int x, int y, int theLastDownButtonId)
 
 
 void Widget::MouseUp(int, int, int, int){}
-
-/*
-void Widget::MouseDrag(int x, int y)
-{
-}
-*/
 
 void Widget::MouseWheel(int){}
 

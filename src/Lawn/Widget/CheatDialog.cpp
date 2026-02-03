@@ -7,7 +7,7 @@
 #include "../System/PlayerInfo.h"
 #include "widget/WidgetManager.h"
 
-CheatDialog::CheatDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_CHEAT, true, __S("CHEAT"), __S("Enter New Level:"), __S(""), Dialog::BUTTONS_OK_CANCEL)
+CheatDialog::CheatDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_CHEAT, true, "CHEAT", "Enter New Level:", "", Dialog::BUTTONS_OK_CANCEL)
 {
 	mApp = theApp;
 	mVerticalCenterText = false;
@@ -18,11 +18,11 @@ CheatDialog::CheatDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_C
 	std::string aCheatStr;
 	if (mApp->mGameMode != GameMode::GAMEMODE_ADVENTURE)
 	{
-		aCheatStr = StrFormat(__S("C%d"), (int)mApp->mGameMode);
+		aCheatStr = StrFormat("C%d", (int)mApp->mGameMode);
 	}
 	else if (mApp->HasFinishedAdventure())
 	{
-		aCheatStr = StrFormat(__S("F%s"), mApp->GetStageString(mApp->mPlayerInfo->GetLevel()).c_str());
+		aCheatStr = StrFormat("F%s", mApp->GetStageString(mApp->mPlayerInfo->GetLevel()).c_str());
 	}
 	else
 	{
@@ -77,14 +77,14 @@ void CheatDialog::EditWidgetText(int theId, const std::string& theString)
 bool CheatDialog::AllowChar(int theId, char theChar)
 {
 	(void)theId;
-	return sexyisdigit(theChar) || theChar == __S('-') || theChar == __S('c') || theChar == __S('C') || theChar == __S('f') || theChar == __S('F');
+	return isdigit(theChar) || theChar == '-' || theChar == 'c' || theChar == 'C' || theChar == 'f' || theChar == 'F';
 }
 
 bool CheatDialog::ApplyCheat()
 {
 	int aChallengeIndex;
-	if (sexysscanf(mLevelEditWidget->mString.c_str(), __S("c%d"), &aChallengeIndex) == 1 || 
-		sexysscanf(mLevelEditWidget->mString.c_str(), __S("C%d"), &aChallengeIndex) == 1)
+	if (sscanf(mLevelEditWidget->mString.c_str(), "c%d", &aChallengeIndex) == 1 || 
+		sscanf(mLevelEditWidget->mString.c_str(), "C%d", &aChallengeIndex) == 1)
 	{
 		mApp->mGameMode = (GameMode)ClampInt(aChallengeIndex, 0, NUM_CHALLENGE_MODES);
 		return true;
@@ -93,23 +93,23 @@ bool CheatDialog::ApplyCheat()
 	int aLevel = -1;
 	int aFinishedAdventure = 0;
 	int aArea, aSubArea;
-	if (sexysscanf(mLevelEditWidget->mString.c_str(), __S("f%d-%d"), &aArea, &aSubArea) == 2 ||
-		sexysscanf(mLevelEditWidget->mString.c_str(), __S("F%d-%d"), &aArea, &aSubArea) == 2)
+	if (sscanf(mLevelEditWidget->mString.c_str(), "f%d-%d", &aArea, &aSubArea) == 2 ||
+		sscanf(mLevelEditWidget->mString.c_str(), "F%d-%d", &aArea, &aSubArea) == 2)
 	{
 		aLevel = (aArea - 1) * LEVELS_PER_AREA + aSubArea;
 		aFinishedAdventure = 1;
 	}
-	else if (sexysscanf(mLevelEditWidget->mString.c_str(), __S("f%d"), &aLevel) == 1 || sexysscanf(mLevelEditWidget->mString.c_str(), __S("F%d"), &aLevel) == 1)
+	else if (sscanf(mLevelEditWidget->mString.c_str(), "f%d", &aLevel) == 1 || sscanf(mLevelEditWidget->mString.c_str(), "F%d", &aLevel) == 1)
 	{
 		aFinishedAdventure = 1;
 	}
-	else if (sexysscanf(mLevelEditWidget->mString.c_str(), __S("%d-%d"), &aArea, &aSubArea) == 2)
+	else if (sscanf(mLevelEditWidget->mString.c_str(), "%d-%d", &aArea, &aSubArea) == 2)
 	{
 		aLevel = (aArea - 1) * LEVELS_PER_AREA + aSubArea;
 	}
 	else
 	{
-		sexysscanf(mLevelEditWidget->mString.c_str(), __S("%d"), &aLevel);
+		sscanf(mLevelEditWidget->mString.c_str(), "%d", &aLevel);
 	}
 
 	if (aLevel <= 0)
@@ -117,9 +117,9 @@ bool CheatDialog::ApplyCheat()
 		mApp->DoDialog(
 			Dialogs::DIALOG_CHEATERROR, 
 			true, 
-			__S("Enter Level"), 
-			__S("Invalid Level. Do 'number' or 'area-subarea' or 'Cnumber' or 'Farea-subarea'."), 
-			__S("OK"), 
+			"Enter Level", 
+			"Invalid Level. Do 'number' or 'area-subarea' or 'Cnumber' or 'Farea-subarea'.", 
+			"OK", 
 			Dialog::BUTTONS_FOOTER
 		);
 		return false;

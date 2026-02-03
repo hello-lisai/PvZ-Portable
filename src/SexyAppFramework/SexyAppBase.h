@@ -127,7 +127,6 @@ enum
 	UPDATESTATE_PROCESS_DONE
 };
 
-typedef std::map<HANDLE, int> HandleToIntMap;
 class SexyAppBase : public ButtonListener, public DialogListener
 {
 public:
@@ -164,9 +163,9 @@ public:
 	bool					mStandardWordWrap;
 	bool					mbAllowExtendedChars;
 
-	HANDLE					mMutex;
+
 	bool					mOnlyAllowOneCopyToRun;
-	UINT					mNotifyGameMessage;
+	unsigned int					mNotifyGameMessage;
 	std::mutex				mCritSect;	
 	bool					mBetaValidate;
 	uchar					mAdd8BitMaxTable[512];
@@ -184,7 +183,7 @@ public:
 	bool					mForceWindowed;	
 	bool					mInitialized;	
 	bool					mProcessInTimer;
-	DWORD					mTimeLoaded;
+	uint32_t					mTimeLoaded;
 	//HWND					mHWnd;
 	//HWND					mInvisHWnd;
 	bool					mIsScreenSaver;
@@ -204,9 +203,9 @@ public:
 	bool					mIsOpeningURL;
 	bool					mShutdownOnURLOpen;
 	std::string				mOpeningURL;
-	DWORD					mOpeningURLTime;
-	DWORD					mLastTimerTime;
-	DWORD					mLastBigDelayTime;	
+	uint32_t					mOpeningURLTime;
+	uint32_t					mLastTimerTime;
+	uint32_t					mLastBigDelayTime;	
 	double					mUnmutedMusicVolume;
 	double					mUnmutedSfxVolume;	
 	int						mMuteCount;
@@ -227,7 +226,7 @@ public:
 	double					mUpdateFTimeAcc;
 	time_t					mLastTimeCheck;
 	time_t					mLastTime;
-	DWORD					mLastUserInputTick;
+	uint32_t					mLastUserInputTick;
 
 	int						mSleepCount;
 	int						mDrawCount;
@@ -239,8 +238,8 @@ public:
 	int						mFastForwardToUpdateNum;
 	bool					mFastForwardToMarker;
 	bool					mFastForwardStep;
-	DWORD					mLastDrawTick;
-	DWORD					mNextDrawTick;
+	uint32_t					mLastDrawTick;
+	uint32_t					mNextDrawTick;
 	int						mStepMode;  // 0 = off, 1 = step, 2 = waiting for step
 
 	int						mCursorNum;
@@ -299,8 +298,6 @@ public:
 	int						mDemoCmdOrder;
 	int						mDemoCmdBitPos;
 	bool					mDemoLoadingComplete;
-	HandleToIntMap			mHandleToIntMap; // For waiting on handles
-	int						mCurHandleNum;
 
 	typedef std::pair<std::string, int> DemoMarker;
 	typedef std::list<DemoMarker> DemoMarkerList;
@@ -316,15 +313,15 @@ public:
 	bool					mVSyncUpdates;
 	bool					mVSyncBroken;
 	int						mVSyncBrokenCount;
-	DWORD					mVSyncBrokenTestStartTick;
-	DWORD					mVSyncBrokenTestUpdates;
+	uint32_t					mVSyncBrokenTestStartTick;
+	uint32_t					mVSyncBrokenTestUpdates;
 	bool					mWaitForVSync;
 	bool					mSoftVSyncWait;
 	bool					mUserChanged3DSetting;
 	bool					mAutoEnable3D;
 	bool					mTest3D;
-	DWORD					mMinVidMemory3D;
-	DWORD					mRecommendedVidMemory3D;
+	uint32_t					mMinVidMemory3D;
+	uint32_t					mRecommendedVidMemory3D;
 
 	bool					mWidescreenAware;
 	Rect					mScreenBounds;
@@ -341,8 +338,6 @@ public:
 #ifdef ZYLOM
 	uint					mZylomGameId;
 #endif
-
-	LONG					mOldWndProc;
 
 protected:	
 	void					RehupFocus();
@@ -552,9 +547,7 @@ public:
 	void					DemoAssertStringEqual(const std::string& theString);
 	void					DemoAssertIntEqual(int theInt);
 	void					DemoAddMarker(const std::string& theString);
-	void					DemoRegisterHandle(HANDLE theHandle);
-	void					DemoWaitForHandle(HANDLE theHandle);
-	bool					DemoCheckHandle(HANDLE theHandle);
+
 	
 
 	// Registry access methods

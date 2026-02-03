@@ -289,7 +289,7 @@ void TitleScreen::Update()
 	{
 		mNeedToInit = false;
 
-		mStartButton->mLabel = TodStringTranslate(__S("[LOADING]"));
+		mStartButton->mLabel = TodStringTranslate("[LOADING]");
 		mStartButton->SetFont(FONT_BRIANNETOD16);
 		mStartButton->Resize((mWidth - IMAGE_LOADBAR_DIRT->mWidth) / 2, 650, mTotalBarWidth, 50);
 		mStartButton->mVisible = true;
@@ -341,7 +341,7 @@ void TitleScreen::Update()
 	}
 	else if (mCurBarWidth > mTotalBarWidth)
 	{
-		mStartButton->mLabel = TodStringTranslate(__S("[CLICK_TO_START]"));
+		mStartButton->mLabel = TodStringTranslate("[CLICK_TO_START]");
 		mCurBarWidth = mTotalBarWidth;
 	}
 

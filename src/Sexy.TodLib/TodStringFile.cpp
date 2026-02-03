@@ -171,7 +171,7 @@ std::string TodStringListFind(const std::string& theName)
 	}
 	else
 	{
-		return Sexy::StrFormat(__S("<Missing %s>"), theName.c_str());
+		return Sexy::StrFormat("<Missing %s>", theName.c_str());
 	}
 }
 

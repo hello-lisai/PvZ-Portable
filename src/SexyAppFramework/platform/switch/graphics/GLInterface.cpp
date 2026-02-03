@@ -601,14 +601,6 @@ void TextureData::ReleaseTextures()
 	mTextures.clear();
 
 	mTexMemSize = 0;
-
-	/*
-	if (mPalette!=nullptr)
-	{
-		mPalette->Release();
-		mPalette = nullptr;
-	}
-	*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -704,22 +696,6 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 
 	if (theImage->mColorIndices != nullptr && (gSupportedPixelFormats & PixelFormat_Palette8))
 	{
-		/*
-		palEntry aPalette[256];
-		for (int i=0; i<256; i++)
-		{
-			uint32_t aPixel = theImage->mColorTable[i];
-			*(uint32_t*)(aPalette+i) = (aPixel&0xFF00FF00) | ((aPixel>>16)&0xFF) | ((aPixel<<16)&0xFF0000);
-		}
-		HRESULT aResult = theDraw->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALPHA | DDPCAPS_ALLOW256,aPalette, &aDDPalette, nullptr);
-		if (SUCCEEDED(aResult))
-			aFormat = PixelFormat_Palette8;
-		else
-		{
-			std::string anError = GetDirectXErrorString(aResult);
-			gSupportedPixelFormats &= ~PixelFormat_Palette8;
-		}
-		*/
 	}
 
 	if ((theImage->mD3DFlags & D3DImageFlag_UseA4R4G4B4) && aFormat==PixelFormat_A8R8G8B8 && (gSupportedPixelFormats & PixelFormat_A4R4G4B4))
@@ -1263,12 +1239,6 @@ GLInterface::GLInterface(SexyAppBase* theApp)
 
 	mPresentationRect = Rect( 0, 0, mWidth, mHeight );
 
-	/*
-	SDL_DisplayMode aMode;
-	SDL_GetCurrentDisplayMode(SDL_GetWindowDisplayIndex(mApp->mSDLWindow), &aMode);
-	mRefreshRate = aMode.refresh_rate;
-	if (!mRefreshRate) mRefreshRate = 60;
-	*/
 	mRefreshRate = 60;
 	mMillisecondsPerFrame = 1000/mRefreshRate;
 
@@ -1543,19 +1513,6 @@ bool GLInterface::RecoverBits(MemoryImage* theImage)
 			glBindTexture(GL_TEXTURE_2D, aPiece->mTexture);
 
 			//glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, theImage->GetBits());
-
-			/*
-			switch (aData->mPixelFormat)
-			{
-			case PixelFormat_A8R8G8B8:	CopyTexture8888ToImage(aDesc.lpSurface, aDesc.lPitch, theImage, offx, offy, aWidth, aHeight); break;
-			case PixelFormat_A4R4G4B4:	CopyTexture4444ToImage(aDesc.lpSurface, aDesc.lPitch, theImage, offx, offy, aWidth, aHeight); break;
-			case PixelFormat_R5G6B5: CopyTexture565ToImage(aDesc.lpSurface, aDesc.lPitch, theImage, offx, offy, aWidth, aHeight); break;
-			case PixelFormat_Palette8:	CopyTexturePalette8ToImage(aDesc.lpSurface, aDesc.lPitch, theImage, offx, offy, aWidth, aHeight, aData->mPalette); break;
-			case PixelFormat_Unknown: break;
-			}
-
-			D3DInterface::CheckDXError(aPiece->mTexture->Unlock(nullptr),"Texture Unlock");
-			*/
 		}
 	}
 

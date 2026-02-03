@@ -17,7 +17,7 @@ static int gUserListWidgetColors[][3] = {  //0x69F274
 
 //0x51C760
 // @Patoke: these dialogs don't have localizations
-UserDialog::UserDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_USERDIALOG, true, __S("WHO ARE YOU?"), __S(""), __S(""), Dialog::BUTTONS_OK_CANCEL)
+UserDialog::UserDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_USERDIALOG, true, "WHO ARE YOU?", "", "", Dialog::BUTTONS_OK_CANCEL)
 {
 	mVerticalCenterText = false;
 	mUserList = new ListWidget(0, FONT_BRIANNETOD16, this);
@@ -26,8 +26,8 @@ UserDialog::UserDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_USE
     mUserList->mJustify = ListWidget::JUSTIFY_CENTER;
     mUserList->mItemHeight = 24;
     
-    mRenameButton = MakeButton(UserDialog::UserDialog_RenameUser, this, __S("Rename"));
-    mDeleteButton = MakeButton(UserDialog::UserDialog_DeleteUser, this, __S("Delete"));
+    mRenameButton = MakeButton(UserDialog::UserDialog_RenameUser, this, "Rename");
+    mDeleteButton = MakeButton(UserDialog::UserDialog_DeleteUser, this, "Delete");
 
     mNumUsers = 0;
     if (theApp->mPlayerInfo)
@@ -50,7 +50,7 @@ UserDialog::UserDialog(LawnApp* theApp) : LawnDialog(theApp, Dialogs::DIALOG_USE
 
     if (mNumUsers < 8)
     {
-        mUserList->AddLine(TodStringTranslate(__S("(Create a New User)")), false);
+        mUserList->AddLine(TodStringTranslate("(Create a New User)"), false);
     }
 
     mTallBottom = true;
@@ -103,7 +103,7 @@ std::string UserDialog::GetSelName()
 {
     if (mUserList->mSelectIdx < 0 || mUserList->mSelectIdx >= mNumUsers)
     {
-        return __S("");
+        return "";
     }
     return mUserList->GetStringAt(mUserList->mSelectIdx);
 }
@@ -127,7 +127,7 @@ void UserDialog::FinishDeleteUser()
     mNumUsers--;
     if (mNumUsers == 7)
     {
-        mUserList->AddLine(TodStringTranslate(__S("[CREATE_NEW_USER]")), false);
+        mUserList->AddLine(TodStringTranslate("[CREATE_NEW_USER]"), false);
     }
 }
 
@@ -195,5 +195,5 @@ void UserDialog::EditWidgetText(int theId, const std::string& theString)
 bool UserDialog::AllowChar(int theId, char theChar)
 {
     (void)theId;
-    return sexyisdigit(theChar);
+    return isdigit(theChar);
 }

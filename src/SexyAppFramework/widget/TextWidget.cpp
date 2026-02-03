@@ -42,7 +42,7 @@ void TextWidget::DrawColorString(Graphics* g, const std::string& theString, int 
 	if (useColors)
 		g->SetColor(Color(0, 0, 0));				
 	
-	std::string aCurString = __S("");
+	std::string aCurString = "";
 	for (int i = 0; i < (int)theString.length(); i++)
 	{
 		// Widestrings are cringe, can safely compare to zero
@@ -53,7 +53,7 @@ void TextWidget::DrawColorString(Graphics* g, const std::string& theString, int 
 				g->DrawString(aCurString, x + aWidth, y);
 			
 			aWidth += g->GetFont()->StringWidth(aCurString);
-			aCurString = __S("");
+			aCurString = "";
 			if (useColors)
 				g->SetColor(Color(theString[i+1], theString[i+2], theString[i+3]));
 			i += 3;
@@ -116,7 +116,7 @@ int TextWidget::GetColorStringWidth(const std::string& theString)
 		if (theString[i] == 0x00)
 		{
 			aWidth += mFont->StringWidth(aTempString);
-			aTempString = __S("");
+			aTempString = "";
 
 			i += 3;
 		}
@@ -181,7 +181,7 @@ Color TextWidget::GetLastColor(const std::string& theString)
 //UNICODE
 void TextWidget::AddToPhysicalLines(int theIdx, const std::string& theLine)
 {		
-	std::string aCurString = __S("");
+	std::string aCurString = "";
 		
 	if (GetColorStringWidth(theLine) <= mWidth - 8)
 	{
@@ -196,7 +196,7 @@ void TextWidget::AddToPhysicalLines(int theIdx, const std::string& theLine)
 			while ((aNextCheckPos < (int)theLine.length()) && (theLine[aNextCheckPos] == ' '))
 				aNextCheckPos++;
 			
-			int aSpacePos = theLine.find(__S(" "), aNextCheckPos);
+			int aSpacePos = theLine.find(" ", aNextCheckPos);
 			if (aSpacePos == -1)
 				aSpacePos = theLine.length();
 			
@@ -206,7 +206,7 @@ void TextWidget::AddToPhysicalLines(int theIdx, const std::string& theLine)
 				mPhysicalLines.push_back(aCurString);					
 				mLineMap.push_back(theIdx);
 				Color aColor = GetLastColor(aCurString);
-				aCurString = __S("  ") [char(0xFF) + (char) aColor.mRed + (char) aColor.mGreen + (char) aColor.mBlue] +
+				aCurString = "  " [char(0xFF) + (char) aColor.mRed + (char) aColor.mGreen + (char) aColor.mBlue] +
 					theLine.substr(aNextCheckPos, aSpacePos - aNextCheckPos);
 			}
 			else
@@ -216,7 +216,7 @@ void TextWidget::AddToPhysicalLines(int theIdx, const std::string& theLine)
 		}
 	}	
 	
-	if ((aCurString.compare(__S("")) != 0) || (theLine.compare(__S("")) == 0))
+	if ((aCurString.compare("") != 0) || (theLine.compare("") == 0))
 	{
 		mPhysicalLines.push_back(aCurString);
 		mLineMap.push_back(theIdx);
@@ -228,8 +228,8 @@ void TextWidget::AddLine(const std::string& theLine)
 {
 	std::string aLine = theLine;
 
-	if (aLine.compare(__S("")) == 0)
-		aLine = __S(" ");
+	if (aLine.compare("") == 0)
+		aLine = " ";
 	
 	bool atBottom = mScrollbar->AtBottom();
 	
@@ -385,7 +385,7 @@ void TextWidget::MouseDrag(int x, int y)
 
 std::string TextWidget::GetSelection()
 {
-	std::string aSelString = __S("");
+	std::string aSelString = "";
 	int aSelIndices[2];	
 	bool first = true;
 	
@@ -397,7 +397,7 @@ std::string TextWidget::GetSelection()
 		GetSelectedIndices(aLineNum, aSelIndices);
 		
 		if (!first)
-			aSelString += __S("\r\n");
+			aSelString += "\r\n";
 		
 		for (int aStrIdx = aSelIndices[0]; aStrIdx < aSelIndices[1]; aStrIdx++)
 		{
@@ -416,21 +416,3 @@ std::string TextWidget::GetSelection()
 }
 
 void TextWidget::KeyDown(KeyCode){}
-/*
-void TextWidget::KeyDown(KeyCode theKey)
-{			
-	if (theKey == 3)
-	{
-		// Control-C		
-		mWidgetManager.mApplet.CopyToClipboard(GetSelection());
-	}
-	else
-	{
-		if (mEditWidget != null)
-		{
-			mWidgetManager.SetFocus(mEditWidget);
-			mEditWidget.KeyDown(theKey, shiftDown, controlDown);
-		}
-	}
-}
-*/

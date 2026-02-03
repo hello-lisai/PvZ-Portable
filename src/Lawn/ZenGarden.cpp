@@ -434,8 +434,8 @@ void ZenGarden::MouseDownWithMoneySign(Plant* thePlant)
 {
     mBoard->ClearCursor();
 
-    std::string aHeader = TodStringTranslate(__S("[ZEN_SELL_HEADER]"));
-    std::string aLines = TodStringTranslate(__S("[ZEN_SELL_LINES]"));
+    std::string aHeader = TodStringTranslate("[ZEN_SELL_HEADER]");
+    std::string aLines = TodStringTranslate("[ZEN_SELL_LINES]");
     int aPrice = GetPlantSellPrice(thePlant);
     if (mApp->mCrazyDaveState == CrazyDaveState::CRAZY_DAVE_OFF)
     {
@@ -444,24 +444,24 @@ void ZenGarden::MouseDownWithMoneySign(Plant* thePlant)
 
     PottedPlant* aPottedPlant = PottedPlantFromIndex(thePlant->mPottedPlantIndex);
     std::string aMessageText = mApp->GetCrazyDaveText(1700);
-    aMessageText = TodReplaceNumberString(aMessageText, __S("{SELL_PRICE}"), aPrice);
+    aMessageText = TodReplaceNumberString(aMessageText, "{SELL_PRICE}", aPrice);
 
     std::string aPlantName;
     if (thePlant->mSeedType == SeedType::SEED_SPROUT && aPottedPlant->mSeedType == SeedType::SEED_MARIGOLD)
     {
-        aPlantName = TodStringTranslate(__S("[MARIGOLD_SPROUT]"));
+        aPlantName = TodStringTranslate("[MARIGOLD_SPROUT]");
     }
     else
     {
         aPlantName = Plant::GetNameString(thePlant->mSeedType, thePlant->mImitaterType);
     }
-    aMessageText = TodReplaceString(aMessageText, __S("{PLANT_TYPE}"), aPlantName);
+    aMessageText = TodReplaceString(aMessageText, "{PLANT_TYPE}", aPlantName);
 
     mApp->CrazyDaveTalkMessage(aMessageText);
     Reanimation* aCrazyDaveReanim = mApp->ReanimationGet(mApp->mCrazyDaveReanimID);
     aCrazyDaveReanim->PlayReanim("anim_blahblah", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
 
-    Dialog* aDialog = mApp->DoDialog(Dialogs::DIALOG_ZEN_SELL, true, aHeader, aLines, __S(""), Dialog::BUTTONS_YES_NO);
+    Dialog* aDialog = mApp->DoDialog(Dialogs::DIALOG_ZEN_SELL, true, aHeader, aLines, "", Dialog::BUTTONS_YES_NO);
     aDialog->mX += 120;
     aDialog->mY += 60;
     mBoard->ShowCoinBank();
@@ -635,7 +635,7 @@ void ZenGarden::PlantWatered(Plant* thePlant)
     if (mBoard->mTutorialState == TutorialState::TUTORIAL_ZEN_GARDEN_WATER_PLANT)
     {
         mBoard->mTutorialState = TutorialState::TUTORIAL_ZEN_GARDEN_KEEP_WATERING;
-        mBoard->DisplayAdvice(__S("[ADVICE_ZEN_GARDEN_KEEP_WATERING]"), MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
+        mBoard->DisplayAdvice("[ADVICE_ZEN_GARDEN_KEEP_WATERING]", MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
     }
 }
 
@@ -1042,14 +1042,14 @@ void ZenGarden::DoFeedingTool(int x, int y, GridItemState theToolType)
             if (AllPlantsHaveBeenFertilized())
             {
                 mApp->mBoard->mTutorialState = TutorialState::TUTORIAL_ZEN_GARDEN_COMPLETED;
-                mApp->mBoard->DisplayAdvice(__S("[ADVICE_ZEN_GARDEN_CONTINUE_ADVENTURE]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
+                mApp->mBoard->DisplayAdvice("[ADVICE_ZEN_GARDEN_CONTINUE_ADVENTURE]", MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
                 mBoard->mMenuButton->mDisabled = false;
                 mBoard->mMenuButton->mBtnNoDraw = false;
             }
             else if (mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] == PURCHASE_COUNT_OFFSET)
             {
                 mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] = PURCHASE_COUNT_OFFSET + 5;
-                mApp->mBoard->DisplayAdvice(__S("[ADVICE_ZEN_GARDEN_NEED_MORE_FERTILIZER]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
+                mApp->mBoard->DisplayAdvice("[ADVICE_ZEN_GARDEN_NEED_MORE_FERTILIZER]", MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
             }
         }
     }
@@ -1445,7 +1445,7 @@ void ZenGarden::StinkyFinishFallingAsleep(GridItem* theStinky, int theBlendTime)
     theStinky->mGridItemState = GridItemState::GRIDITEM_STINKY_SLEEPING;
     if (!gLawnApp->mPlayerInfo->mHasWokenStinky)
     {
-        mApp->mBoard->DisplayAdvice(__S("[ADVICE_STINKY_SLEEPING]"), MessageStyle::MESSAGE_STYLE_HINT_LONG, AdviceType::ADVICE_STINKY_SLEEPING);
+        mApp->mBoard->DisplayAdvice("[ADVICE_STINKY_SLEEPING]", MessageStyle::MESSAGE_STYLE_HINT_LONG, AdviceType::ADVICE_STINKY_SLEEPING);
     }
 }
 
@@ -1791,7 +1791,7 @@ void ZenGarden::ZenGardenUpdate()
 
     if (mBoard->mTutorialState == TutorialState::TUTORIAL_ZEN_GARDEN_KEEP_WATERING && CountPlantsNeedingFertilizer() > 0)
     {
-        mBoard->DisplayAdvice(__S("[ADVICE_ZEN_GARDEN_VISIT_STORE]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_LONG, AdviceType::ADVICE_NONE);
+        mBoard->DisplayAdvice("[ADVICE_ZEN_GARDEN_VISIT_STORE]", MessageStyle::MESSAGE_STYLE_HINT_TALL_LONG, AdviceType::ADVICE_NONE);
         mBoard->mTutorialState = TutorialState::TUTORIAL_ZEN_GARDEN_VISIT_STORE;
         mBoard->mStoreButton->mDisabled = false;
         mBoard->mStoreButton->mBtnNoDraw = false;
@@ -1907,7 +1907,7 @@ void ZenGarden::GotoNextGarden()
     {
         if (!mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_WHEEL_BARROW])
         {
-            mBoard->DisplayAdvice(__S("[ADVICE_NEED_WHEELBARROW]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NEED_WHEELBARROW);
+            mBoard->DisplayAdvice("[ADVICE_NEED_WHEELBARROW]", MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NEED_WHEELBARROW);
         }
     }
 
@@ -1922,7 +1922,7 @@ void ZenGarden::MouseDownWithFullWheelBarrow(int x, int y)
 
     if (mApp->mZenGarden->mGardenType == GardenType::GARDEN_AQUARIUM && !Plant::IsAquatic(aPottedPlant->mSeedType))
     {
-        mBoard->DisplayAdvice(__S("[ZEN_ONLY_AQUATIC_PLANTS]"), MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
+        mBoard->DisplayAdvice("[ZEN_ONLY_AQUATIC_PLANTS]", MessageStyle::MESSAGE_STYLE_HINT_TALL_FAST, AdviceType::ADVICE_NONE);
         return;
     }
 
@@ -2082,7 +2082,7 @@ void ZenGarden::ShowTutorialArrowOnWateringCan()
     Rect aButtonRect = mBoard->GetShovelButtonRect();
     mBoard->GetZenButtonRect(GameObjectType::OBJECT_TYPE_WATERING_CAN, aButtonRect);
     mBoard->TutorialArrowShow(aButtonRect.mX + 10, aButtonRect.mY + 10);
-    mBoard->DisplayAdvice(__S("[ADVICE_ZEN_GARDEN_PICK_UP_WATER]"), MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
+    mBoard->DisplayAdvice("[ADVICE_ZEN_GARDEN_PICK_UP_WATER]", MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
     mBoard->mTutorialState = TutorialState::TUTORIAL_ZEN_GARDEN_PICKUP_WATER;
 }
 
@@ -2395,7 +2395,7 @@ void ZenGarden::OpenStore()
         aStore->SetupForIntro(2600);
         mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] = PURCHASE_COUNT_OFFSET + 5;
     }
-    aStore->mBackButton->SetLabel(__S("[STORE_BACK_TO_GAME]"));
+    aStore->mBackButton->SetLabel("[STORE_BACK_TO_GAME]");
     aStore->mPage = StorePages::STORE_PAGE_ZEN1;
     aStore->WaitForResult(true);
 
@@ -2409,7 +2409,7 @@ void ZenGarden::OpenStore()
         mApp->mMusic->MakeSureMusicIsPlaying(MusicTune::MUSIC_TUNE_ZEN_GARDEN);
         if (mBoard->mTutorialState == TutorialState::TUTORIAL_ZEN_GARDEN_VISIT_STORE)
         {
-            mBoard->DisplayAdvice(__S("[ADVICE_ZEN_GARDEN_FERTILIZE]"), MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
+            mBoard->DisplayAdvice("[ADVICE_ZEN_GARDEN_FERTILIZE]", MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
             mBoard->mTutorialState = TutorialState::TUTORIAL_ZEN_GARDEN_FERTILIZE_PLANTS;
         }
         AddStinky();
@@ -2420,7 +2420,7 @@ void ZenGarden::OpenStore()
 // GOTY @Patoke: 0x52CC50
 void ZenGarden::SetupForZenTutorial()
 {
-    mBoard->mMenuButton->SetLabel(__S("[CONTINUE_BUTTON]"));
+    mBoard->mMenuButton->SetLabel("[CONTINUE_BUTTON]");
     mBoard->mStoreButton->mDisabled = true;
     mBoard->mStoreButton->mBtnNoDraw = true;
     mBoard->mMenuButton->mDisabled = true;

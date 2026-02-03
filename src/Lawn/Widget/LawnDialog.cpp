@@ -14,7 +14,7 @@
 
 //0x456A80
 LawnDialog::LawnDialog(LawnApp* theApp, int theId, bool isModal, const std::string& theDialogHeader, const std::string& theDialogLines, const std::string& theDialogFooter, int theButtonMode) :
-	Dialog(nullptr, nullptr, theId, isModal, theDialogHeader, theDialogLines, __S(""), BUTTONS_NONE)
+	Dialog(nullptr, nullptr, theId, isModal, theDialogHeader, theDialogLines, "", BUTTONS_NONE)
 {
     mApp = theApp;
     mButtonDelay = -1;
@@ -34,13 +34,13 @@ LawnDialog::LawnDialog(LawnApp* theApp, int theId, bool isModal, const std::stri
     // @Patoke: these dialogs had the wrong local name
     if (theButtonMode == 1)
     {
-        mLawnYesButton = MakeButton(1000, this, __S("[DIALOG_BUTTON_YES]"));
-        mLawnNoButton = MakeButton(1001, this, __S("[DIALOG_BUTTON_NO]"));
+        mLawnYesButton = MakeButton(1000, this, "[DIALOG_BUTTON_YES]");
+        mLawnNoButton = MakeButton(1001, this, "[DIALOG_BUTTON_NO]");
     }
     else if (theButtonMode == 2)
     {
-        mLawnYesButton = MakeButton(1000, this, __S("[DIALOG_BUTTON_OK]"));
-        mLawnNoButton = MakeButton(1001, this, __S("[DIALOG_BUTTON_CANCEL]"));
+        mLawnYesButton = MakeButton(1000, this, "[DIALOG_BUTTON_OK]");
+        mLawnNoButton = MakeButton(1001, this, "[DIALOG_BUTTON_CANCEL]");
     }
     else if (theButtonMode == 3)
     {
@@ -444,13 +444,13 @@ GameOverDialog::GameOverDialog(const std::string& theMessage, bool theShowChalle
     gLawnApp, 
     Dialogs::DIALOG_GAME_OVER, 
     true, 
-    __S("[GAME_OVER]"), 
+    "[GAME_OVER]", 
     theMessage,
-    __S(""), 
+    "", 
     Dialog::BUTTONS_FOOTER)
 {
     mMenuButton = nullptr;
-    mLawnYesButton->SetLabel(__S("[TRY_AGAIN]"));
+    mLawnYesButton->SetLabel("[TRY_AGAIN]");
     if (theShowChallengeName)
     {
         mDialogHeader = TodStringTranslate(mApp->GetCurrentChallengeDef().mChallengeName);
@@ -464,7 +464,7 @@ GameOverDialog::GameOverDialog(const std::string& theMessage, bool theShowChalle
     mApp->CenterDialog(this, mWidth, mHeight);
     mClip = false;
 
-    mMenuButton = MakeButton(1, this, __S("[MAIN_MENU_BUTTON]"));
+    mMenuButton = MakeButton(1, this, "[MAIN_MENU_BUTTON]");
     mMenuButton->Resize(635 - mX, -10 - mY, 163, 46);
 
     gLawnApp->mBoard->mShowShovel = false;

@@ -398,7 +398,7 @@ void WidgetManager::DrawWidgetsTo(Graphics* g)
 bool WidgetManager::DrawScreen()
 {
 	SEXY_AUTO_PERF("WidgetManager::DrawScreen");
-	//DWORD start = timeGetTime();
+	//uint32_t start = timeGetTime();
 
 	ModalFlags aModalFlags;
 	InitModalFlags(&aModalFlags);
@@ -425,13 +425,6 @@ bool WidgetManager::DrawScreen()
 
 	Graphics aScrG(mImage);
 	mCurG = &aScrG;
-
-	/*
-	DDImage* aDDImage = dynamic_cast<DDImage*>(mImage);
-	bool surfaceLocked = false;
-	if (aDDImage != nullptr)
-		surfaceLocked = aDDImage->LockSurface();
-	*/
 
 	if (aDirtyCount > 0)
 	{
@@ -465,11 +458,6 @@ bool WidgetManager::DrawScreen()
 	}
 	
 	FlushDeferredOverlayWidgets(0x7FFFFFFF);
-
-	/*
-	if (aDDImage != nullptr && surfaceLocked)
-		aDDImage->UnlockSurface();
-	*/
 
 	mCurG = nullptr;
 
@@ -628,23 +616,9 @@ bool WidgetManager::MouseDown(int x, int y, int theClickCount)
 	int aWidgetY;
 	Widget* aWidget = GetWidgetAt(x, y, &aWidgetX, &aWidgetY);	
 
-	// Begin mouse down options
-/*	
-	// Option 1
-	//This code sets a new widget as the mouse drag focus widget and lets the old 
-	//mousedownwidget think the buttons popped up.
-	if ((mLastDownWidget != nullptr) && (mLastDownWidget != aWidget))
-	{
-		DoMouseUps(mLastDownWidget, mDownButtons);
-		mDownButtons = 0;
-	}
-*/
-	// Option 2
 	// This code passes all button downs to the mLastDownWidget 
 	if (mLastDownWidget != nullptr)
 		aWidget = mLastDownWidget;
-
-	// End mouse down options
 
 	if (theClickCount < 0)
 	{

@@ -172,7 +172,7 @@ Board::Board(LawnApp* theApp)
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
 	{
-		mMenuButton->SetLabel(__S("[MAIN_MENU_BUTTON]"));
+		mMenuButton->SetLabel("[MAIN_MENU_BUTTON]");
 		mMenuButton->Resize(628, -10, 163, 46);
 
 		mStoreButton = new GameButton(1);
@@ -184,7 +184,7 @@ Board::Board(LawnApp* theApp)
 	}
 	else
 	{
-		mMenuButton->SetLabel(__S("[MENU_BUTTON]"));
+		mMenuButton->SetLabel("[MENU_BUTTON]");
 		mMenuButton->Resize(681, -10, 117, 46);
 	}
 
@@ -198,13 +198,13 @@ Board::Board(LawnApp* theApp)
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL)
 	{
-		mMenuButton->SetLabel(__S("[MAIN_MENU_BUTTON]"));
+		mMenuButton->SetLabel("[MAIN_MENU_BUTTON]");
 		mMenuButton->Resize(628, -10, 163, 46);
 
 		mStoreButton = new GameButton(1);
 		mStoreButton->mDrawStoneButton = true;
 		mStoreButton->mBtnNoDraw = true;
-		mStoreButton->SetLabel(__S("[GET_FULL_VERSION_BUTTON]"));
+		mStoreButton->SetLabel("[GET_FULL_VERSION_BUTTON]");
 	}
 }
 
@@ -1237,7 +1237,7 @@ bool Board::IsZombieWaveDistributionOk()
 	{
 		if (aZombieType != ZombieType::ZOMBIE_YETI && CanZombieSpawnOnLevel(aZombieType, mLevel) && aZombieTypeCount[(int)aZombieType] == 0)
 		{
-			TodTraceAndLog("Didn't spawn required zombie %s, level %d", SexyStringToStringFast(GetZombieDefinition(aZombieType).mZombieName), mLevel);
+			TodTraceAndLog("Didn't spawn required zombie %s, level %d", GetZombieDefinition(aZombieType).mZombieName, mLevel);
 			return false;
 		}
 	}
@@ -1953,8 +1953,8 @@ void Board::FadeOutLevel()
 		else
 		{
 			mLevelAwardSpawned = true;
-			std::string aStreakStr = mApp->IsEndlessScaryPotter(mApp->mGameMode) ? __S("[ADVICE_MORE_SCARY_POTS]") : __S("[ADVICE_3_IN_A_ROW]");
-			std::string aMessage = TodReplaceNumberString(aStreakStr, __S("{STREAK}"), mChallenge->mSurvivalStage + 1);
+			std::string aStreakStr = mApp->IsEndlessScaryPotter(mApp->mGameMode) ? "[ADVICE_MORE_SCARY_POTS]" : "[ADVICE_3_IN_A_ROW]";
+			std::string aMessage = TodReplaceNumberString(aStreakStr, "{STREAK}", mChallenge->mSurvivalStage + 1);
 			PuzzleSaveStreak();
 			ClearAdvice(AdviceType::ADVICE_NONE);
 			DisplayAdvice(aMessage, MessageStyle::MESSAGE_STYLE_BIG_MIDDLE, AdviceType::ADVICE_NONE);
@@ -1965,7 +1965,7 @@ void Board::FadeOutLevel()
 	if (mApp->IsEndlessIZombie(mApp->mGameMode))
 	{
 		mNextSurvivalStageCounter = 500;
-		std::string aMessage = TodReplaceNumberString(__S("[ADVICE_MORE_IZOMBIE]"), __S("{STREAK}"), mChallenge->mSurvivalStage + 1);
+		std::string aMessage = TodReplaceNumberString("[ADVICE_MORE_IZOMBIE]", "{STREAK}", mChallenge->mSurvivalStage + 1);
 		PuzzleSaveStreak();
 		ClearAdvice(AdviceType::ADVICE_NONE);
 		DisplayAdvice(aMessage, MessageStyle::MESSAGE_STYLE_BIG_MIDDLE, AdviceType::ADVICE_NONE);
@@ -2005,7 +2005,7 @@ void Board::FadeOutLevel()
 	{
 		TOD_ASSERT(mApp->IsSurvivalMode());
 		mNextSurvivalStageCounter = 500;
-		DisplayAdvice(__S("[ADVICE_MORE_ZOMBIES]"), MessageStyle::MESSAGE_STYLE_BIG_MIDDLE, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_MORE_ZOMBIES]", MessageStyle::MESSAGE_STYLE_BIG_MIDDLE, AdviceType::ADVICE_NONE);
 		mApp->mMusic->FadeOut(500);
 		mApp->PlaySample(Sexy::SOUND_HUGE_WAVE);
 		for (int aRow = 0; aRow < MAX_GRID_SIZE_Y; aRow++)
@@ -2065,7 +2065,7 @@ Coin* Board::AddCoin(int theX, int theY, CoinType theCoinType, CoinMotion theCoi
 	aCoin->CoinInitialize(theX, theY, theCoinType, theCoinMotion);
 	if (mApp->IsFirstTimeAdventureMode() && mLevel == 1)
 	{
-		DisplayAdvice(__S("[ADVICE_CLICK_ON_SUN]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_CLICK_ON_SUN);
+		DisplayAdvice("[ADVICE_CLICK_ON_SUN]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_CLICK_ON_SUN);
 	}
 	return aCoin;
 }
@@ -3405,17 +3405,17 @@ void Board::UpdateToolTip()
 			return;
 		}
 
-		std::string aZombieName = StrFormat(__S("[%s]"), GetZombieDefinition(aZombie->mZombieType).mZombieName);
+		std::string aZombieName = StrFormat("[%s]", GetZombieDefinition(aZombie->mZombieType).mZombieName);
 		mToolTip->SetTitle(aZombieName);
 		if (mApp->CanShowAlmanac() && aZombie->mZombieType != ZombieType::ZOMBIE_REDEYE_GARGANTUAR)
 		{
-			mToolTip->SetLabel(__S("[CLICK_TO_VIEW]"));
+			mToolTip->SetLabel("[CLICK_TO_VIEW]");
 		}
 		else
 		{
-			mToolTip->SetLabel(__S(""));
+			mToolTip->SetLabel("");
 		}
-		mToolTip->SetWarningText(__S(""));
+		mToolTip->SetWarningText("");
 
 		Rect aRect = aZombie->GetZombieRect();
 		mToolTip->mX = aRect.mWidth / 2 + aRect.mX + 5;
@@ -3457,9 +3457,9 @@ void Board::UpdateToolTip()
 
 	mToolTip->mMinLeft = 0;
 	mToolTip->mMaxBottom = BOARD_HEIGHT;
-	mToolTip->SetTitle(__S(""));
-	mToolTip->SetLabel(__S(""));
-	mToolTip->SetWarningText(__S(""));
+	mToolTip->SetTitle("");
+	mToolTip->SetLabel("");
+	mToolTip->SetWarningText("");
 	mToolTip->mCenter = false;
 	if (mChallenge->UpdateToolTip(aMouseX, aMouseY))
 	{
@@ -3471,7 +3471,7 @@ void Board::UpdateToolTip()
 
 	if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_SHOVEL)
 	{
-		mToolTip->SetLabel(__S("[SHOVEL_TOOLTIP]"));
+		mToolTip->SetLabel("[SHOVEL_TOOLTIP]");
 		Rect aShovelButtonRect = GetShovelButtonRect();
 		mToolTip->mX = aShovelButtonRect.mX + 35;
 		mToolTip->mY = aShovelButtonRect.mY + 72;
@@ -3482,7 +3482,7 @@ void Board::UpdateToolTip()
 
 	if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_NEXT_GARDEN)
 	{
-		mToolTip->SetLabel(__S("[NEXT_GARDEN_TOOLTIP]"));
+		mToolTip->SetLabel("[NEXT_GARDEN_TOOLTIP]");
 		Rect aButtonRect = GetShovelButtonRect();
 		mToolTip->mX = 599;
 		mToolTip->mY = aButtonRect.mY + 52;
@@ -3503,39 +3503,39 @@ void Board::UpdateToolTip()
 	{
 		if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_WATERING_CAN)
 		{
-			mToolTip->SetLabel(__S("[WATERING_CAN_TOOLTIP]"));
+			mToolTip->SetLabel("[WATERING_CAN_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_FERTILIZER)
 		{
-			mToolTip->SetLabel(__S("[FERTILIZER_TOOLTIP]"));
+			mToolTip->SetLabel("[FERTILIZER_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_BUG_SPRAY)
 		{
-			mToolTip->SetLabel(__S("[BUG_SPRAY_TOOLTIP]"));
+			mToolTip->SetLabel("[BUG_SPRAY_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_PHONOGRAPH)
 		{
-			mToolTip->SetLabel(__S("[PHONOGRAPH_TOOLTIP]"));
+			mToolTip->SetLabel("[PHONOGRAPH_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_CHOCOLATE)
 		{
-			mToolTip->SetLabel(__S("[CHOCOLATE_TOOLTIP]"));
+			mToolTip->SetLabel("[CHOCOLATE_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_GLOVE)
 		{
-			mToolTip->SetLabel(__S("[GLOVE_TOOLTIP]"));
+			mToolTip->SetLabel("[GLOVE_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_MONEY_SIGN)
 		{
-			mToolTip->SetLabel(__S("[MONEY_SIGN_TOOLTIP]"));
+			mToolTip->SetLabel("[MONEY_SIGN_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_WHEELBARROW)
 		{
-			mToolTip->SetLabel(__S("[WHEELBARROW_TOOLTIP]"));
+			mToolTip->SetLabel("[WHEELBARROW_TOOLTIP]");
 		}
 		else if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_TREE_FOOD)
 		{
-			mToolTip->SetLabel(__S("[TREE_FERTILIZER_TOOLTIP]"));
+			mToolTip->SetLabel("[TREE_FERTILIZER_TOOLTIP]");
 		}
 
 		Rect aButtonRect = GetShovelButtonRect();
@@ -3564,100 +3564,100 @@ void Board::UpdateToolTip()
 	{
 		if (aUseSeedType == SeedType::SEED_REPEATER)
 		{
-			mToolTip->SetLabel(__S("[BEGHOULED_REPEATER_UPGRADE_TOOLTIP]"));
+			mToolTip->SetLabel("[BEGHOULED_REPEATER_UPGRADE_TOOLTIP]");
 		}
 		else if (aUseSeedType == SeedType::SEED_FUMESHROOM)
 		{
-			mToolTip->SetLabel(__S("[BEGHOULED_FUMESHROOM_UPGRADE_TOOLTIP]"));
+			mToolTip->SetLabel("[BEGHOULED_FUMESHROOM_UPGRADE_TOOLTIP]");
 		}
 		else if (aUseSeedType == SeedType::SEED_TALLNUT)
 		{
-			mToolTip->SetLabel(__S("[BEGHOULED_TALLNUT_UPGRADE_TOOLTIP]"));
+			mToolTip->SetLabel("[BEGHOULED_TALLNUT_UPGRADE_TOOLTIP]");
 		}
 		else if (aUseSeedType == SeedType::SEED_BEGHOULED_BUTTON_SHUFFLE)
 		{
-			mToolTip->SetLabel(__S("[BEGHOULED_SHUFFLE_TOOLTIP]"));
+			mToolTip->SetLabel("[BEGHOULED_SHUFFLE_TOOLTIP]");
 		}
 		else if (aUseSeedType == SeedType::SEED_BEGHOULED_BUTTON_CRATER)
 		{
-			mToolTip->SetLabel(__S("[BEGHOULED_CRATER_TOOLTIP]"));
+			mToolTip->SetLabel("[BEGHOULED_CRATER_TOOLTIP]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_SLOT_MACHINE_SUN)
 	{
-		mToolTip->SetLabel(__S("[SLOT_MACHINE_SUN_TOOLTIP]"));
+		mToolTip->SetLabel("[SLOT_MACHINE_SUN_TOOLTIP]");
 	}
 	else if (aUseSeedType == SeedType::SEED_SLOT_MACHINE_DIAMOND)
 	{
-		mToolTip->SetLabel(__S("[SLOT_MACHINE_DIAMOND_TOOLTIP]"));
+		mToolTip->SetLabel("[SLOT_MACHINE_DIAMOND_TOOLTIP]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIQUARIUM_SNORKLE)
 	{
-		mToolTip->SetLabel(__S("[ZOMBIQUARIUM_SNORKEL_TOOLTIP]"));
+		mToolTip->SetLabel("[ZOMBIQUARIUM_SNORKEL_TOOLTIP]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIQUARIUM_TROPHY)
 	{
-		mToolTip->SetLabel(__S("[ZOMBIQUARIUM_TROPHY_TOOLTIP]"));
+		mToolTip->SetLabel("[ZOMBIQUARIUM_TROPHY_TOOLTIP]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_NORMAL)
 	{
-		mToolTip->SetLabel(__S("[ZOMBIE]"));
+		mToolTip->SetLabel("[ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_TRAFFIC_CONE)
 	{
-		mToolTip->SetLabel(__S("[CONEHEAD_ZOMBIE]"));
+		mToolTip->SetLabel("[CONEHEAD_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_POLEVAULTER)
 	{
-		mToolTip->SetLabel(__S("[POLE_VAULTING_ZOMBIE]"));
+		mToolTip->SetLabel("[POLE_VAULTING_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_PAIL)
 	{
-		mToolTip->SetLabel(__S("[BUCKETHEAD_ZOMBIE]"));
+		mToolTip->SetLabel("[BUCKETHEAD_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_LADDER)
 	{
-		mToolTip->SetLabel(__S("[LADDER_ZOMBIE]"));
+		mToolTip->SetLabel("[LADDER_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_DIGGER)
 	{
-		mToolTip->SetLabel(__S("[DIGGER_ZOMBIE]"));
+		mToolTip->SetLabel("[DIGGER_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_BUNGEE)
 	{
-		mToolTip->SetLabel(__S("[BUNGEE_ZOMBIE]"));
+		mToolTip->SetLabel("[BUNGEE_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_FOOTBALL)
 	{
-		mToolTip->SetLabel(__S("[FOOTBALL_ZOMBIE]"));
+		mToolTip->SetLabel("[FOOTBALL_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_BALLOON)
 	{
-		mToolTip->SetLabel(__S("[BALLOON_ZOMBIE]"));
+		mToolTip->SetLabel("[BALLOON_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_SCREEN_DOOR)
 	{
-		mToolTip->SetLabel(__S("[SCREEN_DOOR_ZOMBIE]"));
+		mToolTip->SetLabel("[SCREEN_DOOR_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBONI)
 	{
-		mToolTip->SetLabel(__S("[ZOMBONI]"));
+		mToolTip->SetLabel("[ZOMBONI]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_POGO)
 	{
-		mToolTip->SetLabel(__S("[POGO_ZOMBIE]"));
+		mToolTip->SetLabel("[POGO_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_DANCER)
 	{
-		mToolTip->SetLabel(__S("[DANCING_ZOMBIE]"));
+		mToolTip->SetLabel("[DANCING_ZOMBIE]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_GARGANTUAR)
 	{
-		mToolTip->SetLabel(__S("[GARGANTUAR]"));
+		mToolTip->SetLabel("[GARGANTUAR]");
 	}
 	else if (aUseSeedType == SeedType::SEED_ZOMBIE_IMP)
 	{
-		mToolTip->SetLabel(__S("[IMP]"));
+		mToolTip->SetLabel("[IMP]");
 	}
 	else
 	{
@@ -3668,81 +3668,81 @@ void Board::UpdateToolTip()
 	int aPlantCost = GetCurrentPlantCost(aSeedPacket->mPacketType, aSeedPacket->mImitaterType);
 	if (mApp->mEasyPlantingCheat)
 	{
-		mToolTip->SetWarningText(__S("FREE_PLANTING_CHEAT"));
+		mToolTip->SetWarningText("FREE_PLANTING_CHEAT");
 	}
 	else if (!aSeedPacket->mActive && (gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST))
 	{
 		if (aSeedPacket->mPacketType == SeedType::SEED_BEGHOULED_BUTTON_CRATER)
 		{
-			mToolTip->SetWarningText(__S("[BEGHOULED_NO_CRATERS]"));
+			mToolTip->SetWarningText("[BEGHOULED_NO_CRATERS]");
 		}
 		else
 		{
-			mToolTip->SetWarningText(__S("[BEGHOULED_SEED_ALREADY_PURCHASED]"));
+			mToolTip->SetWarningText("[BEGHOULED_SEED_ALREADY_PURCHASED]");
 		}
 	}
 	else if (!aSeedPacket->mActive)
 	{
-		mToolTip->SetWarningText(__S("[WAITING_FOR_SEED]"));
+		mToolTip->SetWarningText("[WAITING_FOR_SEED]");
 	}
 	else if (!CanTakeSunMoney(aPlantCost) && !HasConveyorBeltSeedBank() && !mApp->IsSlotMachineLevel())
 	{
-		mToolTip->SetWarningText(__S("[NOT_ENOUGH_SUN]"));
+		mToolTip->SetWarningText("[NOT_ENOUGH_SUN]");
 	}
 	else if (aUseSeedType == SeedType::SEED_GATLINGPEA)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_REPEATER]"));
+			mToolTip->SetWarningText("[REQUIRES_REPEATER]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_WINTERMELON)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_MELONPULT]"));
+			mToolTip->SetWarningText("[REQUIRES_MELONPULT]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_TWINSUNFLOWER)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_SUNFLOWER]"));
+			mToolTip->SetWarningText("[REQUIRES_SUNFLOWER]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_SPIKEROCK)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_SPIKEWEED]"));
+			mToolTip->SetWarningText("[REQUIRES_SPIKEWEED]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_COBCANNON)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_KERNELPULTS]"));
+			mToolTip->SetWarningText("[REQUIRES_KERNELPULTS]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_GOLD_MAGNET)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_MAGNETSHROOM]"));
+			mToolTip->SetWarningText("[REQUIRES_MAGNETSHROOM]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_GLOOMSHROOM)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_FUMESHROOM]"));
+			mToolTip->SetWarningText("[REQUIRES_FUMESHROOM]");
 		}
 	}
 	else if (aUseSeedType == SeedType::SEED_CATTAIL)
 	{
 		if (!PlantingRequirementsMet(aUseSeedType))
 		{
-			mToolTip->SetWarningText(__S("[REQUIRES_LILY_PAD]"));
+			mToolTip->SetWarningText("[REQUIRES_LILY_PAD]");
 		}
 	}
 
@@ -3810,71 +3810,71 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 		// 根据不同的种植原因播放相应的提示字幕
 		if (aReason == PlantingReason::PLANTING_ONLY_ON_GRAVES)
 		{
-			DisplayAdvice(__S("[ADVICE_GRAVEBUSTERS_ON_GRAVES]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_GRAVEBUSTERS_ON_GRAVES);
+			DisplayAdvice("[ADVICE_GRAVEBUSTERS_ON_GRAVES]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_GRAVEBUSTERS_ON_GRAVES);
 		}
 		else if (aPlantingSeedType == SeedType::SEED_LILYPAD)
 		{
 			if (aReason == PlantingReason::PLANTING_ONLY_IN_POOL)
 			{
-				DisplayAdvice(__S("[ADVICE_LILYPAD_ON_WATER]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_LILYPAD_ON_WATER);
+				DisplayAdvice("[ADVICE_LILYPAD_ON_WATER]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_LILYPAD_ON_WATER);
 			}
 		}
 		else if (aPlantingSeedType == SeedType::SEED_TANGLEKELP)
 		{
 			if (aReason == PlantingReason::PLANTING_ONLY_IN_POOL)
 			{
-				DisplayAdvice(__S("[ADVICE_TANGLEKELP_ON_WATER]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_TANGLEKELP_ON_WATER);
+				DisplayAdvice("[ADVICE_TANGLEKELP_ON_WATER]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_TANGLEKELP_ON_WATER);
 			}
 		}
 		else if (aPlantingSeedType == SeedType::SEED_SEASHROOM)
 		{
 			if (aReason == PlantingReason::PLANTING_ONLY_IN_POOL)
 			{
-				DisplayAdvice(__S("[ADVICE_SEASHROOM_ON_WATER]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_SEASHROOM_ON_WATER);
+				DisplayAdvice("[ADVICE_SEASHROOM_ON_WATER]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_SEASHROOM_ON_WATER);
 			}
 		}
 		else if (aReason == PlantingReason::PLANTING_ONLY_ON_GROUND)
 		{
-			DisplayAdvice(__S("[ADVICE_POTATO_MINE_ON_LILY]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_POTATOE_MINE_ON_LILY);
+			DisplayAdvice("[ADVICE_POTATO_MINE_ON_LILY]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_POTATOE_MINE_ON_LILY);
 		}
 		else if (aReason == PlantingReason::PLANTING_NOT_PASSED_LINE)
 		{
-			DisplayAdvice(__S("[ADVICE_NOT_PASSED_LINE]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_PASSED_LINE);
+			DisplayAdvice("[ADVICE_NOT_PASSED_LINE]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_PASSED_LINE);
 		}
 		else if (aReason == PlantingReason::PLANTING_NEEDS_UPGRADE)
 		{
 			switch (aPlantingSeedType)
 			{
 			case SeedType::SEED_GATLINGPEA:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_REPEATERS]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_REPEATERS);
+				DisplayAdvice("[ADVICE_ONLY_ON_REPEATERS]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_REPEATERS);
 				break;
 
 			case SeedType::SEED_TWINSUNFLOWER:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_SUNFLOWER]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_SUNFLOWER);
+				DisplayAdvice("[ADVICE_ONLY_ON_SUNFLOWER]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_SUNFLOWER);
 				break;
 
 			case SeedType::SEED_GLOOMSHROOM:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_FUMESHROOM]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_FUMESHROOM);
+				DisplayAdvice("[ADVICE_ONLY_ON_FUMESHROOM]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_FUMESHROOM);
 				break;
 
 			case SeedType::SEED_CATTAIL:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_LILYPAD]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_LILYPAD);
+				DisplayAdvice("[ADVICE_ONLY_ON_LILYPAD]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_LILYPAD);
 				break;
 
 			case SeedType::SEED_WINTERMELON:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_MELONPULT]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_MELONPULT);
+				DisplayAdvice("[ADVICE_ONLY_ON_MELONPULT]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_MELONPULT);
 				break;
 
 			case SeedType::SEED_GOLD_MAGNET:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_MAGNETSHROOM]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_MAGNETSHROOM);
+				DisplayAdvice("[ADVICE_ONLY_ON_MAGNETSHROOM]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_MAGNETSHROOM);
 				break;
 
 			case SeedType::SEED_SPIKEROCK:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_SPIKEWEED]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_SPIKEWEED);
+				DisplayAdvice("[ADVICE_ONLY_ON_SPIKEWEED]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_SPIKEWEED);
 				break;
 
 			case SeedType::SEED_COBCANNON:
-				DisplayAdvice(__S("[ADVICE_ONLY_ON_KERNELPULT]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_KERNELPULT);
+				DisplayAdvice("[ADVICE_ONLY_ON_KERNELPULT]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_ONLY_ON_KERNELPULT);
 				break;
 			default:
 				break;
@@ -3883,57 +3883,57 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 		else if (aReason == PlantingReason::PLANTING_NOT_ON_ART)
 		{
 			std::string aSeedName = Plant::GetNameString(mChallenge->GetArtChallengeSeed(aGridX, aGridY), SeedType::SEED_NONE);
-			std::string aMessage = TodReplaceString(__S("ADVICE_WRONG_ART_TYPE"), __S("{SEED}"), aSeedName);
+			std::string aMessage = TodReplaceString("ADVICE_WRONG_ART_TYPE", "{SEED}", aSeedName);
 			DisplayAdvice(aMessage, MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_WRONG_ART_TYPE);
 		}
 		else if (aReason == PlantingReason::PLANTING_NEEDS_POT)
 		{
 			if (mApp->IsFirstTimeAdventureMode() && mLevel == 41)
 			{
-				DisplayAdvice(__S("[ADVICE_PLANT_NEED_POT1]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NEED_POT);
+				DisplayAdvice("[ADVICE_PLANT_NEED_POT1]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NEED_POT);
 			}
 			else
 			{
-				DisplayAdvice(__S("[ADVICE_PLANT_NEED_POT2]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NEED_POT);
+				DisplayAdvice("[ADVICE_PLANT_NEED_POT2]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NEED_POT);
 			}
 		}
 		else if (aReason == PlantingReason::PLANTING_NOT_ON_GRAVE)
 		{
-			DisplayAdvice(__S("[ADVICE_PLANT_NOT_ON_GRAVE]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_ON_GRAVE);
+			DisplayAdvice("[ADVICE_PLANT_NOT_ON_GRAVE]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_ON_GRAVE);
 		}
 		else if (aReason == PlantingReason::PLANTING_NOT_ON_CRATER)
 		{
 			if (IsPoolSquare(aGridX, aGridY))
 			{
-				DisplayAdvice(__S("[ADVICE_CANT_PLANT_THERE]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_CANT_PLANT_THERE);
+				DisplayAdvice("[ADVICE_CANT_PLANT_THERE]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_CANT_PLANT_THERE);
 			}
 			else
 			{
-				DisplayAdvice(__S("[ADVICE_PLANT_NOT_ON_CRATER]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_ON_CRATER);
+				DisplayAdvice("[ADVICE_PLANT_NOT_ON_CRATER]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_ON_CRATER);
 			}
 		}
 		else if (aReason == PlantingReason::PLANTING_NOT_ON_WATER)
 		{
 			if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN && mApp->mZenGarden->mGardenType == GardenType::GARDEN_AQUARIUM)
 			{
-				DisplayAdvice(__S("[ZEN_ONLY_AQUATIC_PLANTS]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_NONE);
+				DisplayAdvice("[ZEN_ONLY_AQUATIC_PLANTS]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_NONE);
 			}
 			else if (aPlantingSeedType == SeedType::SEED_POTATOMINE)
 			{
-				DisplayAdvice(__S("[ADVICE_POTATO_MINE_ON_LILY]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_POTATOE_MINE_ON_LILY);
+				DisplayAdvice("[ADVICE_POTATO_MINE_ON_LILY]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_POTATOE_MINE_ON_LILY);
 			}
 			else
 			{
-				DisplayAdvice(__S("[ADVICE_PLANT_NOT_ON_WATER]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_ON_WATER);
+				DisplayAdvice("[ADVICE_PLANT_NOT_ON_WATER]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANT_NOT_ON_WATER);
 			}
 		}
 		else if (aReason == PlantingReason::PLANTING_NEEDS_GROUND)
 		{
-			DisplayAdvice(__S("[ADVICE_PLANTING_NEEDS_GROUND]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANTING_NEEDS_GROUND);
+			DisplayAdvice("[ADVICE_PLANTING_NEEDS_GROUND]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANTING_NEEDS_GROUND);
 		}
 		else if (aReason == PlantingReason::PLANTING_NEEDS_SLEEPING)
 		{
-			DisplayAdvice(__S("[ADVICE_PLANTING_NEED_SLEEPING]"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANTING_NEED_SLEEPING);
+			DisplayAdvice("[ADVICE_PLANTING_NEED_SLEEPING]", MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_PLANTING_NEED_SLEEPING);
 		}
 
 		// 特定情况下，放下原有手持的植物
@@ -4103,7 +4103,7 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 		int aSunFlowersCount = CountSunFlowers();
 		if (aPlantingSeedType == SeedType::SEED_SUNFLOWER && aSunFlowersCount == 2)
 		{
-			DisplayAdvice(__S("[ADVICE_MORE_SUNFLOWERS]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_MORE_SUNFLOWERS]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
 			if (!mSeedBank->mSeedPackets[1].CanPickUp())
 			{
 				SetTutorialState(TutorialState::TUTORIAL_LEVEL_2_REFRESH_SUNFLOWER);
@@ -4131,7 +4131,7 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 		if (CountSunFlowers() >= 3)
 		{
 			SetTutorialState(TutorialState::TUTORIAL_MORESUN_COMPLETED);
-			DisplayAdvice(__S("[ADVICE_PLANT_SUNFLOWER5]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LATER, AdviceType::ADVICE_PLANT_SUNFLOWER5);
+			DisplayAdvice("[ADVICE_PLANT_SUNFLOWER5]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LATER, AdviceType::ADVICE_PLANT_SUNFLOWER5);
 			mTutorialTimer = -1;
 		}
 		else if (!mSeedBank->mSeedPackets[1].CanPickUp())
@@ -4487,7 +4487,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 		if (mTutorialState == TutorialState::TUTORIAL_ZEN_GARDEN_PICKUP_WATER)
 		{
 			mTutorialState = TutorialState::TUTORIAL_ZEN_GARDEN_WATER_PLANT;
-			DisplayAdvice(__S("[ADVICE_ZEN_GARDEN_WATER_PLANT]"), MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_ZEN_GARDEN_WATER_PLANT]", MessageStyle::MESSAGE_STYLE_ZEN_GARDEN_LONG, AdviceType::ADVICE_NONE);
 			TutorialArrowRemove();
 		}
 		mCursorObject->mCursorType = CursorType::CURSOR_TYPE_WATERING_CAN;
@@ -5297,20 +5297,20 @@ void Board::ZombiesWon(Zombie* theZombie)
 	std::string aGameOverMsg;
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZOMBIQUARIUM)
 	{
-		aGameOverMsg = __S("[ZOMBIQUARIUM_DEATH_MESSAGE]");
+		aGameOverMsg = "[ZOMBIQUARIUM_DEATH_MESSAGE]";
 	}
 	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND)
 	{
-		std::string aFlagStr = mApp->Pluralize(GetSurvivalFlagsCompleted(), __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
-		aGameOverMsg = TodReplaceString(__S("[LAST_STAND_DEATH_MESSAGE]"), __S("{FLAGS}"), aFlagStr);
+		std::string aFlagStr = mApp->Pluralize(GetSurvivalFlagsCompleted(), "[ONE_FLAG]", "[COUNT_FLAGS]");
+		aGameOverMsg = TodReplaceString("[LAST_STAND_DEATH_MESSAGE]", "{FLAGS}", aFlagStr);
 	}
 	else if (mApp->IsEndlessIZombie(mApp->mGameMode) || mApp->IsEndlessScaryPotter(mApp->mGameMode))
 	{
-		aGameOverMsg = TodReplaceNumberString(__S("[ENDLESS_PUZZLE_DEATH_MESSAGE]"), __S("{STREAK}"), mChallenge->mSurvivalStage);
+		aGameOverMsg = TodReplaceNumberString("[ENDLESS_PUZZLE_DEATH_MESSAGE]", "{STREAK}", mChallenge->mSurvivalStage);
 	}
 	else if (mApp->IsIZombieLevel())
 	{
-		aGameOverMsg = __S("[I_ZOMBIE_DEATH_MESSAGE]");
+		aGameOverMsg = "[I_ZOMBIE_DEATH_MESSAGE]";
 	}
 	else
 	{
@@ -5568,7 +5568,7 @@ void Board::UpdateZombieSpawning()
 		if (IsFlagWave(mCurrentWave))
 		{
 			ClearAdviceImmediately();
-			DisplayAdviceAgain(__S("[ADVICE_HUGE_WAVE]"), MessageStyle::MESSAGE_STYLE_HUGE_WAVE, AdviceType::ADVICE_HUGE_WAVE);
+			DisplayAdviceAgain("[ADVICE_HUGE_WAVE]", MessageStyle::MESSAGE_STYLE_HUGE_WAVE, AdviceType::ADVICE_HUGE_WAVE);
 			mHugeWaveCountDown = 750;
 			return;
 		}
@@ -5722,7 +5722,7 @@ void Board::UpdateTutorial()
 
 	if (mTutorialState == TutorialState::TUTORIAL_LEVEL_1_PICK_UP_PEASHOOTER && mTutorialTimer == 0)
 	{
-		DisplayAdvice(__S("[ADVICE_CLICK_PEASHOOTER]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_CLICK_PEASHOOTER]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
 		TutorialArrowShow(mSeedBank->mX + mSeedBank->mSeedPackets[1].mX, mSeedBank->mY + mSeedBank->mSeedPackets[1].mY);
 		mTutorialTimer = -1;
 	}
@@ -5732,12 +5732,12 @@ void Board::UpdateTutorial()
 	{
 		if (mTutorialTimer == 0)
 		{
-			DisplayAdvice(__S("[ADVICE_PLANT_SUNFLOWER2]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_PLANT_SUNFLOWER2]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
 			mTutorialTimer = -1;
 		}
 		else if (mZombieCountDown == 750 && mCurrentWave == 0)
 		{
-			DisplayAdvice(__S("[ADVICE_PLANT_SUNFLOWER3]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_PLANT_SUNFLOWER3]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
 		}
 	}
 	else if (mTutorialState == TutorialState::TUTORIAL_MORESUN_PICK_UP_SUNFLOWER || 
@@ -5746,7 +5746,7 @@ void Board::UpdateTutorial()
 	{
 		if (mTutorialTimer == 0)
 		{
-			DisplayAdvice(__S("[ADVICE_PLANT_SUNFLOWER5]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LATER, AdviceType::ADVICE_PLANT_SUNFLOWER5);
+			DisplayAdvice("[ADVICE_PLANT_SUNFLOWER5]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LATER, AdviceType::ADVICE_PLANT_SUNFLOWER5);
 			mTutorialTimer = -1;
 		}
 	}
@@ -5756,7 +5756,7 @@ void Board::UpdateTutorial()
 		mCurrentWave >= 5 && !gShownMoreSunTutorial && mSeedBank->mSeedPackets[1].CanPickUp() && CountPlantByType(SeedType::SEED_SUNFLOWER) < 3)
 	{
 		TOD_ASSERT(!ChooseSeedsOnCurrentLevel());
-		DisplayAdvice(__S("[ADVICE_PLANT_SUNFLOWER4]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LATER_STAY, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_PLANT_SUNFLOWER4]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LATER_STAY, AdviceType::ADVICE_NONE);
 		gShownMoreSunTutorial = true;
 		SetTutorialState(TutorialState::TUTORIAL_MORESUN_PICK_UP_SUNFLOWER);
 		mTutorialTimer = 500;
@@ -5774,11 +5774,11 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 			float aPosX = mSeedBank->mX + mSeedBank->mSeedPackets[0].mX;
 			float aPosY = mSeedBank->mY + mSeedBank->mSeedPackets[0].mY;
 			TutorialArrowShow(aPosX, aPosY);
-			DisplayAdvice(__S("[ADVICE_CLICK_SEED_PACKET]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_CLICK_SEED_PACKET]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
 		}
 		else
 		{
-			DisplayAdvice(__S("[ADVICE_ENOUGH_SUN]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_ENOUGH_SUN]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
 			mTutorialTimer = 400;
 		}
 		break;
@@ -5788,7 +5788,7 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 		TutorialArrowRemove();
 		if (mPlants.mSize == 0)
 		{
-			DisplayAdvice(__S("[ADVICE_CLICK_ON_GRASS]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_CLICK_ON_GRASS]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
 		}
 		else
 		{
@@ -5797,12 +5797,12 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 		break;
 
 	case TutorialState::TUTORIAL_LEVEL_1_REFRESH_PEASHOOTER:
-		DisplayAdvice(__S("[ADVICE_PLANTED_PEASHOOTER]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_PLANTED_PEASHOOTER]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
 		mSunCountDown = 400;
 		break;
 
 	case TutorialState::TUTORIAL_LEVEL_1_COMPLETED:
-		DisplayAdvice(__S("[ADVICE_ZOMBIE_ONSLAUGHT]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_ZOMBIE_ONSLAUGHT]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1, AdviceType::ADVICE_NONE);
 		mZombieCountDown = 99;
 		mZombieCountDownStart = mZombieCountDown;
 		break;
@@ -5828,7 +5828,7 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 		break;
 
 	case TutorialState::TUTORIAL_SLOT_MACHINE_PULL:
-		DisplayAdvice(__S("[ADVICE_SLOT_MACHINE_PULL]"), MessageStyle::MESSAGE_STYLE_SLOT_MACHINE, AdviceType::ADVICE_SLOT_MACHINE_PULL);
+		DisplayAdvice("[ADVICE_SLOT_MACHINE_PULL]", MessageStyle::MESSAGE_STYLE_SLOT_MACHINE, AdviceType::ADVICE_SLOT_MACHINE_PULL);
 		break;
 
 	case TutorialState::TUTORIAL_SLOT_MACHINE_COMPLETED:
@@ -5837,7 +5837,7 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 
 	case TutorialState::TUTORIAL_SHOVEL_PICKUP:
 	{
-		DisplayAdvice(__S("[ADVICE_CLICK_SHOVEL]"), MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_CLICK_SHOVEL]", MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
 		Rect aShovelButtonRect = GetShovelButtonRect();
 		int aPosX = aShovelButtonRect.mX + aShovelButtonRect.mWidth / 2 - 25;
 		int aPosY = aShovelButtonRect.mY + aShovelButtonRect.mHeight - 65;
@@ -5846,12 +5846,12 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 	}
 
 	case TutorialState::TUTORIAL_SHOVEL_DIG:
-		DisplayAdvice(__S("[ADVICE_CLICK_PLANT]"), MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_CLICK_PLANT]", MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
 		TutorialArrowRemove();
 		break;
 
 	case TutorialState::TUTORIAL_SHOVEL_KEEP_DIGGING:
-		DisplayAdvice(__S("[ADVICE_KEEP_DIGGING]"), MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
+		DisplayAdvice("[ADVICE_KEEP_DIGGING]", MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
 		break;
 
 	case TutorialState::TUTORIAL_SHOVEL_COMPLETED:
@@ -5922,7 +5922,7 @@ void Board::UpdateGame()
 		else if (mLevel == 2)
 		{
 			SetTutorialState(TutorialState::TUTORIAL_LEVEL_2_PICK_UP_SUNFLOWER);
-			DisplayAdvice(__S("[ADVICE_PLANT_SUNFLOWER1]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
+			DisplayAdvice("[ADVICE_PLANT_SUNFLOWER1]", MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL2, AdviceType::ADVICE_NONE);
 			mTutorialTimer = 500;
 		}
 	}
@@ -6797,29 +6797,29 @@ void Board::DrawProgressMeter(Graphics* g)
 	// @Patoke: updated these
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
 	{
-		std::string aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 75, TodStringTranslate(__S("[MATCHES]")).c_str());
+		std::string aMatchStr = StrFormat("%d/%d %s", mChallenge->mChallengeScore, 75, TodStringTranslate("[MATCHES]").c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->IsSquirrelLevel())
 	{
-		std::string aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 7, TodStringTranslate(__S("[SQUIRRELS]")).c_str());
+		std::string aMatchStr = StrFormat("%d/%d %s", mChallenge->mChallengeScore, 7, TodStringTranslate("[SQUIRRELS]").c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_SLOT_MACHINE)
 	{
 		int aSunMoney = ClampInt(mSunMoney, 0, 2000);
-		std::string aMatchStr = StrFormat(__S("%d/%d %s"), aSunMoney, 2000, TodStringTranslate(__S("[SUN]")).c_str());
+		std::string aMatchStr = StrFormat("%d/%d %s", aSunMoney, 2000, TodStringTranslate("[SUN]").c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZOMBIQUARIUM)
 	{
 		int aSunMoney = ClampInt(mSunMoney, 0, 1000);
-		std::string aMatchStr = StrFormat(__S("%d/%d %s"), aSunMoney, 1000, TodStringTranslate(__S("[SUN]")).c_str());
+		std::string aMatchStr = StrFormat("%d/%d %s", aSunMoney, 1000, TodStringTranslate("[SUN]").c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (mApp->IsIZombieLevel())
 	{
-		std::string aMatchStr = StrFormat(__S("%d/%d %s"), mChallenge->mChallengeScore, 5, TodStringTranslate(__S("[BRAINS]")).c_str());
+		std::string aMatchStr = StrFormat("%d/%d %s", mChallenge->mChallengeScore, 5, TodStringTranslate("[BRAINS]").c_str());
 		TodDrawString(g, aMatchStr, aPosX, 589, Sexy::FONT_DWARVENTODCRAFT12, aColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 	else if (ProgressMeterHasFlags())
@@ -6906,7 +6906,7 @@ void Board::DrawLevel(Graphics* g)
 	std::string aLevelStr;
 	if (mApp->IsAdventureMode())
 	{
-		aLevelStr = TodStringTranslate(__S("[LEVEL]")) + __S(" ") + mApp->GetStageString(mLevel);
+		aLevelStr = TodStringTranslate("[LEVEL]") + " " + mApp->GetStageString(mLevel);
 	}
 	else
 	{
@@ -6916,9 +6916,9 @@ void Board::DrawLevel(Graphics* g)
 			int aFlags = GetSurvivalFlagsCompleted();
 			if (aFlags > 0)
 			{
-				std::string aFlagStr = mApp->Pluralize(aFlags, __S("[ONE_FLAG]"), __S("[COUNT_FLAGS]"));
-				std::string aCompletedStr = TodReplaceString(__S("[FLAGS_COMPLETED]"), __S("{FLAGS}"), aFlagStr);
-				aLevelStr = StrFormat(__S("%s - %s"), TodStringTranslate(aLevelStr).c_str(), aCompletedStr.c_str());
+				std::string aFlagStr = mApp->Pluralize(aFlags, "[ONE_FLAG]", "[COUNT_FLAGS]");
+				std::string aCompletedStr = TodReplaceString("[FLAGS_COMPLETED]", "{FLAGS}", aFlagStr);
+				aLevelStr = StrFormat("%s - %s", TodStringTranslate(aLevelStr).c_str(), aCompletedStr.c_str());
 			}
 		}
 		else if (mApp->IsEndlessIZombie(mApp->mGameMode) || mApp->IsEndlessScaryPotter(mApp->mGameMode))
@@ -6930,8 +6930,8 @@ void Board::DrawLevel(Graphics* g)
 			}
 			if (aStreak > 0)
 			{
-				std::string aStreakStr = TodReplaceNumberString(__S("[ENDLESS_STREAK]"), __S("{STREAK}"), aStreak);
-				aLevelStr = StrFormat(__S("%s - %s"), TodStringTranslate(aLevelStr).c_str(), aStreakStr.c_str());
+				std::string aStreakStr = TodReplaceNumberString("[ENDLESS_STREAK]", "{STREAK}", aStreak);
+				aLevelStr = StrFormat("%s - %s", TodStringTranslate(aLevelStr).c_str(), aStreakStr.c_str());
 			}
 		}
 	}
@@ -7047,7 +7047,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_FERTILIZER, aButtonRect.mX - 6, aButtonRect.mY + aOffsetY - 7);
 				g->SetColorizeImages(false);
 
-				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat("x%d", aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_BUG_SPRAY)
@@ -7061,7 +7061,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_BUG_SPRAY, aButtonRect.mX, aButtonRect.mY + aOffsetY - 1);
 				g->SetColorizeImages(false);
 
-				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat("x%d", aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_PHONOGRAPH)
@@ -7079,7 +7079,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_CHOCOLATE, aButtonRect.mX + 6, aButtonRect.mY + aOffsetY + 4);
 				g->SetColorizeImages(false);
 
-				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat("x%d", aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_GLOVE)
@@ -7115,7 +7115,7 @@ void Board::DrawZenButtons(Graphics* g)
 				g->DrawImage(Sexy::IMAGE_TREEFOOD, aButtonRect.mX - 6, aButtonRect.mY + aOffsetY - 7);
 				g->SetColorizeImages(false);
 
-				std::string aChargeString = StrFormat(__S("x%d"), aCharges);
+				std::string aChargeString = StrFormat("x%d", aCharges);
 				TodDrawString(g, aChargeString, aButtonRect.mX + 64, aButtonRect.mY + aOffsetY + 65, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 			}
 		}
@@ -7166,36 +7166,36 @@ void Board::DrawDebugText(Graphics* g)
 		int aTime = mZombieCountDownStart - mZombieCountDown;
 		float aCountDownFraction = (float)aTime / (float)mZombieCountDownStart;
 
-		aText += StrFormat(__S("ZOMBIE SPAWNING DEBUG\n"));
-		aText += StrFormat(__S("CurrentWave: %d of %d\n"), mCurrentWave, mNumWaves);
-		aText += StrFormat(__S("TimeSinseLastSpawn: %d %s\n"), aTime, aTime > 400 ? __S("") : __S("(too soon)"));
-		aText += StrFormat(__S("ZombieCountDown: %d/%d (%.0f%%)\n"), mZombieCountDown, mZombieCountDownStart, aCountDownFraction);
+		aText += StrFormat("ZOMBIE SPAWNING DEBUG\n");
+		aText += StrFormat("CurrentWave: %d of %d\n", mCurrentWave, mNumWaves);
+		aText += StrFormat("TimeSinseLastSpawn: %d %s\n", aTime, aTime > 400 ? "" : "(too soon)");
+		aText += StrFormat("ZombieCountDown: %d/%d (%.0f%%)\n", mZombieCountDown, mZombieCountDownStart, aCountDownFraction);
 
 		if (mZombieHealthToNextWave != -1)
 		{
 			int aTotalHealth = TotalZombiesHealthInWave(mCurrentWave - 1);
 			int aHealthRange = std::max(mZombieHealthWaveStart - mZombieHealthToNextWave, 1);
 			float aHealthFraction = (float)(mZombieHealthToNextWave - aTotalHealth + aHealthRange) / (float)aHealthRange;
-			aText += StrFormat(__S("ZombieHealth: CurZombieHealth %d trigger %d (%.0f%%)\n"), aTotalHealth, mZombieHealthToNextWave, aHealthFraction * 100);
+			aText += StrFormat("ZombieHealth: CurZombieHealth %d trigger %d (%.0f%%)\n", aTotalHealth, mZombieHealthToNextWave, aHealthFraction * 100);
 		}
 		else
 		{
-			aText += StrFormat(__S("ZombieHealth: before first wave\n"));
+			aText += StrFormat("ZombieHealth: before first wave\n");
 		}
 
 		if (mHugeWaveCountDown > 0)
 		{
-			aText += StrFormat(__S("HugeWaveCountDown: %d\n"), mHugeWaveCountDown);
+			aText += StrFormat("HugeWaveCountDown: %d\n", mHugeWaveCountDown);
 		}
 
 		Zombie* aBossZombie = GetBossZombie();
 		if (aBossZombie)
 		{
-			aText += StrFormat(__S("\nSpawn: %d\n"), aBossZombie->mSummonCounter);
-			aText += StrFormat(__S("Stomp: %d\n"), aBossZombie->mBossStompCounter);
-			aText += StrFormat(__S("Bungee: %d\n"), aBossZombie->mBossBungeeCounter);
-			aText += StrFormat(__S("Head: %d\n"), aBossZombie->mBossHeadCounter);
-			aText += StrFormat(__S("Health: %d of %d\n"), aBossZombie->mBodyHealth, aBossZombie->mBodyMaxHealth);
+			aText += StrFormat("\nSpawn: %d\n", aBossZombie->mSummonCounter);
+			aText += StrFormat("Stomp: %d\n", aBossZombie->mBossStompCounter);
+			aText += StrFormat("Bungee: %d\n", aBossZombie->mBossBungeeCounter);
+			aText += StrFormat("Head: %d\n", aBossZombie->mBossHeadCounter);
+			aText += StrFormat("Health: %d of %d\n", aBossZombie->mBodyHealth, aBossZombie->mBodyMaxHealth);
 		}
 
 		break;
@@ -7203,60 +7203,60 @@ void Board::DrawDebugText(Graphics* g)
 
 	case DebugTextMode::DEBUG_TEXT_MUSIC:
 	{
-		aText += StrFormat(__S("MUSIC DEBUG\n"));
-		aText += StrFormat(__S("CurrentWave: %d of %d\n"), mCurrentWave, mNumWaves);
+		aText += StrFormat("MUSIC DEBUG\n");
+		aText += StrFormat("CurrentWave: %d of %d\n", mCurrentWave, mNumWaves);
 
 		if (mApp->mMusic->mCurMusicFileMain == MusicFile::MUSIC_FILE_NONE)
 		{
-			aText += StrFormat(__S("No music"));
+			aText += StrFormat("No music");
 		}
 		else
 		{
-			aText += StrFormat(__S("Music Burst: "));
+			aText += StrFormat("Music Burst: ");
 
 			if (mApp->mMusic->mMusicBurstState == MusicBurstState::MUSIC_BURST_OFF)
 			{
-				aText += StrFormat(__S("Off"));
+				aText += StrFormat("Off");
 			}
 			else if (mApp->mMusic->mMusicBurstState == MusicBurstState::MUSIC_BURST_STARTING)
 			{
-				aText += StrFormat(__S("Starting %d/%d"), mApp->mMusic->mBurstStateCounter, 400);
+				aText += StrFormat("Starting %d/%d", mApp->mMusic->mBurstStateCounter, 400);
 			}
 			else if (mApp->mMusic->mMusicBurstState == MusicBurstState::MUSIC_BURST_ON)
 			{
-				aText += StrFormat(__S("On at least until %d/%d"), mApp->mMusic->mBurstStateCounter, 800);
+				aText += StrFormat("On at least until %d/%d", mApp->mMusic->mBurstStateCounter, 800);
 			}
 			else if (mApp->mMusic->mMusicBurstState == MusicBurstState::MUSIC_BURST_FINISHING)
 			{
-				aText += StrFormat(__S("Finishing %d/%d"), mApp->mMusic->mBurstStateCounter, 400);
+				aText += StrFormat("Finishing %d/%d", mApp->mMusic->mBurstStateCounter, 400);
 			}
 
 			if (mApp->mMusic->mMusicDrumsState == MusicDrumsState::MUSIC_DRUMS_OFF)
 			{
-				aText += StrFormat(__S(", Drums off"));
+				aText += StrFormat(", Drums off");
 			}
 			else if (mApp->mMusic->mMusicDrumsState == MusicDrumsState::MUSIC_DRUMS_ON_QUEUED)
 			{
-				aText += StrFormat(__S(", Drums queued on"));
+				aText += StrFormat(", Drums queued on");
 			}
 			else if (mApp->mMusic->mMusicDrumsState == MusicDrumsState::MUSIC_DRUMS_ON)
 			{
-				aText += StrFormat(__S(", Drums on"));
+				aText += StrFormat(", Drums on");
 			}
 			else if (mApp->mMusic->mMusicDrumsState == MusicDrumsState::MUSIC_DRUMS_OFF_QUEUED)
 			{
-				aText += StrFormat(__S(", Drums queued off"));
+				aText += StrFormat(", Drums queued off");
 			}
 			else if (mApp->mMusic->mMusicDrumsState == MusicDrumsState::MUSIC_DRUMS_FADING)
 			{
-				aText += StrFormat(__S(", Drums fading off %d/%d"), mApp->mMusic->mDrumsStateCounter, 50);
+				aText += StrFormat(", Drums fading off %d/%d", mApp->mMusic->mDrumsStateCounter, 50);
 			}
-			aText += StrFormat(__S("\n"));
+			aText += StrFormat("\n");
 
 			/*
 			int aPackedOrderMain = mApp->mMusic->GetMusicOrder(mApp->mMusic->mCurMusicFileMain);
 			int aCurrentOrder = LOWORD(aPackedOrderMain);
-			aText += StrFormat(__S("Music order %02d row %02d\n"), LOWORD(aPackedOrderMain), HIWORD(aPackedOrderMain) / 4);
+			aText += StrFormat("Music order %02d row %02d\n", LOWORD(aPackedOrderMain), HIWORD(aPackedOrderMain) / 4);
 			if (mApp->mMusic->mCurMusicTune == MusicTune::MUSIC_TUNE_DAY_GRASSWALK ||
 				mApp->mMusic->mCurMusicTune == MusicTune::MUSIC_TUNE_POOL_WATERYGRAVES ||
 				mApp->mMusic->mCurMusicTune == MusicTune::MUSIC_TUNE_FOG_RIGORMORMIST ||
@@ -7270,7 +7270,7 @@ void Board::DrawDebugText(Graphics* g)
 					int aDiffDrums = HIWORD(aPackedOrderDrums) - HIWORD(aPackedOrderMain);
 					if (abs(aDiffHihats) > 1 || abs(aDiffDrums) > 1)
 					{
-						aText += StrFormat(__S("Music unsynced hihats %d drums %d\n"), aDiffHihats, aDiffDrums);
+						aText += StrFormat("Music unsynced hihats %d drums %d\n", aDiffHihats, aDiffDrums);
 					}
 				}
 
@@ -7283,16 +7283,16 @@ void Board::DrawDebugText(Graphics* g)
 				gBass->BASS_ChannelGetAttribute(aMusicHandle1, BASS_ATTRIB_MUSIC_BPM, &bpm1);
 				gBass->BASS_ChannelGetAttribute(aMusicHandle2, BASS_ATTRIB_MUSIC_BPM, &bpm2);
 				gBass->BASS_ChannelGetAttribute(aMusicHandle3, BASS_ATTRIB_MUSIC_BPM, &bpm3);
-				aText += StrFormat(__S("bpm1 %f bmp2 %f bpm3 %f\n"), bpm1, bpm2, bpm3);
+				aText += StrFormat("bpm1 %f bmp2 %f bpm3 %f\n", bpm1, bpm2, bpm3);
 			}
 			else if (mApp->mMusic->mCurMusicTune == MusicTune::MUSIC_TUNE_NIGHT_MOONGRAINS)
 			{
 				int aPackedOrderDrums = mApp->mMusic->GetMusicOrder(mApp->mMusic->mCurMusicFileDrums);
-				aText += StrFormat(__S("Drum order %02d row %02d\n"), LOWORD(aPackedOrderDrums), HIWORD(aPackedOrderDrums) / 4);
+				aText += StrFormat("Drum order %02d row %02d\n", LOWORD(aPackedOrderDrums), HIWORD(aPackedOrderDrums) / 4);
 				int aDiffDrums = HIWORD(aPackedOrderDrums) - HIWORD(aPackedOrderMain);
 				if (abs(aDiffDrums) > 0 && abs(aDiffDrums) <= 128)
 				{
-					aText += StrFormat(__S("Drums unsynced %d"), aDiffDrums);
+					aText += StrFormat("Drums unsynced %d", aDiffDrums);
 				}
 			}
 			*/
@@ -7302,23 +7302,23 @@ void Board::DrawDebugText(Graphics* g)
 	}
 
 	case DebugTextMode::DEBUG_TEXT_MEMORY:
-		aText += StrFormat(__S("MEMORY DEBUG\n"));
-		aText += StrFormat(__S("attachments %d\n"), mApp->mEffectSystem->mAttachmentHolder->mAttachments.mSize);
-		aText += StrFormat(__S("emitters %d\n"), mApp->mEffectSystem->mParticleHolder->mEmitters.mSize);
-		aText += StrFormat(__S("particles %d\n"), mApp->mEffectSystem->mParticleHolder->mParticles.mSize);
-		aText += StrFormat(__S("particle systems %d\n"), mApp->mEffectSystem->mParticleHolder->mParticleSystems.mSize);
-		aText += StrFormat(__S("trails %d\n"), mApp->mEffectSystem->mTrailHolder->mTrails.mSize);
-		aText += StrFormat(__S("reanimation %d\n"), mApp->mEffectSystem->mReanimationHolder->mReanimations.mSize);
-		aText += StrFormat(__S("zombies %d\n"), mZombies.mSize);
-		aText += StrFormat(__S("plants %d\n"), mPlants.mSize);
-		aText += StrFormat(__S("projectiles %d\n"), mProjectiles.mSize);
-		aText += StrFormat(__S("coins %d\n"), mCoins.mSize);
-		aText += StrFormat(__S("lawn mowers %d\n"), mLawnMowers.mSize);
-		aText += StrFormat(__S("grid items %d\n"), mGridItems.mSize);
+		aText += StrFormat("MEMORY DEBUG\n");
+		aText += StrFormat("attachments %d\n", mApp->mEffectSystem->mAttachmentHolder->mAttachments.mSize);
+		aText += StrFormat("emitters %d\n", mApp->mEffectSystem->mParticleHolder->mEmitters.mSize);
+		aText += StrFormat("particles %d\n", mApp->mEffectSystem->mParticleHolder->mParticles.mSize);
+		aText += StrFormat("particle systems %d\n", mApp->mEffectSystem->mParticleHolder->mParticleSystems.mSize);
+		aText += StrFormat("trails %d\n", mApp->mEffectSystem->mTrailHolder->mTrails.mSize);
+		aText += StrFormat("reanimation %d\n", mApp->mEffectSystem->mReanimationHolder->mReanimations.mSize);
+		aText += StrFormat("zombies %d\n", mZombies.mSize);
+		aText += StrFormat("plants %d\n", mPlants.mSize);
+		aText += StrFormat("projectiles %d\n", mProjectiles.mSize);
+		aText += StrFormat("coins %d\n", mCoins.mSize);
+		aText += StrFormat("lawn mowers %d\n", mLawnMowers.mSize);
+		aText += StrFormat("grid items %d\n", mGridItems.mSize);
 		break;
 
 	case DebugTextMode::DEBUG_TEXT_COLLISION:
-		aText += StrFormat(__S("COLLISION DEBUG\n"));
+		aText += StrFormat("COLLISION DEBUG\n");
 		break;
 
 	default:
@@ -7905,7 +7905,7 @@ void Board::DoTypingCheck(KeyCode theKey)
 		{
 			if (mApp->mGameScene == GameScenes::SCENE_PLAYING)
 			{
-				DisplayAdvice(__S("[CANT_USE_CODE]"), MessageStyle::MESSAGE_STYLE_BIG_MIDDLE_FAST, AdviceType::ADVICE_NONE);
+				DisplayAdvice("[CANT_USE_CODE]", MessageStyle::MESSAGE_STYLE_BIG_MIDDLE_FAST, AdviceType::ADVICE_NONE);
 			}
 			mApp->PlaySample(Sexy::SOUND_BUZZER);
 			return;
@@ -7922,7 +7922,7 @@ void Board::DoTypingCheck(KeyCode theKey)
 		{
 			if (mApp->mGameScene == GameScenes::SCENE_PLAYING)
 			{
-				DisplayAdvice(__S("[CANT_USE_CODE]"), MessageStyle::MESSAGE_STYLE_BIG_MIDDLE_FAST, AdviceType::ADVICE_NONE);
+				DisplayAdvice("[CANT_USE_CODE]", MessageStyle::MESSAGE_STYLE_BIG_MIDDLE_FAST, AdviceType::ADVICE_NONE);
 			}
 			mApp->PlaySample(Sexy::SOUND_BUZZER);
 			return;
@@ -7939,7 +7939,7 @@ void Board::DoTypingCheck(KeyCode theKey)
 		{
 			if (mApp->mGameScene == GameScenes::SCENE_PLAYING)
 			{
-				DisplayAdvice(__S("[CANT_USE_CODE]"), MessageStyle::MESSAGE_STYLE_BIG_MIDDLE_FAST, AdviceType::ADVICE_NONE);
+				DisplayAdvice("[CANT_USE_CODE]", MessageStyle::MESSAGE_STYLE_BIG_MIDDLE_FAST, AdviceType::ADVICE_NONE);
 			}
 			mApp->PlaySample(Sexy::SOUND_BUZZER);
 			return;
@@ -8007,7 +8007,7 @@ void Board::KeyChar(char theChar)
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN)
 	{
-		if (theChar == __S('m'))
+		if (theChar == 'm')
 		{
 			if (!mApp->mZenGarden->IsZenGardenFull(true))
 			{
@@ -8019,7 +8019,7 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 		
-		if (theChar == __S('+'))
+		if (theChar == '+')
 		{
 			if (!mApp->mZenGarden->IsZenGardenFull(true))
 			{
@@ -8030,7 +8030,7 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 		
-		if (theChar == __S('a'))
+		if (theChar == 'a')
 		{
 			if (!mApp->mZenGarden->IsZenGardenFull(true))
 			{
@@ -8042,7 +8042,7 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 		
-		if (theChar == __S('f'))
+		if (theChar == 'f')
 		{
 			Plant* aPlant = nullptr;
 			while (IteratePlants(aPlant))
@@ -8088,7 +8088,7 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 
-		if (theChar == __S('r'))
+		if (theChar == 'r')
 		{
 			Plant* aPlant = nullptr;
 			while (IteratePlants(aPlant))
@@ -8103,7 +8103,7 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 
-		if (theChar == __S('s'))
+		if (theChar == 's')
 		{
 			if (mApp->mZenGarden->IsStinkySleeping())
 			{
@@ -8116,7 +8116,7 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 
-		if (theChar == __S('c'))
+		if (theChar == 'c')
 		{
 			if (mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_CHOCOLATE] < PURCHASE_COUNT_OFFSET)
 			{
@@ -8129,7 +8129,7 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 
-		if (theChar == __S(']'))
+		if (theChar == ']')
 		{
 			PottedPlant* aPottedPlant = mApp->mZenGarden->GetPottedPlantInWheelbarrow();
 			if (aPottedPlant)
@@ -8150,7 +8150,7 @@ void Board::KeyChar(char theChar)
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
 	{
-		if (theChar == __S('f'))
+		if (theChar == 'f')
 		{
 			if (mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_TREE_FOOD] <= PURCHASE_COUNT_OFFSET)
 			{
@@ -8158,55 +8158,55 @@ void Board::KeyChar(char theChar)
 			}
 			mChallenge->TreeOfWisdomFertilize();
 		}
-		else if (theChar == __S('g'))
+		else if (theChar == 'g')
 		{
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('b'))
+		else if (theChar == 'b')
 		{
 			mChallenge->mChallengeStateCounter = 1;
 		}
-		else if (theChar == __S('0'))
+		else if (theChar == '0')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 0;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('1'))
+		else if (theChar == '1')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 9;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('2'))
+		else if (theChar == '2')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 19;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('3'))
+		else if (theChar == '3')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 29;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('4'))
+		else if (theChar == '4')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 39;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('5'))
+		else if (theChar == '5')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 49;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('6'))
+		else if (theChar == '6')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 98;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('7'))
+		else if (theChar == '7')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 498;
 			mChallenge->TreeOfWisdomGrow();
 		}
-		else if (theChar == __S('8'))
+		else if (theChar == '8')
 		{
 			mApp->mPlayerInfo->mChallengeRecords[mApp->GetCurrentChallengeIndex()] = 998;
 			mChallenge->TreeOfWisdomGrow();
@@ -8215,15 +8215,15 @@ void Board::KeyChar(char theChar)
 		return;
 	}
 
-	if (theChar == __S('<'))
+	if (theChar == '<')
 	{
 		mApp->DoNewOptions(false);
 	}
-	else if (theChar == __S('l'))
+	else if (theChar == 'l')
 	{
 		mApp->DoCheatDialog();
 	}
-	else if (theChar == __S('#'))
+	else if (theChar == '#')
 	{
 		if (mApp->IsSurvivalMode())
 		{
@@ -8238,7 +8238,7 @@ void Board::KeyChar(char theChar)
 			FadeOutLevel();
 		}
 	}
-	else if (theChar == __S('!'))
+	else if (theChar == '!')
 	{
 		mApp->mBoardResult = BoardResult::BOARDRESULT_CHEAT;
 		if (IsLastStandStageWithRepick())
@@ -8279,7 +8279,7 @@ void Board::KeyChar(char theChar)
 			mBoardFadeOutCounter = 200;
 		}
 	}
-	else if (theChar == __S('+'))
+	else if (theChar == '+')
 	{
 		mApp->mBoardResult = BoardResult::BOARDRESULT_CHEAT;
 		if (IsLastStandStageWithRepick())
@@ -8324,19 +8324,19 @@ void Board::KeyChar(char theChar)
 			mBoardFadeOutCounter = 200;
 		}
 	}
-	else if (theChar == __S('8'))
+	else if (theChar == '8')
 	{
 		mApp->mEasyPlantingCheat = !mApp->mEasyPlantingCheat;
 	}
-	else if (theChar == __S('7'))
+	else if (theChar == '7')
 	{
 		mApp->ToggleSlowMo();
 	}
-	else if (theChar == __S('6'))
+	else if (theChar == '6')
 	{
 		mApp->ToggleFastMo();
 	}
-	else if (theChar == __S('z'))
+	else if (theChar == 'z')
 	{
 		mDebugTextMode = (DebugTextMode)((int)mDebugTextMode + 1);
 		if (mDebugTextMode > DebugTextMode::DEBUG_TEXT_COLLISION)
@@ -8353,32 +8353,32 @@ void Board::KeyChar(char theChar)
 	Zombie* aBossZombie = GetBossZombie();
 	if (aBossZombie && !aBossZombie->IsDeadOrDying())
 	{
-		if (theChar == __S('b'))
+		if (theChar == 'b')
 		{
 			aBossZombie->mBossBungeeCounter = 0;
 			return;
 		}
-		if (theChar == __S('u'))
+		if (theChar == 'u')
 		{
 			aBossZombie->mSummonCounter = 0;
 			return;
 		}
-		if (theChar == __S('s'))
+		if (theChar == 's')
 		{
 			aBossZombie->mBossStompCounter = 0;
 			return;
 		}
-		if (theChar == __S('r'))
+		if (theChar == 'r')
 		{
 			aBossZombie->BossRVAttack();
 			return;
 		}
-		if (theChar == __S('h'))
+		if (theChar == 'h')
 		{
 			aBossZombie->mBossHeadCounter = 0;
 			return;
 		}
-		if (theChar == __S('d'))
+		if (theChar == 'd')
 		{
 			aBossZombie->TakeDamage(10000, 0U);
 			return;
@@ -8387,34 +8387,34 @@ void Board::KeyChar(char theChar)
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_WAR_AND_PEAS || mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_WAR_AND_PEAS_2)
 	{
-		if (theChar == __S('w'))
+		if (theChar == 'w')
 		{
 			AddZombie(ZombieType::ZOMBIE_WALLNUT_HEAD, Zombie::ZOMBIE_WAVE_DEBUG);
 			return;
 		}
-		if (theChar == __S('t'))
+		if (theChar == 't')
 		{
 			AddZombie(ZombieType::ZOMBIE_TALLNUT_HEAD, Zombie::ZOMBIE_WAVE_DEBUG);
 			return;
 		}
-		if (theChar == __S('j'))
+		if (theChar == 'j')
 		{
 			AddZombie(ZombieType::ZOMBIE_JALAPENO_HEAD, Zombie::ZOMBIE_WAVE_DEBUG);
 			return;
 		}
-		if (theChar == __S('g'))
+		if (theChar == 'g')
 		{
 			AddZombie(ZombieType::ZOMBIE_GATLING_HEAD, Zombie::ZOMBIE_WAVE_DEBUG);
 			return;
 		}
-		if (theChar == __S('s'))
+		if (theChar == 's')
 		{
 			AddZombie(ZombieType::ZOMBIE_SQUASH_HEAD, Zombie::ZOMBIE_WAVE_DEBUG);
 			return;
 		}
 	}
 
-	if (theChar == __S('q'))
+	if (theChar == 'q')
 	{
 		if (mApp->IsSurvivalEndless(mApp->mGameMode))
 		{
@@ -8516,7 +8516,7 @@ void Board::KeyChar(char theChar)
 		return;
 	}
 
-	if (theChar == __S('O'))
+	if (theChar == 'O')
 	{
 		mApp->mEasyPlantingCheat = true;
 		for (int y = 0; y < MAX_GRID_SIZE_Y; y++)
@@ -8532,7 +8532,7 @@ void Board::KeyChar(char theChar)
 		return;
 	}
 
-	if (theChar == __S('?') || theChar == __S('/'))
+	if (theChar == '?' || theChar == '/')
 	{
 		if (mHugeWaveCountDown > 0)
 		{
@@ -8545,69 +8545,69 @@ void Board::KeyChar(char theChar)
 		return;
 	}
 
-	if (theChar == __S('b'))
+	if (theChar == 'b')
 	{
 		AddZombie(ZombieType::ZOMBIE_BUNGEE, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('o'))
+	if (theChar == 'o')
 	{
 		AddZombie(ZombieType::ZOMBIE_FOOTBALL, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('s'))
+	if (theChar == 's')
 	{
 		AddZombie(ZombieType::ZOMBIE_DOOR, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('L'))
+	if (theChar == 'L')
 	{
 		AddZombie(ZombieType::ZOMBIE_LADDER, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('y'))
+	if (theChar == 'y')
 	{
 		AddZombie(ZombieType::ZOMBIE_YETI, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('a'))
+	if (theChar == 'a')
 	{
 		AddZombie(ZombieType::ZOMBIE_FLAG, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('w'))
+	if (theChar == 'w')
 	{
 		AddZombie(ZombieType::ZOMBIE_NEWSPAPER, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('F'))
+	if (theChar == 'F')
 	{
 		AddZombie(ZombieType::ZOMBIE_BALLOON, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('n'))
+	if (theChar == 'n')
 	{
 		if (StageHasPool())
 		{
 			AddZombie(ZombieType::ZOMBIE_SNORKEL, Zombie::ZOMBIE_WAVE_DEBUG);
 		}
 	}
-	if (theChar == __S('c'))
+	if (theChar == 'c')
 	{
 		AddZombie(ZombieType::ZOMBIE_TRAFFIC_CONE, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('m'))
+	if (theChar == 'm')
 	{
 		AddZombie(ZombieType::ZOMBIE_DANCER, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('h'))
+	if (theChar == 'h')
 	{
 		AddZombie(ZombieType::ZOMBIE_PAIL, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	//if (theChar == __S('H')
+	//if (theChar == 'H'
 	//{
 	//	AddZombie(ZombieType::ZOMBIE_PAIL, Zombie::ZOMBIE_WAVE_DEBUG);
 	//	AddZombie(ZombieType::ZOMBIE_PAIL, Zombie::ZOMBIE_WAVE_DEBUG);
@@ -8616,22 +8616,22 @@ void Board::KeyChar(char theChar)
 	//	AddZombie(ZombieType::ZOMBIE_PAIL, Zombie::ZOMBIE_WAVE_DEBUG);
 	//	return;
 	//}
-	if (theChar == __S('D'))
+	if (theChar == 'D')
 	{
 		AddZombie(ZombieType::ZOMBIE_DIGGER, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('p'))
+	if (theChar == 'p')
 	{
 		AddZombie(ZombieType::ZOMBIE_POLEVAULTER, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('P'))
+	if (theChar == 'P')
 	{
 		AddZombie(ZombieType::ZOMBIE_POGO, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('R'))
+	if (theChar == 'R')
 	{
 		if (StageHasPool())
 		{
@@ -8639,32 +8639,32 @@ void Board::KeyChar(char theChar)
 		}
 		return;
 	}
-	else if(theChar == __S('j'))
+	else if(theChar == 'j')
 	{
 		AddZombie(ZombieType::ZOMBIE_JACK_IN_THE_BOX, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('g'))
+	if (theChar == 'g')
 	{
 		AddZombie(ZombieType::ZOMBIE_GARGANTUAR, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('G'))
+	if (theChar == 'G')
 	{
 		AddZombie(ZombieType::ZOMBIE_REDEYE_GARGANTUAR, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('i'))
+	if (theChar == 'i')
 	{
 		AddZombie(ZombieType::ZOMBIE_ZAMBONI, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('C'))
+	if (theChar == 'C')
 	{
 		AddZombie(ZombieType::ZOMBIE_CATAPULT, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('1'))
+	if (theChar == '1')
 	{
 		Plant* aPlant = GetTopPlantAt(0, 0, PlantPriority::TOPPLANT_ANY);
 		if (aPlant)
@@ -8674,12 +8674,12 @@ void Board::KeyChar(char theChar)
 			return;
 		}
 	}
-	if (theChar == __S('B'))
+	if (theChar == 'B')
 	{
 		mFogBlownCountDown = 2200;
 		return;
 	}
-	if (theChar == __S('t'))
+	if (theChar == 't')
 	{
 		if (!CanAddBobSled())
 		{
@@ -8700,31 +8700,31 @@ void Board::KeyChar(char theChar)
 		AddZombie(ZombieType::ZOMBIE_BOBSLED, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
-	if (theChar == __S('r'))
+	if (theChar == 'r')
 	{
 		SpawnZombiesFromGraves();
 		return;
 	}
-	if (theChar == __S('0'))
+	if (theChar == '0')
 	{
 		AddSunMoney(100);
 		mApp->PlaySample(SOUND_BUTTONCLICK);
 		return;
 	}
-	if (theChar == __S('9'))
+	if (theChar == '9')
 	{
 		AddSunMoney(999999);
 		mApp->PlaySample(SOUND_BUTTONCLICK);
 		return;
 	}
-	if (theChar == __S('$'))
+	if (theChar == '$')
 	{
 		mApp->mPlayerInfo->AddCoins(100);
 		mApp->PlaySample(SOUND_BUTTONCLICK);
 		ShowCoinBank();
 		return;
 	}
-	if (theChar == __S('-'))
+	if (theChar == '-')
 	{
 		mSunMoney -= 100;
 		if (mSunMoney < 0)
@@ -8733,17 +8733,17 @@ void Board::KeyChar(char theChar)
 		}
 		return;
 	}
-	if (theChar == __S('%'))
+	if (theChar == '%')
 	{
 		mApp->SwitchScreenMode(mApp->mIsWindowed, !mApp->Is3DAccelerated(), false);
 	}
-	if (theChar == __S('M'))
+	if (theChar == 'M')
 	{
 		mApp->mMusic->mBurstOverride -= 2 - (mApp->mMusic->mBurstOverride != 1);
 		return;
 	}
 
-	if (theChar == __S('\3') && mApp->mCtrlDown && mApp->mTodCheatKeys)
+	if (theChar == '\3' && mApp->mCtrlDown && mApp->mTodCheatKeys)
 	{
 		TodCrash();
 

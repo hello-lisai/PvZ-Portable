@@ -829,16 +829,6 @@ bool FontData::HandleCommand(const ListDataElement& theParams)
 					{
 						char32_t first_char = UTF8CharToUTF32Char(aCharsVector[i]);
 						aLayer->GetCharData(first_char)->mWidth = aCharWidthsVector[i];
-						/*
-						std::wstring aWString = UTF8StringToWString(aCharsVector[i]);
-						if (aWString.length() == 1)
-						{
-							//aLayer->mCharData[(uchar) aCharsVector[i][0]].mWidth = aCharWidthsVector[i];
-							aLayer->GetCharData(aWString[0])->mWidth = aCharWidthsVector[i];
-						}
-						else
-							invalidParamFormat = true;
-						*/
 					}
 				}
 				else
@@ -1308,17 +1298,6 @@ ImageFont::~ImageFont()
 {
 	mFontData->DeRef();
 }
-
-/*ImageFont::ImageFont(const ImageFont& theImageFont, Image* theImage) :
-	_Font(theImageFont),
-	mImage(theImage)
-{
-	for (int i = 0; i < 256; i++)
-	{
-		mCharPos[i] = theImageFont.mCharPos[i];
-		mCharWidth[i] = theImageFont.mCharWidth[i];
-	}
-}*/
 
 void ImageFont::GenerateActiveFontLayers()
 {

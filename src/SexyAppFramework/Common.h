@@ -1,14 +1,6 @@
 #ifndef __SEXYAPPFRAMEWORK_COMMON_H__
 #define __SEXYAPPFRAMEWORK_COMMON_H__
 
-#undef _WIN32_WINNT
-#undef WIN32_LEAN_AND_MEAN
-
-#define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x0500
-#undef _UNICODE
-#undef UNICODE
-
 #include <string>
 #include <vector>
 #include <map>
@@ -23,6 +15,12 @@
 #endif
 
 #ifdef _WIN32
+#undef _WIN32_WINNT
+#undef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#define _WIN32_WINNT 0x0500
+#undef _UNICODE
+#undef UNICODE
 #define NOMINMAX 1
 #include <windows.h>
 #include <shellapi.h>
@@ -33,44 +31,6 @@
 #include <stdint.h>
 #define _stricmp strcasecmp
 #define _cdecl
-typedef uint8_t BYTE;
-typedef uint16_t WORD;
-typedef uint32_t DWORD;
-typedef uint64_t QWORD;
-typedef uint32_t UINT;
-typedef int64_t __int64;
-typedef int INT;
-typedef long LONG;
-typedef unsigned long ULONG;
-typedef LONG WINBOOL;
-typedef void* HANDLE;
-typedef WORD* LPWORD;
-typedef DWORD* LPDWORD;
-typedef char CHAR;
-typedef CHAR* LPSTR;
-typedef const CHAR* LPCSTR;
-typedef wchar_t WCHAR;
-typedef WCHAR TCHAR;
-typedef WCHAR* LPWSTR;
-typedef TCHAR* LPTSTR;
-typedef const WCHAR* LPCWSTR;
-typedef const TCHAR* LPCTSTR;
-typedef HANDLE* LPHANDLE;
-typedef HANDLE HWND;
-
-typedef struct tagRECT {
-	LONG left;
-	LONG top;
-	LONG right;
-	LONG bottom;
-} RECT, *PRECT, *NPRECT, *LPRECT;
-
-typedef struct _GUID {
-	unsigned long  Data1;
-	unsigned short Data2;
-	unsigned short Data3;
-	unsigned char  Data4[8];
-} GUID;
 
 #endif
 
@@ -122,26 +82,8 @@ inline int nanosleep(const struct timespec* ts, struct timespec* rem)
 #define unreachable __builtin_unreachable
 #endif
 
-// Removed wide string support
-#define __S(x)				x
-
-#define sexystrncmp			strncmp
-#define sexystrcmp			strcmp
-#define sexystricmp			strcasecmp
-#define sexysscanf			sscanf
-#define sexyatoi			atoi
-#define sexystrcpy			strcpy
-#define sexystrlen			strlen
-#define sexyisdigit			isdigit
-#define sexyisalnum			isalnum
-#define sexystrchr			strchr
-
-#define SexyStringToStringFast(x)	(x)
-#define StringToSexyStringFast(x)	(x)
-
 #define LONG_BIGE_TO_NATIVE(l) (((l >> 24) & 0xFF) | ((l >> 8) & 0xFF00) | ((l << 8) & 0xFF0000) | ((l << 24) & 0xFF000000))
 #define WORD_BIGE_TO_NATIVE(w) (((w >> 8) & 0xFF) | ((w << 8) & 0xFF00))
-#define LONG_LITTLEE_TO_NATIVE(l) (l)
 #define WORD_LITTLEE_TO_NATIVE(w) (w)
 
 #define LENGTH(anyarray) (sizeof(anyarray) / sizeof(anyarray[0]))
@@ -161,7 +103,6 @@ namespace Sexy
 const ulong SEXY_RAND_MAX = 0x7FFFFFFF;
 
 extern bool			gDebug;
-//extern HINSTANCE	gHInstance;
 
 #define printf(...) Sexy::PrintF(__VA_ARGS__)
 void				PrintF(const char *text, ...);
@@ -172,15 +113,12 @@ float				Rand(float range);
 void				SRand(ulong theSeed);
 extern std::string	vformat(const char* fmt, va_list argPtr);
 extern std::string	StrFormat(const char* fmt ...);
-//bool				CheckFor98Mill();
-//bool				CheckForVista();
 std::string			GetAppDataFolder();
 void				SetAppDataFolder(const std::string& thePath);
 std::string			GetAppDataPath(const std::string& theRelativePath);
 const std::string&	GetResourceFolder();
 void				SetResourceFolder(const std::string& thePath);
 std::string			GetResourcePath(const std::string& theRelativePath);
-std::string			URLEncode(const std::string& theString);
 std::string			StringToUpper(const std::string& theString);
 std::string			StringToLower(const std::string& theString);
 std::string			Upper(const std::string& theData);
@@ -213,8 +151,6 @@ void				SMemRStr(void*& _Src, std::string& theString);
 // Write memory and then move the pointer
 void				SMemW(void*& _Dst, const void* _Src, size_t _Size);
 void				SMemWStr(void*& _Dst, const std::string& theString);
-
-// Removed wide string support
 
 inline void			inlineLTrim(std::string &theData, const std::string& theChars = " \t\r\n")
 {

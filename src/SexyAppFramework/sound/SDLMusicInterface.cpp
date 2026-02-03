@@ -31,28 +31,6 @@ bool SDLMusicInterface::LoadMusic(int theSongId, const std::string& theFileName)
 	if (aDotPos!=std::string::npos)
 		anExt = StringToLower(theFileName.substr(aDotPos+1));
 
-	/*
-	if (anExt=="wav" || anExt=="ogg" || anExt=="mp3")
-		aStream = gBass->BASS_StreamCreateFile(FALSE, (void*) theFileName.c_str(), 0, 0, 0);
-	else
-	{
-		PFILE* aFP = p_fopen(theFileName.c_str(), "rb");
-		if (aFP == nullptr)
-			return false;
-
-		p_fseek(aFP, 0, SEEK_END);
-		int aSize = p_ftell(aFP);
-		p_fseek(aFP, 0, SEEK_SET);
-
-		uchar* aData = new uchar[aSize];
-		p_fread(aData, 1, aSize, aFP);
-		p_fclose(aFP);
-
-		aHMusic = gBass->BASS_MusicLoad(FALSE, (void*) theFileName.c_str(), 0, 0, BASS_MUSIC_LOOP | BASS2_MUSIC_RAMP, 0);
-
-		delete[] aData;
-	}
-	*/
 	aHMusic = Mix_LoadMUS(theFileName.c_str());
 
 	if (aHMusic==0)
@@ -79,25 +57,6 @@ void SDLMusicInterface::PlayMusic(int theSongId, int theOffset, bool noLoop)
 		Mix_PlayMusicStream(aMusicInfo->mHMusic, (noLoop) ? 0 : -1);
 		if (theOffset > 0)
 			Mix_ModMusicStreamJumpToOrder(aMusicInfo->mHMusic, theOffset);
-		/*
-		gBass->BASS_ChannelSetAttribute(aMusicInfo->GetHandle(), BASS_ATTRIB_VOL, (int) (aMusicInfo->mVolume));
-
-		gBass->BASS_ChannelStop(aMusicInfo->GetHandle());
-		if (aMusicInfo->mHMusic)
-		{
-			if (gBass->mVersion2)
-				gBass->BASS_MusicPlayEx(aMusicInfo->mHMusic, theOffset, BASS_MUSIC_POSRESET | BASS2_MUSIC_RAMP | (noLoop ? 0 : BASS_MUSIC_LOOP), TRUE);
-			else
-				gBass->BASS_MusicPlayEx(aMusicInfo->mHMusic, theOffset, noLoop ? 0 : BASS_MUSIC_LOOP, TRUE);
-		}
-		else
-		{
-			BOOL flush = theOffset == -1 ? FALSE : TRUE;
-			gBass->BASS_StreamPlay(aMusicInfo->mHStream, flush, noLoop ? 0 : BASS_MUSIC_LOOP);
-			if (theOffset > 0)
-				gBass->BASS_ChannelSetPosition(aMusicInfo->mHStream, theOffset, BASS_POS_BYTE);
-		}
-		*/
 	}
 }
 
@@ -206,27 +165,6 @@ void SDLMusicInterface::FadeIn(int theSongId, int theOffset, double theSpeed, bo
 		Mix_PlayMusicStream(aMusicInfo->mHMusic, (noLoop) ? 0 : -1);
 		if (theOffset > 0)
 			Mix_ModMusicStreamJumpToOrder(aMusicInfo->mHMusic, theOffset);
-
-		/*
-		gBass->BASS_ChannelStop(aMusicInfo->GetHandle());
-		gBass->BASS_ChannelSetAttribute(aMusicInfo->GetHandle(), BASS_ATTRIB_VOL, (int) (aMusicInfo->mVolume));
-		if (aMusicInfo->mHMusic)
-		{
-			if (theOffset == -1)
-				gBass->BASS_MusicPlay(aMusicInfo->mHMusic);
-			else
-			{
-				gBass->BASS_MusicPlayEx(aMusicInfo->mHMusic, theOffset, BASS2_MUSIC_RAMP | (noLoop ? 0 : BASS_MUSIC_LOOP), TRUE);
-			}
-		}
-		else
-		{
-			BOOL flush = theOffset == -1 ? FALSE : TRUE;
-			gBass->BASS_StreamPlay(aMusicInfo->mHStream, flush, noLoop ? 0 : BASS_MUSIC_LOOP);
-			if (theOffset > 0)
-				gBass->BASS_ChannelSetPosition(aMusicInfo->mHStream, theOffset, BASS_POS_BYTE);
-		}
-		*/
 
 	}
 }

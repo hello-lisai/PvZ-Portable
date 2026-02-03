@@ -70,10 +70,10 @@ void XMLParser::Fail(const std::string& theErrorText)
 
 void XMLParser::Init()
 {
-	mSection = __S("");
+	mSection = "";
 	mLineNum = 1;
 	mHasFailed = false;
-	mErrorText = __S("");
+	mErrorText = "";
 	mFirstChar = true;
 	mByteSwap = false;
 }
@@ -86,7 +86,7 @@ bool XMLParser::AddAttribute(XMLElement* theElement, const std::string& theAttri
 	if (!aRet.second)
 		aRet.first->second = theAttributeValue;
 
-	if (theAttributeKey != __S("/"))
+	if (theAttributeKey != "/")
 		theElement->mAttributeIteratorList.push_back(aRet.first);
 
 	return aRet.second;
@@ -315,7 +315,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 	{		
 		theElement->mType = XMLElement::TYPE_NONE;
 		theElement->mSection = mSection;
-		theElement->mValue = __S("");
+		theElement->mValue = "";
 		theElement->mAttributes.clear();			
 		theElement->mInstruction.erase();
 
@@ -355,7 +355,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 					}
 					else
 					{
-						if (error) Fail(__S("Illegal Character"));
+						if (error) Fail("Illegal Character");
 						aVal = 0;
 					}
 				}
@@ -440,7 +440,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 							}
 							else
 							{
-								Fail(__S("Unexpected '<'"));
+								Fail("Unexpected '<'");
 								return false;
 							}
 						}
@@ -450,7 +450,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 							{	
 								bool insertEnd = false;
 
-								if (aAttributeKey == __S("/"))
+								if (aAttributeKey == "/")
 								{
 									// We will get this if we have a space before the />, so we can ignore it
 									//  and go about our business now
@@ -469,8 +469,8 @@ bool XMLParser::NextElement(XMLElement* theElement)
 										aLastAttributeKey = aAttributeKey;
 										AddAttribute(theElement, aLastAttributeKey, aAttributeValue);
 
-										aAttributeKey = __S("");
-										aAttributeValue = __S("");
+										aAttributeKey = "";
+										aAttributeValue = "";
 									}
 
 									if (aLastAttributeKey.length() > 0)
@@ -505,7 +505,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 								// Do we want to fake an ending section?
 								if (insertEnd)
 								{									
-									std::string anAddString = __S("</") + theElement->mValue + __S(">");
+									std::string anAddString = "</" + theElement->mValue + ">";
 
 									int anOldSize = mBufferedText.size();
 									int anAddLength = anAddString.length();
@@ -517,13 +517,13 @@ bool XMLParser::NextElement(XMLElement* theElement)
 
 									// clear out aAttributeKey, since it contains "/" as its value and will insert
 									// it into the element's attribute map.
-									aAttributeKey = __S("");
+									aAttributeKey = "";
 
 									//OLD: mBufferedText = "</" + theElement->mValue + ">" + mBufferedText;
 								}
 
 								if (mSection.length() != 0)
-									mSection += __S("/");
+									mSection += "/";
 
 								mSection += theElement->mValue;								
 
@@ -531,10 +531,10 @@ bool XMLParser::NextElement(XMLElement* theElement)
 							}
 							else if (theElement->mType == XMLElement::TYPE_END)
 							{
-								int aLastSlash = mSection.rfind(__S('/'));
+								int aLastSlash = mSection.rfind('/');
 								if ((aLastSlash == -1) && (mSection.length() == 0))
 								{
-									Fail(__S("Unexpected End"));
+									Fail("Unexpected End");
 									return false;
 								}
 
@@ -542,7 +542,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 								
 								if (aLastSectionName != theElement->mValue)
 								{
-									Fail(__S("End '") + theElement->mValue + __S("' Doesn't Match Start '") + aLastSectionName + __S("'"));
+									Fail("End '" + theElement->mValue + "' Doesn't Match Start '" + aLastSectionName + "'");
 									return false;
 								}
 
@@ -555,25 +555,25 @@ bool XMLParser::NextElement(XMLElement* theElement)
 							}
 							else
 							{
-								Fail(__S("Unexpected '>'"));
+								Fail("Unexpected '>'");
 								return false;
 							}
 						}
-						else if ((c == '/') && (theElement->mType == XMLElement::TYPE_START) && (theElement->mValue == __S("")))
+						else if ((c == '/') && (theElement->mType == XMLElement::TYPE_START) && (theElement->mValue == ""))
 						{					
 							theElement->mType = XMLElement::TYPE_END;					
 						}				
-						else if ((c == '?') && (theElement->mType == XMLElement::TYPE_START) && (theElement->mValue == __S("")))
+						else if ((c == '?') && (theElement->mType == XMLElement::TYPE_START) && (theElement->mValue == ""))
 						{
 							theElement->mType = XMLElement::TYPE_INSTRUCTION;
 						}
 						else if (::isspace((uchar) c))
 						{
-							if (theElement->mValue != __S(""))
+							if (theElement->mValue != "")
 								hasSpace = true;
 
 							// It's a comment!
-							if ((theElement->mType == XMLElement::TYPE_START) && (theElement->mValue == __S("!--")))
+							if ((theElement->mType == XMLElement::TYPE_START) && (theElement->mValue == "!--"))
 								theElement->mType = XMLElement::TYPE_COMMENT;
 						}
 						else if (c > 32)
@@ -582,7 +582,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 						}
 						else
 						{
-							Fail(__S("Illegal Character"));
+							Fail("Illegal Character");
 							return false;
 						}
 					} 
@@ -612,8 +612,8 @@ bool XMLParser::NextElement(XMLElement* theElement)
 
 										AddAttribute(theElement, aAttributeKey, aAttributeValue);
 
-										aAttributeKey = __S("");
-										aAttributeValue = __S("");
+										aAttributeKey = "";
+										aAttributeValue = "";
 
 										aLastAttributeKey = aAttributeKey;
 									}
@@ -659,7 +659,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 						{
 							if (hasSpace)
 							{
-								theElement->mValue += __S(" ");
+								theElement->mValue += " ";
 								hasSpace = false;
 							}
 							
@@ -671,7 +671,7 @@ bool XMLParser::NextElement(XMLElement* theElement)
 			else
 			{
 				if (theElement->mType != XMLElement::TYPE_NONE)
-					Fail(__S("Unexpected End of File"));
+					Fail("Unexpected End of File");
 					
 				return false;
 			}			

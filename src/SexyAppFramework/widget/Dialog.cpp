@@ -10,10 +10,10 @@
 using namespace Sexy;
 
 
-std::string Sexy::DIALOG_YES_STRING				= __S("YES");
-std::string Sexy::DIALOG_NO_STRING				= __S("NO");
-std::string Sexy::DIALOG_OK_STRING				= __S("OK");
-std::string Sexy::DIALOG_CANCEL_STRING			= __S("CANCEL");
+std::string Sexy::DIALOG_YES_STRING				= "YES";
+std::string Sexy::DIALOG_NO_STRING				= "NO";
+std::string Sexy::DIALOG_OK_STRING				= "OK";
+std::string Sexy::DIALOG_CANCEL_STRING			= "CANCEL";
 
 static int gDialogColors[][3] = 
 {{255, 255, 255},
@@ -404,9 +404,3 @@ void Dialog::ButtonDepress(int theId)
 		mDialogListener->DialogButtonDepress(mId, theId);
 	}
 }
-
-/*
-void Dialog::ButtonDownTick(int theId)
-{	
-}
-*/

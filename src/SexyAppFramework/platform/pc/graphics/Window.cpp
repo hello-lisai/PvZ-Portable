@@ -29,7 +29,7 @@ void SexyAppBase::MakeWindow()
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
 		mWindow = (void*)SDL_CreateWindow(
-			SexyStringToStringFast(mTitle).c_str(),
+			mTitle.c_str(),
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 			mWidth * IMG_DOWNSCALE, mHeight * IMG_DOWNSCALE,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | (!mIsWindowed ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)

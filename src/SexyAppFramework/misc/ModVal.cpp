@@ -43,7 +43,7 @@ static FileModMap& GetFileModMap()
 	return aMap;
 }
 
-static const char* FindFileInStringTable(const std::string &theSearch, const char *theMem, DWORD theLength, const char *theStartPos)
+static const char* FindFileInStringTable(const std::string &theSearch, const char *theMem, uint32_t theLength, const char *theStartPos)
 {
 	const char *aFind = nullptr;
 	try
@@ -93,7 +93,7 @@ static bool ParseModValString(std::string &theStr, int *theCounter = nullptr, in
 	return true;
 }
 
-static bool FindModValsInMemoryHelper(const char *theMem, DWORD theLength)
+static bool FindModValsInMemoryHelper(const char *theMem, uint32_t theLength)
 {
 	std::string aSearchStr = "SEXYMODVAL";
 
@@ -128,67 +128,15 @@ static bool FindModValsInMemoryHelper(const char *theMem, DWORD theLength)
 
 static void FindModValsInMemory()
 {
-	/*
-	MEMORY_BASIC_INFORMATION mbi; 
-	PVOID      pvAddress = 0; 
-
-	const char *aMem = nullptr;
-	DWORD aMemLength = 0;
-
-	int aFound = 0; (void)aFound;
-	int aTotal = 0; (void)aTotal;
-	memset(&mbi, 0, sizeof(MEMORY_BASIC_INFORMATION)); 
-	for (; VirtualQuery(pvAddress, &mbi, sizeof(MEMORY_BASIC_INFORMATION)) == sizeof(MEMORY_BASIC_INFORMATION); pvAddress = ((BYTE*)mbi.BaseAddress) + mbi.RegionSize) 
-	{ 	
-		const char *anAddress = (const char*)mbi.BaseAddress;
-		if (mbi.State==MEM_COMMIT && mbi.Type==MEM_IMAGE)
-		{
-			aTotal++;
-			if (aMem!=nullptr && aMem+aMemLength==anAddress) // compact these two
-			{
-				aMemLength += mbi.RegionSize;
-				continue;
-			}
-			
-			if (aMem!=nullptr) // do find in old section
-			{
-				if (FindModValsInMemoryHelper(aMem,aMemLength))
-				{
-					aFound++;
-					return;
-				}
-
-				aMem = nullptr;
-			}
-
-			aMem = anAddress;
-			aMemLength = mbi.RegionSize;
-		}
-	} 
-
-	if (aMem!=nullptr)
-	{
-		if (FindModValsInMemoryHelper(aMem,aMemLength))
-			aFound++;
-	}
-	*/
+	// Not implemented
 }
 
 static ModStorage* CreateFileModsHelper(const char* theFileName)
 {
 	ModStorage *aModStorage = new ModStorage;
 	aModStorage->mChanged = false;
-
-	// Change this thinggie
-	/*
-	DWORD anOldProtect;
-	VirtualProtect((LPVOID) theFileName, 5, PAGE_READWRITE, &anOldProtect);
-	*((char*) theFileName) = 0;
-	*((ModStorage**) (theFileName+1)) = aModStorage;
-	VirtualProtect((LPVOID) theFileName, 5, anOldProtect, &anOldProtect);
-	*/
-	
-	return aModStorage;	
+	(void)theFileName;
+	return aModStorage;
 }
 
 
@@ -437,243 +385,4 @@ static bool ModStringToString(const char* theString, std::string &theStrVal)
 bool Sexy::ReparseModValues()
 {
 	return false;
-	/*
-	if (gLastFileTime == 0)
-	{
-		char anEXEName[256];
-		GetModuleFileNameA(nullptr, anEXEName, 256);
-		gLastFileTime = GetFileDate(anEXEName);
-		
-		FindModValsInMemory();
-	}
-
-	bool hasNewFiles = false;
-	std::string aFileList;
-
-	// Process each file one at a time
-	FileModMap &aMap = GetFileModMap();
-	FileModMap::iterator aFileModItr;
-	for (aFileModItr = aMap.begin(); aFileModItr != aMap.end(); ++aFileModItr)
-	{
-		FileMod &aFileMod = aFileModItr->second;
-		if (!aFileMod.mHasMods)
-			continue;
-
-		ModStorageMap &aModMap = aFileMod.mMap;
-		std::string aFileName = aFileModItr->first;
-
-		time_t aThisTime = GetFileDate(aFileName);
-		if (aThisTime > gLastFileTime)
-		{
-			gLastFileTime = aThisTime;
-			hasNewFiles = true;
-		}
-
-		if (aFileList.length() > 0)
-			aFileList += "\r\n  ";
-		aFileList += aFileName;
-
-		int aLineNum = 1;
-		int aModNum = 0;(void)aModNum;
-		ModStorageMap::iterator aModMapItr = aModMap.begin();
-
-		std::fstream aStream(aFileName.c_str(), std::ios::in);
-
-		if (aStream.is_open())
-		{
-			while (!aStream.eof())
-			{
-				char aString[8192];
-				aStream.getline(aString, 8192);
-
-				int aCharIdx = 0;
-				int aChar = 0;
-				int aLastChar = 0;
-				while (aString[aCharIdx] != 0)
-				{
-					aLastChar = aChar;
-					aChar = aString[aCharIdx];
-					
-					if (aChar == '"')  // Skip strings
-					{
-						while (true)
-						{
-							aLastChar = aChar;
-							aChar = aString[++aCharIdx];
-
-							if (aChar=='\\' && aLastChar=='\\') // so we don't interpret \\" as an escaped quote
-								aChar = 0;
-							else if (aChar=='"' && aLastChar!='\\')
-								break;
-							else if (aChar==0)
-							{
-								if (aLastChar=='\\') // continuation
-								{
-									aCharIdx = -1;
-									aChar = 0;
-									aLastChar = 0;
-									aLineNum++;
-
-									aStream.getline(aString, 8192);
-									if (aString[0]!=0 || !aStream.eof()) // got valid new line
-										continue;
-								}
-
-								char aStr[512];
-								sprintf(aStr, "ERROR in %s on line %d: Error parsing quotes", aFileName.c_str(), aLineNum);
-								MessageBoxA(nullptr, aStr, "MODVAL ERROR", MB_OK | MB_ICONERROR);
-								return false;
-							}
-						}
-					}
-					else if (aChar=='/') // Skip C++ comments
-					{
-						if (aLastChar=='/') 
-						{
-
-							while (true)
-							{
-								aLastChar = aChar;
-								aChar = aString[++aCharIdx];
-								if (aChar==0) // line continuation
-								{
-									if (aLastChar=='\\') // continuation
-									{
-										aCharIdx = -1;
-										aChar = 0;
-										aLastChar = 0;
-										aLineNum++;
-
-										aStream.getline(aString, 8192);
-										if (aString[0]!=0 || !aStream.eof()) // got valid new line
-											continue;
-									}
-									else
-									{
-										aCharIdx--;
-										break;
-									}
-
-									char aStr[512];
-									sprintf(aStr, "ERROR in %s on line %d: Error parsing c++ comment", aFileName.c_str(), aLineNum);
-									MessageBoxA(nullptr, aStr, "MODVAL ERROR", MB_OK | MB_ICONERROR);
-									return false;
-								}
-							}
-						}
-					}
-					else if (aChar=='*') // skip C comments
-					{
-						if (aLastChar=='/') 
-						{
-							while (true)
-							{
-								aLastChar = aChar;
-								aChar = aString[++aCharIdx];
-								if (aChar=='/' && aLastChar=='*')
-									break;
-								else if (aChar==0) // line continuation
-								{
-									aCharIdx = -1;
-									aChar = 0;
-									aLastChar = 0;
-									aLineNum++;
-
-									aStream.getline(aString, 8192);
-									if (aString[0]!=0 || !aStream.eof()) // got valid new line
-										continue;
-
-									char aStr[512];
-									sprintf(aStr, "ERROR in %s on line %d: Error parsing c comment", aFileName.c_str(), aLineNum);
-									MessageBoxA(nullptr, aStr, "MODVAL ERROR", MB_OK | MB_ICONERROR);
-									return false;
-								}
-							}
-						}
-					}
-					else if (aChar == '(')
-					{
-						int theAreaNum = -1;
-						if ((aCharIdx >= 2) && (aString[aCharIdx-1] == 'M') &&
-							(!isalpha((unsigned char) aString[aCharIdx-2])))
-						{
-							theAreaNum = 0;							
-						}
-						else if ((aCharIdx >= 3) && 
-							(aString[aCharIdx-1] >= '1') && (aString[aCharIdx-1] <= '9') &&
-							(aString[aCharIdx-2] == 'M') &&
-							(!isalpha((unsigned char) aString[aCharIdx-3])))
-						{
-							theAreaNum = aString[aCharIdx-1] - '0';
-						}
-
-						if (theAreaNum != -1)
-						{
-							while (aModMapItr!=aModMap.end() && aModMapItr->second.mLineNum<aLineNum)
-								++aModMapItr;
-
-							if (aModMapItr!=aModMap.end() && aModMapItr->second.mLineNum==aLineNum)
-							{
-								const char *aPtr = aModMapItr->second.mStrPtr;
-								aModMapItr++;
-
-								int anIntVal = 0;
-								double aDoubleVal = 0.0;
-								std::string aStrVal;
-
-								// Try to parse out a number
-								if ((ModStringToString(aString + aCharIdx + 1, aStrVal)) ||
-									(ModStringToInteger(aString + aCharIdx + 1, &anIntVal)) ||
-									(ModStringToDouble(aString + aCharIdx + 1, &aDoubleVal)))
-								{						
-									// We found a mod value!
-
-									if (*aPtr!=0) // have stored something here
-										CreateFileMods(aPtr);
-
-									ModStorage* aModStorage = *(ModStorage**)(aPtr+1);
-									aModStorage->mInt = anIntVal;
-									aModStorage->mDouble = aDoubleVal;
-									aModStorage->mString = aStrVal;
-									aModStorage->mChanged = true;
-								}
-								else
-								{
-									char aStr[512];
-									sprintf(aStr, "ERROR in %s on line %d.  Parsing Error.", aFileName.c_str(), aLineNum);
-									MessageBoxA(nullptr, aStr, "MODVAL ERROR", MB_OK | MB_ICONERROR);
-
-									return false;
-								}
-							}
-							else
-							{
-								// Functions can be optimized out
-							}
-						}
-					}
-
-					aCharIdx++;
-				}
-
-				aLineNum++;
-			}
-		}
-		else
-		{
-			MessageBoxA(nullptr, (std::string("ERROR: Unable to open ") + aFileName + " for reparsing.").c_str(), "MODVAL ERROR!", MB_OK | MB_ICONERROR);
-			return false;
-		}		
-	}
-
-	if (!hasNewFiles)
-	{
-		if (aFileList.length() == 0)
-			aFileList = "none";
-		MessageBoxA(nullptr, (std::string("WARNING: No file changes detected.  Files parsed: \r\n  ") + aFileList).c_str(), "MODVAL WARNING!", MB_OK | MB_ICONWARNING);
-		return false;
-	}
-
-	return true;
-	*/
 }

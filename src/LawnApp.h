@@ -298,7 +298,7 @@ public:
 	/*inline*/ bool					IsChallengeMode();
 	static /*inline*/ bool			IsEndlessIZombie(GameMode theGameMode);
 	void							CrazyDaveDoneHanding();
-	inline std::string				GetCurrentLevelName() { return __S("Unknown"); }
+	inline std::string				GetCurrentLevelName() { return "Unknown"; }
 	/*inline*/ int					TrophiesNeedForGoldSunflower();
 	/*inline*/ int					GetCurrentChallengeIndex();
 	void							LoadGroup(const char* theGroupName, int theGroupAveMsToLoad);
