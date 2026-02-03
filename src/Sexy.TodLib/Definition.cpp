@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include <sys/stat.h>
 #include <filesystem>
-#include <chrono>
 #include <fstream>
 #include "TodDebug.h"
 #include "Definition.h"
@@ -583,17 +582,11 @@ static std::string DefinitionGetCompiledCacheFullPath(const std::string& theComp
     return GetAppDataPath(aCacheRoot + theCompiledFilePath);
 }
 
-static bool DefinitionGetFileModTime(const std::string& theFilePath, time_t& theTime)
+static bool DefinitionGetFileModTime(const std::string& theFilePath, std::filesystem::file_time_type& theTime)
 {
     std::error_code ec;
-    auto ftime = std::filesystem::last_write_time(Sexy::PathFromU8(theFilePath), ec);
-    if (ec)
-        return false;
-
-    auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-        ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
-    theTime = std::chrono::system_clock::to_time_t(sctp);
-    return true;
+    theTime = std::filesystem::last_write_time(Sexy::PathFromU8(theFilePath), ec);
+    return !ec;
 }
 
 //0x444560 : (void* def, *defMap, eax = string& compiledFilePath)  //esp -= 8
@@ -680,14 +673,14 @@ bool DefinitionIsCompiled(const std::string& theXMLFilePath)
         return true;
 
     std::string aFullCompiledPath = DefinitionGetCompiledCacheFullPath(aCompiledFilePath);
-    time_t aCompiledFileTime = 0;
+    std::filesystem::file_time_type aCompiledFileTime{};
     if (!DefinitionGetFileModTime(aFullCompiledPath, aCompiledFileTime))
     {
         if (!DefinitionGetFileModTime(aCompiledFilePath, aCompiledFileTime))
             return false;
     }
 
-    time_t aXMLFileTime = 0;
+    std::filesystem::file_time_type aXMLFileTime{};
     if (!DefinitionGetFileModTime(theXMLFilePath, aXMLFileTime))
     {
         TodTrace(__S("Can't find source file to compile '%s'"), theXMLFilePath.c_str());
