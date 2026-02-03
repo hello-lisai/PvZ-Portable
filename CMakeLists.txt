@@ -24,13 +24,11 @@ file(GLOB SOURCES
 	src/SexyAppFramework/paklib/*.cpp
 	src/SexyAppFramework/sound/*.cpp
 	src/SexyAppFramework/widget/*.cpp
-	#src/SexyAppFramework/ogg/*.c
 	src/SexyAppFramework/fcaseopen/*.c
 	src/Sexy.TodLib/*.cpp
 	src/Lawn/*.cpp
 	src/Lawn/Widget/*.cpp
 	src/Lawn/System/*.cpp
-	#src/SexyAppFramework/LawnProject.rc
 )
 
 # these files are included and must not be built in the project
