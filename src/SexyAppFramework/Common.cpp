@@ -5,7 +5,8 @@
 #include <cstdlib>
 #include <filesystem>
 #include <chrono>
-#include <stdarg.h>
+#include <cstdarg>
+#include <cstdio>
 
 #ifdef __SWITCH__
 #include <switch.h>
@@ -31,18 +32,18 @@ static inline char ToLowerAscii(char c)
 
 void Sexy::PrintF(const char *text, ...)
 {
-	char str[1024];
-
 	va_list args;
 	va_start(args, text);
-	vsnprintf(str, sizeof(str), text, args);
+	std::string buffer = Sexy::VFormat(text, args);
 	va_end(args);
+	if (buffer.empty())
+		return;
 
 #if defined(__SWITCH__) || defined(__3DS__)
-	svcOutputDebugString(str, sizeof(str));
+	svcOutputDebugString(buffer.c_str(), buffer.size());
 #endif
 
-	fprintf(stdout, "%s", str);
+	std::fwrite(buffer.data(), 1, buffer.size(), stdout);
 }
 
 int Sexy::Rand()
@@ -289,20 +290,7 @@ std::string Sexy::RemoveTrailingSlash(const std::string& theDirectory)
 
 	return std::filesystem::path(theDirectory).lexically_normal().generic_string();
 }
-
-time_t Sexy::GetFileDate(const std::string& theFileName)
-{
-	std::error_code ec;
-	auto ftime = std::filesystem::last_write_time(theFileName, ec);
-	if (ec)
-		return 0;
-
-	auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-		ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
-	return std::chrono::system_clock::to_time_t(sctp);
-}
-
-std::string Sexy::vformat(const char* fmt, va_list argPtr) 
+std::string Sexy::VFormat(const char* fmt, va_list argPtr) 
 {
 	va_list argsCopy;
 	va_copy(argsCopy, argPtr);
@@ -339,7 +327,7 @@ std::string Sexy::StrFormat(const char* fmt ...)
 {
     va_list argList;
     va_start(argList, fmt);
-	std::string result = vformat(fmt, argList);
+	std::string result = VFormat(fmt, argList);
     va_end(argList);
 
     return result;

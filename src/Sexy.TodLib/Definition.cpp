@@ -702,7 +702,7 @@ void DefinitionXmlError(XMLParser* theXmlParser, const char* theFormat, ...)
 {
     va_list argList;
     va_start(argList, theFormat);
-    std::string aFormattedMessage = vformat(theFormat, argList);
+    std::string aFormattedMessage = Sexy::VFormat(theFormat, argList);
     va_end(argList);
 
     int aLine = theXmlParser->GetCurrentLineNum();

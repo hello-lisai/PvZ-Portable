@@ -131,7 +131,7 @@ bool ProfileMgr::RenameProfile(const std::string& theOldName, const std::string&
     else
     {
         // 判断修改前后的用户名是否一致，一致则直接在原存档中进行修改，否则需要额外操作
-        if (_stricmp(theOldName.c_str(), theNewName.c_str()) == 0)
+        if (strcasecmp(theOldName.c_str(), theNewName.c_str()) == 0)
             anOldItr->second.mName = theNewName;
         else
         {

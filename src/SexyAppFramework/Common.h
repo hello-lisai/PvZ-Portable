@@ -28,9 +28,8 @@
 #else
 
 #include <string.h>
+#include <strings.h>
 #include <stdint.h>
-#define _stricmp strcasecmp
-#define _cdecl
 
 #endif
 
@@ -111,7 +110,7 @@ int					Rand();
 int					Rand(int range);
 float				Rand(float range);
 void				SRand(ulong theSeed);
-extern std::string	vformat(const char* fmt, va_list argPtr);
+extern std::string	VFormat(const char* fmt, va_list argPtr);
 extern std::string	StrFormat(const char* fmt ...);
 std::string			GetAppDataFolder();
 void				SetAppDataFolder(const std::string& thePath);
@@ -139,7 +138,6 @@ void				MkDir(const std::string& theDir);
 std::string			GetFileName(const std::string& thePath, bool noExtension = false);
 std::string			GetFileDir(const std::string& thePath, bool withSlash = false);
 std::string			RemoveTrailingSlash(const std::string& theDirectory);
-time_t				GetFileDate(const std::string& theFileName);
 std::string			GetCurDir();
 std::string			GetFullPath(const std::string& theRelPath);
 std::string			GetPathFrom(const std::string& theRelPath, const std::string& theDir);
@@ -203,7 +201,7 @@ inline constexpr uint32_t ByteSwap32(uint32_t v) noexcept
            ((v & 0xFF000000u) >> 24);
 }
 
-struct StringLessNoCase { bool operator()(const std::string &s1, const std::string &s2) const { return _stricmp(s1.c_str(),s2.c_str())<0; } };
+struct StringLessNoCase { bool operator()(const std::string &s1, const std::string &s2) const { return strcasecmp(s1.c_str(),s2.c_str())<0; } };
 
 }
 
