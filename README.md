@@ -6,7 +6,7 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/wszqkzqk/PvZ-Portable)
 
-A **cross-platform** community-driven reimplementation of Plants vs. Zombies: Game of the Year Edition, aiming to bring the **100% authentic PvZ experience** to every platform.
+A **cross-platform** community-driven reimplementation of Plants vs. Zombies: Game of the Year Edition, aiming to bring the **100% authentic experience** of Plants vs. Zombies to every platform.
 
 | 🌿 Authentic | 🎮 Portable | 🛠️ Open |
 | :---: | :---: | :---: |
@@ -14,7 +14,7 @@ A **cross-platform** community-driven reimplementation of Plants vs. Zombies: Ga
 
 ## License
 
-This project is licensed under the **[GNU Lesser General Public License v2.1](LICENSE) or later (LGPL-2.1-or-later)**.
+This project is licensed under the terms of the [**GNU Lesser General Public License v3.0**](https://www.gnu.org/licenses/lgpl-3.0.html) or later (LGPL-3.0-or-later).
 
 * The code is provided "as is", **WITHOUT WARRANTY** of any kind.
 * The **original game IP (Plants vs. Zombies) belongs to PopCap/EA**. This license applies **only to the code implementation** in this repository.
@@ -28,6 +28,14 @@ This project is licensed under the **[GNU Lesser General Public License v2.1](LI
 * Most of the previous re-implementation code of the framework is contributed by [Patoke](https://github.com/Patoke/) and [Headshotnoby](https://github.com/headshot2017/).
 * Project icons and platform-specific logos are created by me (wszqkzqk) with the help of AI image generation tools and are not official assets of PopCap/EA.
 * To play the game using this project you **MUST** have access to the original game files by purchasing it on [EA's official website](https://www.ea.com/games/plants-vs-zombies/plants-vs-zombies) or [Steam](https://store.steampowered.com/app/3590/Plants_vs_Zombies_GOTY_Edition/).
+
+### PopCap Games Framework Acknowledgment
+
+The `SexyAppFramework` directory may contain code originally based on the **PopCap Games Framework**. This code is subject to the permissive **[PopCap Games Framework License](src/SexyAppFramework/LICENSE)**. To the extent that original code remains, the following acknowledgment applies:
+
+> "This product includes portions of the PopCap Games Framework, © 2005-2009 PopCap Games, Inc.  All rights reserved. (http://popcapframework.sourceforge.net/)."
+
+Note that this code has been **heavily refactored**, **optimized** and **modernized** by the community over time.
 
 ## Features
 
@@ -260,8 +268,8 @@ The framework differs from many other APIs in that some class properties are not
 - **[@Patoke](https://www.github.com/Patoke)**: For the incredible initial reimplementation of PvZ GOTY.
 - **[@rspforhp](https://www.github.com/octokatherine)**: For the 0.9.9 version's work.
 - **[@ruslan831](https://github.com/ruslan831)**: For archiving the 0.9.9 version's re-implementation.
+- **PopCap Games**: For creating the amazing game and releasing their framework to the public with a permissive license.
 - **The SDL Team**: For the amazing cross-platform development library that powers this port.
 - **The GLFW Team**: For their work on the windowing library used in the original re-implementation.
 - **The OpenMPT Team**: For libopenmpt, enabling high-quality MO3 music playback.
-- **PopCap Games**: For creating the amazing PvZ franchise.
 - All the contributors who have worked or are actively working in this amazing project.
