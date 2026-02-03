@@ -16,6 +16,11 @@
 #include <cstdint>
 #include <ctime>
 #include <filesystem>
+#include <type_traits>
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
 
 #ifdef _WIN32
 #define NOMINMAX 1
@@ -244,6 +249,23 @@ inline std::string PathToU8(const std::filesystem::path& p)
 inline std::filesystem::path PathFromU8(const std::string& s) { return std::filesystem::path(s); }
 inline std::string PathToU8(const std::filesystem::path& p) { return p.string(); }
 #endif
+
+inline constexpr uint32_t ByteSwap32(uint32_t v) noexcept
+{
+	if (!std::is_constant_evaluated()) {
+#if defined(__has_builtin)
+#	if __has_builtin(__builtin_bswap32)
+		return __builtin_bswap32(v);
+#	endif
+#elif defined(_MSC_VER)
+		return _byteswap_ulong(v);
+#endif
+	}
+    return ((v & 0x000000FFu) << 24) |
+           ((v & 0x0000FF00u) <<  8) |
+           ((v & 0x00FF0000u) >>  8) |
+           ((v & 0xFF000000u) >> 24);
+}
 
 struct StringLessNoCase { bool operator()(const std::string &s1, const std::string &s2) const { return _stricmp(s1.c_str(),s2.c_str())<0; } };
 

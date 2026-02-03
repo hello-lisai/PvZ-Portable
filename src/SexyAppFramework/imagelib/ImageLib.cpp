@@ -112,13 +112,18 @@ Image* GetPNGImage(const std::string& theFileName)
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, nullptr, nullptr,
        nullptr, nullptr, nullptr);
 
-	/* Add filler (or alpha) byte (before/after each RGB triplet) */
 	png_set_expand(png_ptr);
-	png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
-	//png_set_gray_1_2_4_to_8(png_ptr);
+	if constexpr (std::endian::native == std::endian::big)
+	{
+		png_set_filler(png_ptr, 0xff, PNG_FILLER_BEFORE);
+	}
+	else
+	{
+		png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+		png_set_bgr(png_ptr);
+	}
 	png_set_palette_to_rgb(png_ptr);
 	png_set_gray_to_rgb(png_ptr);
-	png_set_bgr(png_ptr);
 
 //	int aNumBytes = png_get_rowbytes(png_ptr, info_ptr) * height / 4;
 	png_bytep* row_pointers = new png_bytep[height];
@@ -210,6 +215,14 @@ Image* GetTGAImage(const std::string& theFileName)
 	anImage->mBits = new uint32_t[anImageWidth*anImageHeight];
 
 	p_fread(anImage->mBits, 4, anImage->mWidth*anImage->mHeight, aTGAFile);
+
+	// TGA stores BGRA in LE; on BE need to byteswap each pixel
+	if constexpr (std::endian::native == std::endian::big)
+	{
+		uint32_t* ptr = anImage->mBits;
+		for (int i = 0; i < anImageWidth * anImageHeight; i++, ptr++)
+			*ptr = Sexy::ByteSwap32(*ptr);
+	}
 
 	p_fclose(aTGAFile);
 

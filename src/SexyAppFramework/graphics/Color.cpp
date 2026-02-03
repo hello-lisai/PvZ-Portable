@@ -14,19 +14,19 @@ Color::Color() :
 }
 
 Color::Color(int theColor) :
-	mRed((theColor   >> 0 ) & 0xFF),
-	mGreen((theColor >> 8 ) & 0xFF),
-	mBlue((theColor  >> 16) & 0xFF),
+	mRed(theColor & 0xFF),
+	mGreen((theColor >> 8) & 0xFF),
+	mBlue((theColor >> 16) & 0xFF),
 	mAlpha((theColor >> 24) & 0xFF)
 {
-	if(mAlpha==0)
+	if (mAlpha == 0)
 		mAlpha = 0xff;
 }
 
 Color::Color(int theColor, int theAlpha) :
-	mRed((theColor   >> 0 ) & 0xFF),
-	mGreen((theColor >> 8 ) & 0xFF),
-	mBlue((theColor  >> 16) & 0xFF),
+	mRed(theColor & 0xFF),
+	mGreen((theColor >> 8) & 0xFF),
+	mBlue((theColor >> 16) & 0xFF),
 	mAlpha(theAlpha)
 {
 }
@@ -127,20 +127,24 @@ int Color::operator[](int theIdx) const
 	}
 }
 
+// Returns 0xAABBGGRR format; on BE, byteswap ensures [R,G,B,A] memory layout for GL
 uint32_t Color::ToInt() const
 {
-	return (mAlpha << 24) | (mRed << 0) | (mGreen << 8) | (mBlue << 16);
+	uint32_t result = (static_cast<uint32_t>(mAlpha) << 24) |
+	                  (static_cast<uint32_t>(mBlue) << 16) |
+	                  (static_cast<uint32_t>(mGreen) << 8) |
+	                  static_cast<uint32_t>(mRed);
+	if constexpr (std::endian::native == std::endian::big)
+		result = ByteSwap32(result);
+	return result;
 }
 
 SexyRGBA Color::ToRGBA() const
 {
-	SexyRGBA anRGBA;
-	anRGBA.r = mRed;
-	anRGBA.g = mGreen;
-	anRGBA.b = mBlue;
-	anRGBA.a = mAlpha;
-
-	return anRGBA;
+	return { static_cast<unsigned char>(mBlue),
+	         static_cast<unsigned char>(mGreen),
+	         static_cast<unsigned char>(mRed),
+	         static_cast<unsigned char>(mAlpha) };
 }
 
 bool Sexy::operator==(const Color& theColor1, const Color& theColor2)
