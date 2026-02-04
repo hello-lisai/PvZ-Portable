@@ -596,7 +596,7 @@ void Board::PutInMissingZombies(int theWaveNumber, ZombiePicker* theZombiePicker
 {
 	for (ZombieType aZombieType = ZombieType::ZOMBIE_NORMAL; aZombieType < ZombieType::NUM_ZOMBIE_TYPES; aZombieType = static_cast<ZombieType>(static_cast<int>(aZombieType) + 1))
 	{
-		if (theZombiePicker->mZombieTypeCount[static_cast<int>(aZombieType)] <= 0 && aZombieType != ZombieType::ZOMBIE_YETI && CanZombieSpawnOnLevel(aZombieType, mLevel))
+		if (theZombiePicker->mZombieTypeCount[aZombieType] <= 0 && aZombieType != ZombieType::ZOMBIE_YETI && CanZombieSpawnOnLevel(aZombieType, mLevel))
 		{
 			PutZombieInWave(aZombieType, theWaveNumber, theZombiePicker);
 		}
@@ -1217,7 +1217,7 @@ bool Board::IsZombieWaveDistributionOk()
 	if (!mApp->IsAdventureMode())
 		return true;
 
-	int aZombieTypeCount[static_cast<int>(ZombieType::NUM_ZOMBIE_TYPES)] = { 0 };
+	int aZombieTypeCount[ZombieType::NUM_ZOMBIE_TYPES] = { 0 };
 	for (int aWave = 0; aWave < mNumWaves; aWave++)
 	{
 		for (int aIndex = 0; aIndex < MAX_ZOMBIES_IN_WAVE; aIndex++)
@@ -1229,13 +1229,13 @@ bool Board::IsZombieWaveDistributionOk()
 			}
 
 			TOD_ASSERT(aZombieType >= 0 && aZombieType < ZombieType::NUM_ZOMBIE_TYPES);
-			aZombieTypeCount[static_cast<int>(aZombieType)]++;
+			aZombieTypeCount[aZombieType]++;
 		}
 	}
 
 	for (ZombieType aZombieType = ZombieType::ZOMBIE_NORMAL; aZombieType < ZombieType::NUM_ZOMBIE_TYPES; aZombieType = static_cast<ZombieType>(static_cast<int>(aZombieType) + 1))
 	{
-		if (aZombieType != ZombieType::ZOMBIE_YETI && CanZombieSpawnOnLevel(aZombieType, mLevel) && aZombieTypeCount[static_cast<int>(aZombieType)] == 0)
+		if (aZombieType != ZombieType::ZOMBIE_YETI && CanZombieSpawnOnLevel(aZombieType, mLevel) && aZombieTypeCount[aZombieType] == 0)
 		{
 			TodTraceAndLog("Didn't spawn required zombie %s, level %d", GetZombieDefinition(aZombieType).mZombieName, mLevel);
 			return false;
@@ -1630,7 +1630,7 @@ Reanimation* Board::CreateRakeReanim(float theRakeX, float theRakeY, int theRend
 //0x40B9C0
 void Board::PlaceRake()
 {
-	if (!mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_RAKE)])
+	if (!mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_RAKE])
 		return;
 
 	int aGridX = 7;
@@ -1667,7 +1667,7 @@ void Board::PlaceRake()
 		return;
 
 	int aGridY = TodPickFromWeightedArray(aPickArray, aPickCount);
-	mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_RAKE)]--;
+	mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_RAKE]--;
 	GridItem* aRake = mGridItems.DataArrayAlloc();
 	aRake->mGridItemType = GridItemType::GRIDITEM_RAKE;
 	aRake->mGridX = aGridX;
@@ -2495,7 +2495,7 @@ ZombieType Board::GetIntroducedZombieType()
 //0x40D770
 ZombieType Board::PickGraveRisingZombieType()
 {
-	TodWeightedArray aZombieWeightArray[static_cast<int>(ZombieType::NUM_ZOMBIE_TYPES)];
+	TodWeightedArray aZombieWeightArray[ZombieType::NUM_ZOMBIE_TYPES];
 	int aCount = 2;
 	aZombieWeightArray[0].mItem = ZombieType::ZOMBIE_NORMAL;
 	aZombieWeightArray[0].mWeight = GetZombieDefinition(ZombieType::ZOMBIE_NORMAL).mPickWeight;
@@ -3235,7 +3235,7 @@ bool Board::IsPlantInGoldWateringCanRange(int theMouseX, int theMouseY, Plant* t
 //0x40E940
 void Board::HighlightPlantsForMouse(int theMouseX, int theMouseY)
 {
-	if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_WATERING_CAN && mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_GOLD_WATERINGCAN)])
+	if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_WATERING_CAN && mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_GOLD_WATERINGCAN])
 	{
 		Plant* aPlant = nullptr;
 		while (IteratePlants(aPlant))
@@ -4495,7 +4495,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 		break;
 
 	case GameObjectType::OBJECT_TYPE_FERTILIZER:
-		if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_FERTILIZER)] > PURCHASE_COUNT_OFFSET)
+		if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_FERTILIZER] > PURCHASE_COUNT_OFFSET)
 		{
 			mCursorObject->mCursorType = CursorType::CURSOR_TYPE_FERTILIZER;
 		}
@@ -4506,7 +4506,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 		break;
 
 	case GameObjectType::OBJECT_TYPE_BUG_SPRAY:
-		if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_BUG_SPRAY)] > PURCHASE_COUNT_OFFSET)
+		if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_BUG_SPRAY] > PURCHASE_COUNT_OFFSET)
 		{
 			mCursorObject->mCursorType = CursorType::CURSOR_TYPE_BUG_SPRAY;
 		}
@@ -4522,7 +4522,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 		break;
 
 	case GameObjectType::OBJECT_TYPE_CHOCOLATE:
-		if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_CHOCOLATE)] > PURCHASE_COUNT_OFFSET)
+		if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_CHOCOLATE] > PURCHASE_COUNT_OFFSET)
 		{
 			mCursorObject->mCursorType = CursorType::CURSOR_TYPE_CHOCOLATE;
 		}
@@ -4550,7 +4550,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 	case GameObjectType::OBJECT_TYPE_TREE_FOOD:
 		if (mChallenge->TreeOfWisdomCanFeed())
 		{
-			if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_TREE_FOOD)] > PURCHASE_COUNT_OFFSET)
+			if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_TREE_FOOD] > PURCHASE_COUNT_OFFSET)
 			{
 				mCursorObject->mCursorType = CursorType::CURSOR_TYPE_TREE_FOOD;
 			}
@@ -7022,7 +7022,7 @@ void Board::DrawZenButtons(Graphics* g)
 
 			if (aTool == GameObjectType::OBJECT_TYPE_WATERING_CAN)
 			{
-				if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_GOLD_WATERINGCAN)])
+				if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_GOLD_WATERINGCAN])
 				{
 					g->DrawImage(Sexy::IMAGE_WATERINGCANGOLD, aButtonRect.mX - 2, aButtonRect.mY + aOffsetY - 6);
 				}
@@ -7033,7 +7033,8 @@ void Board::DrawZenButtons(Graphics* g)
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_FERTILIZER)
 			{
-				int aCharges = mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_FERTILIZER)] - PURCHASE_COUNT_OFFSET;
+				uint32_t aPurchase = mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_FERTILIZER];
+				int aCharges = aPurchase > PURCHASE_COUNT_OFFSET ? aPurchase - PURCHASE_COUNT_OFFSET : 0;
 				if (aCharges == 0)
 				{
 					g->SetColorizeImages(true);
@@ -7052,7 +7053,8 @@ void Board::DrawZenButtons(Graphics* g)
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_BUG_SPRAY)
 			{
-				int aCharges = mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_BUG_SPRAY)] - PURCHASE_COUNT_OFFSET;
+				uint32_t aPurchase = mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_BUG_SPRAY];
+				int aCharges = aPurchase > PURCHASE_COUNT_OFFSET ? aPurchase - PURCHASE_COUNT_OFFSET : 0;
 				if (aCharges == 0)
 				{
 					g->SetColorizeImages(true);
@@ -7070,7 +7072,8 @@ void Board::DrawZenButtons(Graphics* g)
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_CHOCOLATE)
 			{
-				int aCharges = mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_CHOCOLATE)] - PURCHASE_COUNT_OFFSET;
+				uint32_t aPurchase = mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_CHOCOLATE];
+				int aCharges = aPurchase > PURCHASE_COUNT_OFFSET ? aPurchase - PURCHASE_COUNT_OFFSET : 0;
 				if (aCharges == 0)
 				{
 					g->SetColorizeImages(true);
@@ -7100,12 +7103,12 @@ void Board::DrawZenButtons(Graphics* g)
 			}
 			else if (aTool == GameObjectType::OBJECT_TYPE_TREE_FOOD)
 			{
-				int aCharges = mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_TREE_FOOD)] - PURCHASE_COUNT_OFFSET;
-				if (aCharges <= 0)
+				uint32_t aPurchase = mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_TREE_FOOD];
+				int aCharges = aPurchase > PURCHASE_COUNT_OFFSET ? aPurchase - PURCHASE_COUNT_OFFSET : 0;
+				if (aCharges == 0)
 				{
 					g->SetColorizeImages(true);
 					g->SetColor(Color(128, 128, 128));
-					aCharges = 0;
 				}
 				if (!mChallenge->TreeOfWisdomCanFeed())
 				{
@@ -8060,9 +8063,9 @@ void Board::KeyChar(char theChar)
 					else if (aNeed == PottedPlantNeed::PLANTNEED_FERTILIZER)
 					{
 						aPlant->mHighlighted = true;
-						if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_FERTILIZER)] <= PURCHASE_COUNT_OFFSET)
+						if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_FERTILIZER] <= PURCHASE_COUNT_OFFSET)
 						{
-							mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_FERTILIZER)] = PURCHASE_COUNT_OFFSET + 1;
+							mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_FERTILIZER] = PURCHASE_COUNT_OFFSET + 1;
 						}
 						mApp->mZenGarden->MouseDownWithFeedingTool(aPlant->mX, aPlant->mY, CursorType::CURSOR_TYPE_FERTILIZER);
 						return;
@@ -8070,9 +8073,9 @@ void Board::KeyChar(char theChar)
 					else if (aNeed == PottedPlantNeed::PLANTNEED_BUGSPRAY)
 					{
 						aPlant->mHighlighted = true;
-						if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_BUG_SPRAY)] <= PURCHASE_COUNT_OFFSET)
+						if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_BUG_SPRAY] <= PURCHASE_COUNT_OFFSET)
 						{
-							mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_BUG_SPRAY)] = PURCHASE_COUNT_OFFSET + 1;
+							mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_BUG_SPRAY] = PURCHASE_COUNT_OFFSET + 1;
 						}
 						mApp->mZenGarden->MouseDownWithFeedingTool(aPlant->mX, aPlant->mY, CursorType::CURSOR_TYPE_BUG_SPRAY);
 						return;
@@ -8118,13 +8121,13 @@ void Board::KeyChar(char theChar)
 
 		if (theChar == 'c')
 		{
-			if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_CHOCOLATE)] < PURCHASE_COUNT_OFFSET)
+			if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_CHOCOLATE] < PURCHASE_COUNT_OFFSET)
 			{
-				mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_CHOCOLATE)] = PURCHASE_COUNT_OFFSET + 1;
+				mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_CHOCOLATE] = PURCHASE_COUNT_OFFSET + 1;
 			}
 			else
 			{
-				mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_CHOCOLATE)]++;
+				mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_CHOCOLATE]++;
 			}
 			return;
 		}
@@ -8152,9 +8155,9 @@ void Board::KeyChar(char theChar)
 	{
 		if (theChar == 'f')
 		{
-			if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_TREE_FOOD)] <= PURCHASE_COUNT_OFFSET)
+			if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_TREE_FOOD] <= PURCHASE_COUNT_OFFSET)
 			{
-				mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_TREE_FOOD)] = PURCHASE_COUNT_OFFSET + 1;
+				mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_TREE_FOOD] = PURCHASE_COUNT_OFFSET + 1;
 			}
 			mChallenge->TreeOfWisdomFertilize();
 		}
@@ -8962,7 +8965,7 @@ int Board::GetNumSeedsInBank()
 		return 9;
 	}
 
-	int aNumSeeds = mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PACKET_UPGRADE)] + 6;
+	int aNumSeeds = mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PACKET_UPGRADE] + 6;
 	int aSeedsAvailable = mApp->GetSeedsAvailable();
 	return std::min(aNumSeeds, aSeedsAvailable);
 }
@@ -9955,33 +9958,33 @@ bool Board::CanUseGameObject(GameObjectType theGameObject)
 	if (theGameObject == GameObjectType::OBJECT_TYPE_NEXT_GARDEN)
 	{
 		return 
-			mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_MUSHROOM_GARDEN)] || 
-			mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_AQUARIUM_GARDEN)] ||
-			mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_TREE_OF_WISDOM)];
+			mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_MUSHROOM_GARDEN] || 
+			mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_AQUARIUM_GARDEN] ||
+			mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_TREE_OF_WISDOM];
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_FERTILIZER)
 	{
-		return mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_FERTILIZER)] > 0;
+		return mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_FERTILIZER] > 0;
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_BUG_SPRAY)
 	{
-		return mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_BUG_SPRAY)] > 0;
+		return mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_BUG_SPRAY] > 0;
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_PHONOGRAPH)
 	{
-		return  mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PHONOGRAPH)] > 0;
+		return  mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PHONOGRAPH] > 0;
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_CHOCOLATE)
 	{
-		return mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_CHOCOLATE)] > 0;
+		return mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_CHOCOLATE] > 0;
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_WHEELBARROW)
 	{
-		return mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_WHEEL_BARROW)] > 0;
+		return mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_WHEEL_BARROW] > 0;
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_GLOVE)
 	{
-		return mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_GARDENING_GLOVE)] > 0;
+		return mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_GARDENING_GLOVE] > 0;
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_MONEY_SIGN)
 	{

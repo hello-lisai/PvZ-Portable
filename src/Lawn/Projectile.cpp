@@ -1238,7 +1238,7 @@ void Projectile::ConvertToPea(int theGridX)
 
 ProjectileDefinition& Projectile::GetProjectileDef()
 {
-	ProjectileDefinition& aProjectileDef = gProjectileDefinition[static_cast<int>(mProjectileType)];
+	ProjectileDefinition& aProjectileDef = gProjectileDefinition[mProjectileType];
 	TOD_ASSERT(aProjectileDef.mProjectileType == mProjectileType);
 
 	return aProjectileDef;

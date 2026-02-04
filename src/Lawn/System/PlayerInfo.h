@@ -53,7 +53,7 @@ public:
     int32_t             mCoins;                             //+0x28
     int32_t             mFinishedAdventure;                 //+0x2C
     int32_t             mChallengeRecords[100];             //+0x30
-    int32_t             mPurchases[80];                     //+0x1C0
+    uint32_t            mPurchases[80];                     //+0x1C0
     int32_t             mPlayTimeActivePlayer;              //+0x300
     int32_t             mPlayTimeInactivePlayer;            //+0x304
     int32_t             mHasUsedCheatKeys;                  //+0x308

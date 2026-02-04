@@ -528,7 +528,7 @@ void GridItem::UpdatePortal()
 //0x44E520
 void GridItem::UpdateScaryPot()
 {
-    if (mApp->mTodCheatKeys && mApp->mWidgetManager->mKeyDown[static_cast<int>(KeyCode::KEYCODE_SHIFT)])
+    if (mApp->mTodCheatKeys && mApp->mWidgetManager->mKeyDown[KeyCode::KEYCODE_SHIFT])
     {
         if (mTransparentCounter < 50)
         {

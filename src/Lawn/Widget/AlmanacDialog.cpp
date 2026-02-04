@@ -696,5 +696,5 @@ void AlmanacInitForPlayer()
 
 void AlmanacPlayerDefeatedZombie(ZombieType theZombieType)
 {
-	gZombieDefeated[static_cast<int>(theZombieType)] = true;
+	gZombieDefeated[theZombieType] = true;
 }

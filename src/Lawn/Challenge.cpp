@@ -991,15 +991,15 @@ SeedType Challenge::BeghouledPickSeed(int theGridX, int theGridY, BeghouledBoard
 		default:	TOD_ASSERT(false);								break;
 		}
 
-		if (mBeghouledPurcasedUpgrade[static_cast<int>(BeghouledUpgrade::BEGHOULED_UPGRADE_REPEATER)] && aSeedType == SeedType::SEED_PEASHOOTER)
+		if (mBeghouledPurcasedUpgrade[BeghouledUpgrade::BEGHOULED_UPGRADE_REPEATER] && aSeedType == SeedType::SEED_PEASHOOTER)
 		{
 			aSeedType = SeedType::SEED_REPEATER;
 		}
-		if (mBeghouledPurcasedUpgrade[static_cast<int>(BeghouledUpgrade::BEGHOULED_UPGRADE_FUMESHROOM)] && aSeedType == SeedType::SEED_PUFFSHROOM)
+		if (mBeghouledPurcasedUpgrade[BeghouledUpgrade::BEGHOULED_UPGRADE_FUMESHROOM] && aSeedType == SeedType::SEED_PUFFSHROOM)
 		{
 			aSeedType = SeedType::SEED_FUMESHROOM;
 		}
-		if (mBeghouledPurcasedUpgrade[static_cast<int>(BeghouledUpgrade::BEGHOULED_UPGRADE_TALLNUT)] && aSeedType == SeedType::SEED_WALLNUT)
+		if (mBeghouledPurcasedUpgrade[BeghouledUpgrade::BEGHOULED_UPGRADE_TALLNUT] && aSeedType == SeedType::SEED_WALLNUT)
 		{
 			aSeedType = SeedType::SEED_TALLNUT;
 		}
@@ -2551,7 +2551,7 @@ void Challenge::InitZombieWavesFromList(ZombieType* theZombieList, int theListLe
 {
 	for (int i = 0; i < theListLength; i++)
 	{
-		mBoard->mZombieAllowed[static_cast<int>(theZombieList[i])] = true;
+		mBoard->mZombieAllowed[theZombieList[i]] = true;
 	}
 }
 

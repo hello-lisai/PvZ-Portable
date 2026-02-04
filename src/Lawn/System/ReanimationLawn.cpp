@@ -377,11 +377,11 @@ void ReanimatorCache::DrawCachedPlant(Graphics* g, float thePosX, float thePosY,
 	}
 	else
 	{
-		aImage = mPlantImages[static_cast<int>(theSeedType)];
+		aImage = mPlantImages[theSeedType];
 		if (aImage == nullptr)
 		{
 			aImage = MakeCachedPlantFrame(theSeedType, DrawVariation::VARIATION_NORMAL);
-			mPlantImages[static_cast<int>(theSeedType)] = aImage;
+			mPlantImages[theSeedType] = aImage;
 		}
 	}
 
@@ -398,9 +398,9 @@ void ReanimatorCache::DrawCachedMower(Graphics* g, float thePosX, float thePosY,
 {
 	TOD_ASSERT(theMowerType >= 0 && theMowerType < LawnMowerType::NUM_MOWER_TYPES);
 	
-	if (mLawnMowers[static_cast<int>(theMowerType)] == nullptr)
-		mLawnMowers[static_cast<int>(theMowerType)] = MakeCachedMowerFrame(theMowerType);
-	TodDrawImageScaledF(g, mLawnMowers[static_cast<int>(theMowerType)], thePosX - 20.0f, thePosY, g->mScaleX, g->mScaleY);
+	if (mLawnMowers[theMowerType] == nullptr)
+		mLawnMowers[theMowerType] = MakeCachedMowerFrame(theMowerType);
+	TodDrawImageScaledF(g, mLawnMowers[theMowerType], thePosX - 20.0f, thePosY, g->mScaleX, g->mScaleY);
 }
 
 //0x470170
@@ -408,7 +408,7 @@ void ReanimatorCache::DrawCachedZombie(Graphics* g, float thePosX, float thePosY
 {
 	TOD_ASSERT(theZombieType >= 0 && theZombieType < ZombieType::NUM_CACHED_ZOMBIE_TYPES);
 	
-	if (mZombieImages[static_cast<int>(theZombieType)] == nullptr)
-		mZombieImages[static_cast<int>(theZombieType)] = MakeCachedZombieFrame(theZombieType);
-	TodDrawImageScaledF(g, mZombieImages[static_cast<int>(theZombieType)], thePosX, thePosY, g->mScaleX, g->mScaleY);
+	if (mZombieImages[theZombieType] == nullptr)
+		mZombieImages[theZombieType] = MakeCachedZombieFrame(theZombieType);
+	TodDrawImageScaledF(g, mZombieImages[theZombieType], thePosX, thePosY, g->mScaleX, g->mScaleY);
 }

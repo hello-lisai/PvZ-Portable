@@ -368,7 +368,7 @@ void CutScene::PreloadResources()
 	{
 		ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_CRAZY_DAVE, true);
 	}
-	if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_RAKE)])
+	if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_RAKE])
 	{
 		ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_RAKE, true);
 	}
@@ -505,7 +505,7 @@ void CutScene::PlaceStreetZombies()
 	// 以下统计出怪列表中各种可预览的僵尸的数量
 	// int aZombieValueTotal = 0;
 	int aTotalZombieCount = 0;
-	int aZombieTypeCount[static_cast<int>(ZombieType::NUM_ZOMBIE_TYPES)] = { 0 };
+	int aZombieTypeCount[ZombieType::NUM_ZOMBIE_TYPES] = { 0 };
 	TOD_ASSERT(mBoard->mNumWaves <= MAX_ZOMBIE_WAVES);
 
 	for (int aWave = 0; aWave < mBoard->mNumWaves; aWave++)
@@ -558,7 +558,7 @@ void CutScene::PlaceStreetZombies()
 	}
 	if (mBoard->StageHasPool())
 	{
-		aZombieTypeCount[static_cast<int>(ZombieType::ZOMBIE_DUCKY_TUBE)] = 1;  // 泳池关卡，必定出现鸭子僵尸预览
+		aZombieTypeCount[ZombieType::ZOMBIE_DUCKY_TUBE] = 1;  // 泳池关卡，必定出现鸭子僵尸预览
 	}
 	
 	bool aZombieGrid[5][5] = {{ false }};
@@ -575,16 +575,16 @@ void CutScene::PlaceStreetZombies()
 	// 优先放置较大体型的僵尸，然后再放置较小体型的僵尸
 	for (ZombieType aZombieType = ZombieType::ZOMBIE_NORMAL; aZombieType < ZombieType::NUM_ZOMBIE_TYPES; aZombieType = static_cast<ZombieType>(static_cast<int>(aZombieType) + 1))
 	{
-		if (aZombieTypeCount[static_cast<int>(aZombieType)] && (Is2x2Zombie(aZombieType) || aZombieType == ZombieType::ZOMBIE_ZAMBONI))
+		if (aZombieTypeCount[aZombieType] && (Is2x2Zombie(aZombieType) || aZombieType == ZombieType::ZOMBIE_ZAMBONI))
 		{
 			FindAndPlaceZombie(aZombieType, aZombieGrid);
 		}
 	}
 	for (ZombieType aZombieType = ZombieType::ZOMBIE_NORMAL; aZombieType < ZombieType::NUM_ZOMBIE_TYPES; aZombieType = static_cast<ZombieType>(static_cast<int>(aZombieType) + 1))
 	{
-		if (aZombieTypeCount[static_cast<int>(aZombieType)] && !Is2x2Zombie(aZombieType) && aZombieType != ZombieType::ZOMBIE_ZAMBONI)
+		if (aZombieTypeCount[aZombieType] && !Is2x2Zombie(aZombieType) && aZombieType != ZombieType::ZOMBIE_ZAMBONI)
 		{
-			int aZombieNumInWave = aZombieTypeCount[static_cast<int>(aZombieType)];
+			int aZombieNumInWave = aZombieTypeCount[aZombieType];
 			int aZombiePreviewNum = aZombieNumInWave * aPreviewCapacity / aTotalZombieCount;
 			aZombiePreviewNum = ClampInt(aZombiePreviewNum, 1, aZombieNumInWave);
 			for (int i = 0; i < aZombiePreviewNum; i++)
@@ -841,7 +841,7 @@ void CutScene::StartLevelIntro()
 	}
 	else if (mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
 	{
-		if (mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_TREE_FOOD)] < PURCHASE_COUNT_OFFSET)
+		if (mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_TREE_FOOD] < PURCHASE_COUNT_OFFSET)
 		{
 			mCrazyDaveDialogStart = 3200;
 			mBoard->mStoreButton->mBtnNoDraw = true;
@@ -1661,7 +1661,7 @@ void CutScene::AdvanceCrazyDaveDialog(bool theJustSkipping)
 	if ((aMessageIndex == 1503 || aMessageIndex == 1553) && !theJustSkipping)
 	{
 		int aCost = StoreScreen::GetItemCost(StoreItem::STORE_ITEM_PACKET_UPGRADE);
-		int aNumPackets = mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PACKET_UPGRADE)];
+		int aNumPackets = mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PACKET_UPGRADE];
 		std::string aBodyString = TodReplaceNumberString("[UPGRADE_DIALOG_BODY]", "{SLOTS}", aNumPackets + 1);
 		std::string aAmountString = mApp->GetMoneyString(mApp->mPlayerInfo->mCoins);
 		// 创建询问是否升级卡槽格数的对话
@@ -1674,7 +1674,7 @@ void CutScene::AdvanceCrazyDaveDialog(bool theJustSkipping)
 		if (aResult == Dialog::ID_YES)
 		{
 			mApp->mPlayerInfo->AddCoins(-aCost);
-			mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PACKET_UPGRADE)]++;
+			mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PACKET_UPGRADE]++;
 			mApp->WriteCurrentUserConfig();
 			mBoard->mSeedBank->UpdateWidth();
 

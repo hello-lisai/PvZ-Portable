@@ -6,7 +6,7 @@ TrailDefinition* gTrailDefArray;  //[0x6A9F24]
 int gTrailParamArraySize;  //[0x6A9F28]
 TrailParams* gTrailParamArray;  //[0x6A9F2C]
 
-TrailParams gLawnTrailArray[static_cast<int>(TrailType::NUM_TRAILS)] = { //0x6A19F4
+TrailParams gLawnTrailArray[TrailType::NUM_TRAILS] = { //0x6A19F4
 	{ TrailType::TRAIL_ICE, "particles/IceTrail.trail" }
 };
 
@@ -209,14 +209,14 @@ void Trail::Draw(Graphics* g)
 		TrailPoint& aPointNext = mTrailPoints[i + 1];
 		float aUCur = 1.0f - i / static_cast<float>(mNumTrailPoints - 1);
 		float aUNext = 1.0f - (i + 1) / static_cast<float>(mNumTrailPoints - 1);
-		float aWidthOverLengthCur = FloatTrackEvaluate(mDefinition->mWidthOverLength, aUCur, mTrailInterp[static_cast<int>(TrailTracks::TRACK_WIDTH_OVER_LENGTH)]);
-		float aWidthOverLengthNext = FloatTrackEvaluate(mDefinition->mWidthOverLength, aUNext, mTrailInterp[static_cast<int>(TrailTracks::TRACK_WIDTH_OVER_LENGTH)]);
-		float aWidthOverTimeCur = FloatTrackEvaluate(mDefinition->mWidthOverTime, aTimeValue, mTrailInterp[static_cast<int>(TrailTracks::TRACK_WIDTH_OVER_TIME)]);
-		float aWidthOverTimeNext = FloatTrackEvaluate(mDefinition->mWidthOverTime, aTimeValue, mTrailInterp[static_cast<int>(TrailTracks::TRACK_WIDTH_OVER_TIME)]);
-		float aAlphaOverLengthCur = FloatTrackEvaluate(mDefinition->mAlphaOverLength, aUCur, mTrailInterp[static_cast<int>(TrailTracks::TRACK_ALPHA_OVER_LENGTH)]);
-		float aAlphaOverLengthNext = FloatTrackEvaluate(mDefinition->mAlphaOverLength, aUNext, mTrailInterp[static_cast<int>(TrailTracks::TRACK_ALPHA_OVER_LENGTH)]);
-		float aAlphaOverTimeCur = FloatTrackEvaluate(mDefinition->mAlphaOverTime, aTimeValue, mTrailInterp[static_cast<int>(TrailTracks::TRACK_ALPHA_OVER_TIME)]);
-		float aAlphaOverTimeNext = FloatTrackEvaluate(mDefinition->mAlphaOverTime, aTimeValue, mTrailInterp[static_cast<int>(TrailTracks::TRACK_ALPHA_OVER_TIME)]);
+		float aWidthOverLengthCur = FloatTrackEvaluate(mDefinition->mWidthOverLength, aUCur, mTrailInterp[TrailTracks::TRACK_WIDTH_OVER_LENGTH]);
+		float aWidthOverLengthNext = FloatTrackEvaluate(mDefinition->mWidthOverLength, aUNext, mTrailInterp[TrailTracks::TRACK_WIDTH_OVER_LENGTH]);
+		float aWidthOverTimeCur = FloatTrackEvaluate(mDefinition->mWidthOverTime, aTimeValue, mTrailInterp[TrailTracks::TRACK_WIDTH_OVER_TIME]);
+		float aWidthOverTimeNext = FloatTrackEvaluate(mDefinition->mWidthOverTime, aTimeValue, mTrailInterp[TrailTracks::TRACK_WIDTH_OVER_TIME]);
+		float aAlphaOverLengthCur = FloatTrackEvaluate(mDefinition->mAlphaOverLength, aUCur, mTrailInterp[TrailTracks::TRACK_ALPHA_OVER_LENGTH]);
+		float aAlphaOverLengthNext = FloatTrackEvaluate(mDefinition->mAlphaOverLength, aUNext, mTrailInterp[TrailTracks::TRACK_ALPHA_OVER_LENGTH]);
+		float aAlphaOverTimeCur = FloatTrackEvaluate(mDefinition->mAlphaOverTime, aTimeValue, mTrailInterp[TrailTracks::TRACK_ALPHA_OVER_TIME]);
+		float aAlphaOverTimeNext = FloatTrackEvaluate(mDefinition->mAlphaOverTime, aTimeValue, mTrailInterp[TrailTracks::TRACK_ALPHA_OVER_TIME]);
 		int anAlphaCur = ClampInt(FloatRoundToInt(aAlphaOverLengthCur * aAlphaOverTimeCur * mColorOverride.mAlpha), 0, 255);
 		int anAlphaNext = ClampInt(FloatRoundToInt(aAlphaOverLengthNext * aAlphaOverTimeNext * mColorOverride.mAlpha), 0, 255);
 		Sexy::Color aColorCur = mColorOverride;
@@ -285,7 +285,7 @@ void TrailHolder::DisposeHolder()
 Trail* TrailHolder::AllocTrail(int theRenderOrder, TrailType theTrailType)
 {
 	TOD_ASSERT(theTrailType >= 0 && theTrailType < gTrailDefCount);
-	return AllocTrailFromDef(theRenderOrder, &gTrailDefArray[static_cast<int>(theTrailType)]);
+	return AllocTrailFromDef(theRenderOrder, &gTrailDefArray[theTrailType]);
 }
 
 Trail* TrailHolder::AllocTrailFromDef(int theRenderOrder, TrailDefinition* theDefinition)

@@ -170,7 +170,7 @@ Image* FilterEffectGetImage(Image* theImage, FilterEffect theFilterEffect)
 {
 	TOD_ASSERT(theFilterEffect >= 0 && theFilterEffect < FilterEffect::NUM_FILTER_EFFECTS);
 
-	ImageFilterMap& aFilterMap = gFilterMap[static_cast<int>(theFilterEffect)];
+	ImageFilterMap& aFilterMap = gFilterMap[theFilterEffect];
 	ImageFilterMap::iterator it = aFilterMap.find(theImage);
 	if (it != aFilterMap.end())
 		return it->second;

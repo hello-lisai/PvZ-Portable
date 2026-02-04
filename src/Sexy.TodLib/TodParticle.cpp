@@ -11,7 +11,7 @@ TodParticleDefinition* gParticleDefArray;   // [0x6A9F0C]
 int gParticleParamArraySize;				// [0x6A9F10]
 ParticleParams* gParticleParamArray;		// [0x6A9F14]
 
-ParticleParams gLawnParticleArray[static_cast<int>(ParticleEffect::NUM_PARTICLES)] = {
+ParticleParams gLawnParticleArray[ParticleEffect::NUM_PARTICLES] = {
 	{ ParticleEffect::PARTICLE_MELONSPLASH, "particles/MelonImpact.xml" },
 	{ ParticleEffect::PARTICLE_WINTERMELON, "particles/WinterMelonImpact.xml" },
 	{ ParticleEffect::PARTICLE_FUMECLOUD, "particles/FumeCloud.xml" },
@@ -460,7 +460,7 @@ TodParticle* TodParticleEmitter::SpawnParticle(int theIndex, int theSpawnCount)
 
 float TodParticleEmitter::ParticleTrackEvaluate(FloatParameterTrack& theTrack, TodParticle* theParticle, ParticleTracks theParticleTrack)
 {
-	return FloatTrackEvaluate(theTrack, theParticle->mParticleTimeValue, theParticle->mParticleInterp[static_cast<int>(theParticleTrack)]);
+	return FloatTrackEvaluate(theTrack, theParticle->mParticleTimeValue, theParticle->mParticleInterp[theParticleTrack]);
 }
 
 //0x516820
@@ -567,7 +567,7 @@ void TodParticleEmitter::UpdateParticleField(TodParticle* theParticle, ParticleF
 
 float TodParticleEmitter::SystemTrackEvaluate(FloatParameterTrack& theTrack, ParticleSystemTracks theSystemTrack)
 {
-	return FloatTrackEvaluate(theTrack, mSystemTimeValue, mTrackInterp[static_cast<int>(theSystemTrack)]);
+	return FloatTrackEvaluate(theTrack, mSystemTimeValue, mTrackInterp[theSystemTrack]);
 }
 
 //0x516D70
@@ -1294,5 +1294,5 @@ TodParticleSystem* TodParticleHolder::AllocParticleSystemFromDef(float theX, flo
 TodParticleSystem* TodParticleHolder::AllocParticleSystem(float theX, float theY, int theRenderOrder, ParticleEffect theParticleEffect)
 {
 	TOD_ASSERT(static_cast<int>(theParticleEffect) >= 0 && static_cast<int>(theParticleEffect) < gParticleDefCount);
-	return AllocParticleSystemFromDef(theX, theY, theRenderOrder, &gParticleDefArray[static_cast<int>(theParticleEffect)], theParticleEffect);
+	return AllocParticleSystemFromDef(theX, theY, theRenderOrder, &gParticleDefArray[theParticleEffect], theParticleEffect);
 }

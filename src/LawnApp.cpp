@@ -2417,35 +2417,35 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 
 	if (theSeedType == SeedType::SEED_TWINSUNFLOWER)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_TWINSUNFLOWER)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_TWINSUNFLOWER] > 0;
 	}
 	if (theSeedType == SeedType::SEED_GLOOMSHROOM)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_GLOOMSHROOM)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GLOOMSHROOM] > 0;
 	}
 	if (theSeedType == SeedType::SEED_CATTAIL)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_CATTAIL)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_CATTAIL] > 0;
 	}
 	if (theSeedType == SeedType::SEED_WINTERMELON)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_WINTERMELON)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_WINTERMELON] > 0;
 	}
 	if (theSeedType == SeedType::SEED_GOLD_MAGNET)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_GOLD_MAGNET)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GOLD_MAGNET] > 0;
 	}
 	if (theSeedType == SeedType::SEED_SPIKEROCK)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_SPIKEROCK)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_SPIKEROCK] > 0;
 	}
 	if (theSeedType == SeedType::SEED_COBCANNON)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_COBCANNON)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_COBCANNON] > 0;
 	}
 	if (theSeedType == SeedType::SEED_IMITATER)
 	{
-		return mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_PLANT_IMITATER)] > 0;
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_IMITATER] > 0;
 	}
 
 	return theSeedType < GetSeedsAvailable();

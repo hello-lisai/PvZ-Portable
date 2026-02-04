@@ -457,7 +457,7 @@ void CreditScreen::PreLoadCredits()
     ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_SUNSHROOM, true);
     ReanimationPreload(ReanimationType::REANIM_SUNSHROOM);
 
-    ReanimatorDefinition* aMain2Def = &gReanimatorDefArray[static_cast<int>(ReanimationType::REANIM_CREDITS_MAIN2)];
+    ReanimatorDefinition* aMain2Def = &gReanimatorDefArray[ReanimationType::REANIM_CREDITS_MAIN2];
     for (int aTrackIndex = 0; aTrackIndex < aMain2Def->mTracks.count; aTrackIndex++)
     {
         ReanimatorTrack* aTrack = &aMain2Def->mTracks.tracks[aTrackIndex];
@@ -470,7 +470,7 @@ void CreditScreen::PreLoadCredits()
             }
         }
     }
-    ReanimatorDefinition* aMain3Def = &gReanimatorDefArray[static_cast<int>(ReanimationType::REANIM_CREDITS_MAIN3)];
+    ReanimatorDefinition* aMain3Def = &gReanimatorDefArray[ReanimationType::REANIM_CREDITS_MAIN3];
     for (int aTrackIndex = 0; aTrackIndex < aMain3Def->mTracks.count; aTrackIndex++)
     {
         ReanimatorTrack* aTrack = &aMain3Def->mTracks.tracks[aTrackIndex];
@@ -483,7 +483,7 @@ void CreditScreen::PreLoadCredits()
             }
         }
     }
-    ReanimatorDefinition* aUndeadDef = &gReanimatorDefArray[static_cast<int>(ReanimationType::REANIM_CREDITS_WEARETHEUNDEAD)];
+    ReanimatorDefinition* aUndeadDef = &gReanimatorDefArray[ReanimationType::REANIM_CREDITS_WEARETHEUNDEAD];
     for (int aTrackIndex = 0; aTrackIndex < aUndeadDef->mTracks.count; aTrackIndex++)
     {
         ReanimatorTrack* aTrack = &aUndeadDef->mTracks.tracks[aTrackIndex];
