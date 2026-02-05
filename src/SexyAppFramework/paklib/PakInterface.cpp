@@ -181,7 +181,7 @@ PFILE* PakInterface::FOpen(const char* theFileName, const char* anAccess)
 
 	const std::string& aResourceBase = Sexy::GetResourceFolder();
 	FILE* aFP = nullptr;
-	if (!aResourceBase.empty() && !std::filesystem::path(theFileName).is_absolute())
+	if (!aResourceBase.empty() && !std::filesystem::path(theFileName).has_root_directory())
 	{
 		aFP = fcaseopenat(aResourceBase.c_str(), theFileName, anAccess);
 	}
