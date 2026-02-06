@@ -1320,17 +1320,17 @@ Image* ImageLib::GetImage(const std::string& theFilename, bool lookForAlphaImage
 
 	Image* anImage = nullptr;
 
-	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".tga") == 0) || (anExt.length() == 0)))
-		anImage = GetTGAImage(aFilename + ".tga");
+	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".png") == 0) || (anExt.length() == 0)))
+		anImage = GetPNGImage(aFilename + ".png");
 
 	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".jpg") == 0) || (anExt.length() == 0)))
 		anImage = GetJPEGImage(aFilename + ".jpg");
 
-	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".png") == 0) || (anExt.length() == 0)))
-		anImage = GetPNGImage(aFilename + ".png");
-
 	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".gif") == 0) || (anExt.length() == 0)))
 		anImage = GetGIFImage(aFilename + ".gif");
+
+	if ((anImage == nullptr) && ((strcasecmp(anExt.c_str(), ".tga") == 0) || (anExt.length() == 0)))
+		anImage = GetTGAImage(aFilename + ".tga");
 
 	if ((anImage == nullptr) && (strcasecmp(anExt.c_str(), ".j2k") == 0))
 		unreachable(); // There are no JPEG2000 files in the project
