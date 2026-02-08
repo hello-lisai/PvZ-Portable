@@ -9,8 +9,8 @@ class DataReader
 protected:
 	FILE*					mFile;			//+0x4
 	char*					mData;			//+0x8
-	uint32_t			mDataLen;		//+0xC
-	uint32_t			mDataPos;		//+0x10
+	uint32_t				mDataLen;		//+0xC
+	uint32_t				mDataPos;		//+0x10
 	bool					mOwnData;		//+0x14
 
 public:
@@ -63,7 +63,7 @@ public:
 	void					WriteFloat(float theFloat);
 	void					WriteDouble(double theDouble);
 	void					WriteString(const std::string& theStr);
-	inline uint32_t	GetPos();
+	inline uint32_t			GetPos();
 	inline void				SetUInt32(uint32_t, uint32_t) { /* 未找到 */ }
 	inline void				SetUInt16(uint32_t, uint32_t) { /* 未找到 */ }
 	inline void				SetUInt8(uint32_t, uint32_t) { /* 未找到 */ }

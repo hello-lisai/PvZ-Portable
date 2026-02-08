@@ -26,13 +26,13 @@ private:
     };
 
 public:
-	LawnApp*					mApp;                           //+0x150
-	NewLawnButton*				mBackButton;                    //+0x154
-	NewLawnButton*				mPrevButton;                    //+0x158
-	NewLawnButton*				mNextButton;                    //+0x15C
+	LawnApp*                    mApp;                           //+0x150
+	NewLawnButton*              mBackButton;                    //+0x154
+	NewLawnButton*              mPrevButton;                    //+0x158
+	NewLawnButton*              mNextButton;                    //+0x15C
     Widget*                     mOverlayWidget;                 //+0x160
 	int                         mStoreTime;                     //+0x164
-	std::string                      mBubbleText;                    //+0x168
+	std::string                 mBubbleText;                    //+0x168
     int                         mBubbleCountDown;               //+0x184
     bool                        mBubbleClickToContinue;         //+0x188
     int                         mAmbientSpeechCountDown;        //+0x18C

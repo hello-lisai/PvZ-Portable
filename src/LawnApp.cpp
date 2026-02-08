@@ -316,6 +316,18 @@ void LawnApp::KillBoard()
 	KillSeedChooserScreen();
 	if (mBoard)
 	{
+		if (mPlayerInfo && (
+			mBoardResult == BoardResult::BOARDRESULT_WON ||
+			mBoardResult == BoardResult::BOARDRESULT_LOST ||
+			mBoardResult == BoardResult::BOARDRESULT_RESTART ||
+			mBoardResult == BoardResult::BOARDRESULT_CHEAT))
+		{
+			std::string aFileName = GetSavedGameName(mGameMode, mPlayerInfo->mId);
+			EraseFile(aFileName);
+			std::string aLegacyFileName = GetLegacySavedGameName(mGameMode, mPlayerInfo->mId);
+			EraseFile(aLegacyFileName);
+		}
+
 /*
 #ifdef _PVZ_DEBUG
 		BetaRecordLevelStats();
@@ -460,6 +472,7 @@ bool LawnApp::TryLoadGame()
 		if (mBoard->LoadGame(aSaveName))
 		{
 			mFirstTimeGameSelector = false;
+			mBoardResult = BoardResult::BOARDRESULT_NONE;
 			DoContinueDialog();
 			return true;
 		}
@@ -472,6 +485,7 @@ bool LawnApp::TryLoadGame()
 		if (mBoard->LoadGame(aLegacySaveName))
 		{
 			mFirstTimeGameSelector = false;
+			mBoardResult = BoardResult::BOARDRESULT_NONE;
 			DoContinueDialog();
 			return true;
 		}

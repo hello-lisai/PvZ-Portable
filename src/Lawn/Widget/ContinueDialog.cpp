@@ -114,14 +114,6 @@ void ContinueDialog::ButtonDepress(int theId)
 {
     if (theId == ContinueDialog::ContinueDialog_Continue)
     {
-        if (mApp->mBoard->mNextSurvivalStageCounter != 1)
-        {
-            std::string aFileName = GetSavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
-            mApp->EraseFile(aFileName);
-            std::string aLegacyFileName = GetLegacySavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
-            mApp->EraseFile(aLegacyFileName);
-        }
-
         RestartLoopingSounds();
         mApp->KillDialog(mId);
     }

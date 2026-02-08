@@ -2,6 +2,7 @@
 #define __SEEDCHOOSERSCREEN_H__
 
 #include "../../ConstEnums.h"
+#include "../../Sexy.TodLib/TodCommon.h"
 #include "widget/Widget.h"
 using namespace Sexy;
 
