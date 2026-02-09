@@ -712,12 +712,12 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 
 	// Release texture if image size has changed
 	bool createTextures = false;
-	if (mWidth!=theImage->mWidth || mHeight!=theImage->mHeight || aFormat!=mPixelFormat || theImage->mRenderFlags!=mImageFlags)
+	if (mWidth!=theImage->mWidth || mHeight!=theImage->mHeight || aFormat!=mPixelFormat || (theImage->mRenderFlags & RenderImageFlag_TextureMask)!=mImageFlags)
 	{
 		ReleaseTextures();
 
 		mPixelFormat = aFormat;
-		mImageFlags = theImage->mRenderFlags;
+		mImageFlags = theImage->mRenderFlags & RenderImageFlag_TextureMask;
 		CreateTextureDimensions(theImage);
 		createTextures = true;
 	}
@@ -760,7 +760,7 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 ///////////////////////////////////////////////////////////////////////////////
 void TextureData::CheckCreateTextures(MemoryImage *theImage)
 {
-	if(mPixelFormat==PixelFormat_Unknown || theImage->mWidth != mWidth || theImage->mHeight != mHeight || theImage->mBitsChangedCount != mBitsChangedCount || theImage->mRenderFlags != mImageFlags)
+	if(mPixelFormat==PixelFormat_Unknown || theImage->mWidth != mWidth || theImage->mHeight != mHeight || theImage->mBitsChangedCount != mBitsChangedCount || (theImage->mRenderFlags & RenderImageFlag_TextureMask) != mImageFlags)
 		CreateTextures(theImage);
 }
 
