@@ -6,7 +6,6 @@
 #include "graphics/GLImage.h"
 #include "graphics/Graphics.h"
 #include "graphics/GLInterface.h"
-//#include "graphics/D3DInterface.h"
 
 //effect documentation by @windowslover1234
 
@@ -237,13 +236,9 @@ void PoolEffect::PoolEffectDraw(Sexy::Graphics* g, bool theIsNight)
     UpdateWaterEffect();
     //send something to OpenGL
     GLInterface* anInterface = ((GLImage*)g->mDestImage)->mGLInterface;
-    //anInterface->CheckDXError(anInterface->mD3DDevice->SetTextureStageState(0, D3DTEXTURESTAGESTATETYPE::D3DTSS_ADDRESSU, D3DTEXTUREADDRESS::D3DTADDRESS_WRAP), "DrawPool");
-    //anInterface->CheckDXError(anInterface->mD3DDevice->SetTextureStageState(0, D3DTEXTURESTAGESTATETYPE::D3DTSS_ADDRESSV, D3DTEXTUREADDRESS::D3DTADDRESS_WRAP), "DrawPool");
     
     //Send caustic effect tris to OpenGL (tex, verts, tris)
     g->DrawTrianglesTex(mCausticImage, aVertArray[2], 150);
-    //anInterface->CheckDXError(anInterface->mD3DDevice->SetTextureStageState(0, D3DTEXTURESTAGESTATETYPE::D3DTSS_ADDRESSU, D3DTEXTUREADDRESS::D3DTADDRESS_CLAMP), "DrawPool");
-    //anInterface->CheckDXError(anInterface->mD3DDevice->SetTextureStageState(0, D3DTEXTURESTAGESTATETYPE::D3DTSS_ADDRESSV, D3DTEXTUREADDRESS::D3DTADDRESS_CLAMP), "DrawPool");
 }
 
 void PoolEffect::PoolEffectUpdate()

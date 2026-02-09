@@ -21,8 +21,8 @@ class MemoryImage : public Image
 public:
 	uint32_t*				mBits;
 	int						mBitsChangedCount;
-	void*					mD3DData;
-	uint32_t					mD3DFlags;	// see D3DInterface.h for possible values
+	void*					mRenderData;
+	uint32_t				mRenderFlags;	// see GLInterface.h for possible values
 
 	uint32_t*				mColorTable;	
 	uchar*					mColorIndices;

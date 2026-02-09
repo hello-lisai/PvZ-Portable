@@ -562,8 +562,8 @@ static bool IsPowerOf2(int theNum)
 ///////////////////////////////////////////////////////////////////////////////
 static void GetBestTextureDimensions(int &theWidth, int &theHeight, bool isEdge, bool usePow2, uint32_t theImageFlags)
 {
-//	theImageFlags = D3DImageFlag_MinimizeNumSubdivisions;
-	if (theImageFlags & D3DImageFlag_Use64By64Subdivisions)
+//	theImageFlags = RenderImageFlag_MinimizeNumSubdivisions;
+	if (theImageFlags & RenderImageFlag_Use64By64Subdivisions)
 	{
 		theWidth = theHeight = 64;
 		return;
@@ -603,7 +603,7 @@ static void GetBestTextureDimensions(int &theWidth, int &theHeight, bool isEdge,
 
 	if (usePow2)
 	{
-		if (isEdge || (theImageFlags & D3DImageFlag_MinimizeNumSubdivisions))
+		if (isEdge || (theImageFlags & RenderImageFlag_MinimizeNumSubdivisions))
 		{
 			aWidth = aWidth >= gMaxTextureWidth ? gMaxTextureWidth : GetClosestPowerOf2Above(aWidth);
 			aHeight = aHeight >= gMaxTextureHeight ? gMaxTextureHeight : GetClosestPowerOf2Above(aHeight);
@@ -746,12 +746,12 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 
 	// Choose appropriate pixel format
 	PixelFormat aFormat = PixelFormat_A8R8G8B8;
-	//theImage->mD3DFlags = D3DImageFlag_UseA4R4G4B4;
+	//theImage->mRenderFlags = RenderImageFlag_UseA4R4G4B4;
 
 	theImage->CommitBits();
 	if (!theImage->mHasAlpha && !theImage->mHasTrans && (gSupportedPixelFormats & PixelFormat_R5G6B5))
 	{
-		if (!(theImage->mD3DFlags & D3DImageFlag_UseA8R8G8B8))
+		if (!(theImage->mRenderFlags & RenderImageFlag_UseA8R8G8B8))
 			aFormat = PixelFormat_R5G6B5;
 	}
 
@@ -759,7 +759,7 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 	{
 	}
 
-	if ((theImage->mD3DFlags & D3DImageFlag_UseA4R4G4B4) && aFormat==PixelFormat_A8R8G8B8 && (gSupportedPixelFormats & PixelFormat_A4R4G4B4))
+	if ((theImage->mRenderFlags & RenderImageFlag_UseA4R4G4B4) && aFormat==PixelFormat_A8R8G8B8 && (gSupportedPixelFormats & PixelFormat_A4R4G4B4))
 		aFormat = PixelFormat_A4R4G4B4;
 
 	if (aFormat==PixelFormat_A8R8G8B8 && !(gSupportedPixelFormats & PixelFormat_A8R8G8B8))
@@ -767,12 +767,12 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 
 	// Release texture if image size has changed
 	bool createTextures = false;
-	if (mWidth!=theImage->mWidth || mHeight!=theImage->mHeight || aFormat!=mPixelFormat || theImage->mD3DFlags!=mImageFlags)
+	if (mWidth!=theImage->mWidth || mHeight!=theImage->mHeight || aFormat!=mPixelFormat || (theImage->mRenderFlags & RenderImageFlag_TextureMask)!=mImageFlags)
 	{
 		ReleaseTextures();
 
 		mPixelFormat = aFormat;
-		mImageFlags = theImage->mD3DFlags;
+		mImageFlags = theImage->mRenderFlags & RenderImageFlag_TextureMask;
 		CreateTextureDimensions(theImage);
 		createTextures = true;
 	}
@@ -821,7 +821,7 @@ void TextureData::CreateTextures(MemoryImage *theImage)
 ///////////////////////////////////////////////////////////////////////////////
 void TextureData::CheckCreateTextures(MemoryImage *theImage)
 {
-	if(mPixelFormat==PixelFormat_Unknown || theImage->mWidth != mWidth || theImage->mHeight != mHeight || theImage->mBitsChangedCount != mBitsChangedCount || theImage->mD3DFlags != mImageFlags)
+	if(mPixelFormat==PixelFormat_Unknown || theImage->mWidth != mWidth || theImage->mHeight != mHeight || theImage->mBitsChangedCount != mBitsChangedCount || (theImage->mRenderFlags & RenderImageFlag_TextureMask) != mImageFlags)
 		CreateTextures(theImage);
 }
 
@@ -1315,8 +1315,8 @@ GLInterface::~GLInterface()
 	for(anItr = mImageSet.begin(); anItr != mImageSet.end(); ++anItr)
 	{
 		MemoryImage *anImage = *anItr;
-		delete (TextureData*)anImage->mD3DData;
-		anImage->mD3DData = nullptr;
+		delete (TextureData*)anImage->mRenderData;
+		anImage->mRenderData = nullptr;
 	}
 
 	delete[] gVertices;
@@ -1352,10 +1352,10 @@ void GLInterface::RemoveGLImage(GLImage* theGLImage)
 
 void GLInterface::Remove3DData(MemoryImage* theImage)
 {
-	if (theImage->mD3DData != nullptr)
+	if (theImage->mRenderData != nullptr)
 	{
-		delete (TextureData*)theImage->mD3DData;
-		theImage->mD3DData = nullptr;
+		delete (TextureData*)theImage->mRenderData;
+		theImage->mRenderData = nullptr;
 
 		std::scoped_lock aCrit(mCritSect); // Make images thread safe
 		mImageSet.erase(theImage);
@@ -1513,9 +1513,9 @@ bool GLInterface::CreateImageTexture(MemoryImage *theImage)
 {
 	bool wantPurge = false;
 
-	if(theImage->mD3DData==nullptr)
+	if(theImage->mRenderData==nullptr)
 	{
-		theImage->mD3DData = new TextureData();
+		theImage->mRenderData = new TextureData();
 		
 		// The actual purging was deferred
 		wantPurge = theImage->mPurgeBits;
@@ -1524,7 +1524,7 @@ bool GLInterface::CreateImageTexture(MemoryImage *theImage)
 		mImageSet.insert(theImage);
 	}
 
-	TextureData *aData = (TextureData*)theImage->mD3DData;
+	TextureData *aData = (TextureData*)theImage->mRenderData;
 	aData->CheckCreateTextures(theImage);
 
 	if (wantPurge)
@@ -1535,10 +1535,10 @@ bool GLInterface::CreateImageTexture(MemoryImage *theImage)
 
 bool GLInterface::RecoverBits(MemoryImage* theImage)
 {
-	if (theImage->mD3DData == nullptr)
+	if (theImage->mRenderData == nullptr)
 		return false;
 
-	TextureData* aData = (TextureData*) theImage->mD3DData;
+	TextureData* aData = (TextureData*) theImage->mRenderData;
 	if (aData->mBitsChangedCount != theImage->mBitsChangedCount) // bits have changed since texture was created
 		return false;
 
@@ -1601,7 +1601,7 @@ void GLInterface::Blt(Image* theImage, float theX, float theY, const Rect& theSr
 
 	SetDrawMode(theDrawMode);
 
-	TextureData *aData = (TextureData*)aSrcMemoryImage->mD3DData;
+	TextureData *aData = (TextureData*)aSrcMemoryImage->mRenderData;
 
 	SetLinearFilter(linearFilter);
 	aData->Blt(theX,theY,theSrcRect,theColor);
@@ -1667,7 +1667,7 @@ void GLInterface::BltTransformed(Image* theImage, const Rect* theClipRect, const
 
 	SetDrawMode(theDrawMode);
 
-	TextureData *aData = (TextureData*)aSrcMemoryImage->mD3DData;
+	TextureData *aData = (TextureData*)aSrcMemoryImage->mRenderData;
 
 	if (!mTransformStack.empty())
 	{
@@ -1822,7 +1822,7 @@ void GLInterface::DrawTrianglesTex(const TriVertex theVertices[][3], int theNumT
 
 	SetDrawMode(theDrawMode);
 
-	TextureData *aData = (TextureData*)aSrcMemoryImage->mD3DData;
+	TextureData *aData = (TextureData*)aSrcMemoryImage->mRenderData;
 
 	SetLinearFilter(blend);
 

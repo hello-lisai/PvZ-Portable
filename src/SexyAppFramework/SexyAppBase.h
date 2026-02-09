@@ -19,7 +19,7 @@ extern HMODULE gDDrawDLL;
 extern HMODULE gDSoundDLL;
 extern HMODULE gVersionDLL;
 
-extern bool gD3DInterfacePreDrawError;
+extern bool gRenderInterfacePreDrawError;
 */
 
 namespace ImageLib

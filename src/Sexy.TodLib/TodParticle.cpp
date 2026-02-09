@@ -174,7 +174,7 @@ bool TodParticleLoadADef(TodParticleDefinition* theParticleDef, const char* theP
 			FloatTrackSetDefault(aDef.mClipRight, 0.0f);
 			FloatTrackSetDefault(aDef.mAnimationRate, 0.0f);
 			if (aDef.mImage)
-				reinterpret_cast<MemoryImage*>(aDef.mImage)->mD3DFlags |= D3DImageFlags::D3DImageFlag_MinimizeNumSubdivisions;
+				reinterpret_cast<MemoryImage*>(aDef.mImage)->mRenderFlags |= RenderImageFlags::RenderImageFlag_MinimizeNumSubdivisions;
 		}
 		return true;
 	}

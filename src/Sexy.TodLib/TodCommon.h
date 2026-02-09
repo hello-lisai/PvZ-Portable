@@ -17,7 +17,7 @@ namespace Sexy
 //using namespace std;
 using namespace Sexy;
 
-#define D3DIMAGEFLAG_SANDING 0x1000
+#define RENDERIMAGEFLAG_SANDING 0x1000
 #define DEG_TO_RAD(deg) ((deg) * 0.017453292f)
 #define RAD_TO_DEG(rad) ((rad) * 57.29578f)
 
