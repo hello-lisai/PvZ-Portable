@@ -39,6 +39,7 @@ SDLSoundManager::SDLSoundManager()
 	mInitializedMixer = true;
 
 	Mix_QuerySpec(&mMixerFreq, &mMixerFormat, &mMixerChannels);
+	Mix_AllocateChannels(MAX_CHANNELS);
 }
 
 SDLSoundManager::~SDLSoundManager()
