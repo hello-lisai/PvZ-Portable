@@ -121,9 +121,6 @@ find_package(OpenGL REQUIRED)
 if (NOT NO_GLEW)
 	find_package(GLEW REQUIRED)
 endif()
-if(MSVC)
-	find_path(DIRENT_INCLUDE_DIRS "dirent.h" REQUIRED)
-endif()
 
 set(SDL_MIXER_X_STATIC ON CACHE BOOL "Build static library of SDL Mixer X")
 set(SDL_MIXER_X_SHARED OFF CACHE BOOL "Build shared library of SDL Mixer X")
@@ -143,9 +140,6 @@ target_include_directories(pvz-portable PRIVATE
 	${SDL2_INCLUDE_DIRS}
 	${PLAT_INCLUDES}
 )
-if(MSVC)
-	target_include_directories(pvz-portable PRIVATE ${DIRENT_INCLUDE_DIRS})
-endif()
 target_compile_definitions(pvz-portable PRIVATE
 	$<$<BOOL:${PVZ_DEBUG}>:_PVZ_DEBUG>
 	$<$<BOOL:${LIMBO_PAGE}>:_PVZ_LIMBO_PAGE>
