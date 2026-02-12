@@ -17,6 +17,7 @@
 #include "../../Sexy.TodLib/DataArray.h"
 #include "../../Sexy.TodLib/TodList.h"
 #include "DataSync.h"
+#include "misc/Buffer.h"
 #include <algorithm>
 #include <vector>
 
@@ -36,6 +37,34 @@ struct SaveFileHeaderV4
 	unsigned int	mPayloadSize;
 	unsigned int	mPayloadCrc;
 };
+
+struct SaveFileHeader
+{
+	unsigned int	mMagicNumber;
+	unsigned int	mBuildVersion;
+	unsigned int	mBuildDate;
+};
+
+// Legacy mid-level save support
+class SaveGameContext
+{
+public:
+	Sexy::Buffer	mBuffer;            //+0x0
+	bool			mFailed;            //+0x20
+	bool			mReading;           //+0x21
+
+public:
+	inline int		ByteLeftToRead() { return (mBuffer.mDataBitSize - mBuffer.mReadBitPos + 7) / 8; }
+	void			SyncBytes(void* theDest, int theReadSize);
+	void			SyncInt(int& theInt);
+	inline void		SyncUint(unsigned int& theInt) { SyncInt((signed int&)theInt); }
+	void			SyncReanimationDef(ReanimatorDefinition*& theDefinition);
+	void			SyncParticleDef(TodParticleDefinition*& theDefinition);
+	void			SyncTrailDef(TrailDefinition*& theDefinition);
+	void			SyncImage(Image*& theImage);
+};
+
+static void FixBoardAfterLoad(Board* theBoard);
 
 enum SaveChunkTypeV4
 {
@@ -2727,7 +2756,7 @@ void SyncBoard(SaveGameContext& theContext, Board* theBoard)
 }
 
 //0x481CE0
-void FixBoardAfterLoad(Board* theBoard)
+static void FixBoardAfterLoad(Board* theBoard)
 {
 	{
 		Plant* aPlant = nullptr;
@@ -2969,20 +2998,4 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
 	memcpy(aOutBuffer.data() + sizeof(aHeader), aPayload.data(), aPayload.size());
 
 	return gSexyAppBase->WriteBytesToFile(theFilePath, aOutBuffer.data(), static_cast<int>(aOutBuffer.size()));
-}
-
-bool LawnSaveGameLegacy(Board* theBoard, const std::string& theFilePath)
-{
-	SaveGameContext aContext;
-	aContext.mFailed = false;
-	aContext.mReading = false;
-
-	SaveFileHeader aHeader;
-	aHeader.mMagicNumber = SAVE_FILE_MAGIC_NUMBER;
-	aHeader.mBuildVersion = SAVE_FILE_VERSION;
-	aHeader.mBuildDate = SAVE_FILE_DATE;
-
-	aContext.SyncBytes(&aHeader, sizeof(aHeader));
-	SyncBoard(aContext, theBoard);
-	return gSexyAppBase->WriteBufferToFile(theFilePath, &aContext.mBuffer);
 }
