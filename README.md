@@ -249,8 +249,13 @@ The framework differs from many other APIs in that some class properties are not
 
 ## License
 
+**Copyright (C) 2026 Zhou Qiankang <wszqkzqk@qq.com>**
+
 This project is licensed under the terms of the [**GNU Lesser General Public License v3.0**](https://www.gnu.org/licenses/lgpl-3.0.html) or later (LGPL-3.0-or-later).
 
+* The repository includes complete license texts at the root:
+  * `LICENSE` — LGPL-3.0 text
+  * `COPYING` — GPL-3.0 text, referenced by LGPL-3.0
 * The code is provided "as is", **WITHOUT WARRANTY** of any kind.
 * The **original game IP (Plants vs. Zombies) belongs to PopCap/EA**. This license applies **only to the code implementation** in this repository.
 * This project does **NOT** include any copyrighted assets from the original game.
