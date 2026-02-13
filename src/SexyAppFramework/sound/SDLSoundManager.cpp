@@ -73,23 +73,23 @@ bool SDLSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theF
 
 	uint32_t aHeaderSize;	
 	p_fread(&aHeaderSize, 4, 1, fp);
-	aHeaderSize = LONG_BIGE_TO_NATIVE(aHeaderSize);
+	aHeaderSize = FromBE32(aHeaderSize);
 
 	uint32_t aDataSize;
 	p_fread(&aDataSize, 4, 1, fp);
-	aDataSize = LONG_BIGE_TO_NATIVE(aDataSize);
+	aDataSize = FromBE32(aDataSize);
 
 	uint32_t anEncoding;
 	p_fread(&anEncoding, 4, 1, fp);
-	anEncoding = LONG_BIGE_TO_NATIVE(anEncoding);
+	anEncoding = FromBE32(anEncoding);
 
 	uint32_t aSampleRate;
 	p_fread(&aSampleRate, 4, 1, fp);
-	aSampleRate = LONG_BIGE_TO_NATIVE(aSampleRate);
+	aSampleRate = FromBE32(aSampleRate);
 
 	uint32_t aChannelCount;
 	p_fread(&aChannelCount, 4, 1, fp);
-	aChannelCount = LONG_BIGE_TO_NATIVE(aChannelCount);
+	aChannelCount = FromBE32(aChannelCount);
 
 	p_fseek(fp, aHeaderSize, SEEK_SET);	
 

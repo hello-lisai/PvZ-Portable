@@ -183,7 +183,7 @@ bool XMLParser::GetUTF16LEChar(char* theChar, bool* error)
 	uint16_t aTempChar = 0;
 	if (p_fread(&aTempChar, 2, 1, mFile) != 1) return false;
 
-	aTempChar = WORD_LITTLEE_TO_NATIVE(aTempChar);
+	aTempChar = FromLE16(aTempChar);
 
 	uint32_t codepoint = aTempChar;
 	if ((aTempChar & 0xD800) == 0xD800)
@@ -191,7 +191,7 @@ bool XMLParser::GetUTF16LEChar(char* theChar, bool* error)
 		uint16_t aNextChar = 0;
 		if (p_fread(&aNextChar, 2, 1, mFile) != 1) return false;
 
-		aNextChar = WORD_LITTLEE_TO_NATIVE(aNextChar);
+		aNextChar = FromLE16(aNextChar);
 		if ((aNextChar & 0xDC00) == 0xDC00)
 			codepoint = (((aTempChar & ~0xD800) << 10) | (aNextChar & ~0xDC00)) + 0x10000;
 		else
@@ -214,7 +214,7 @@ bool XMLParser::GetUTF16BEChar(char* theChar, bool* error)
 	uint16_t aTempChar = 0;
 	if (p_fread(&aTempChar, 2, 1, mFile) != 1) return false;
 
-	aTempChar = WORD_BIGE_TO_NATIVE(aTempChar);
+	aTempChar = FromBE16(aTempChar);
 
 	uint32_t codepoint = aTempChar;
 	if ((aTempChar & 0xD800) == 0xD800)
@@ -222,7 +222,7 @@ bool XMLParser::GetUTF16BEChar(char* theChar, bool* error)
 		uint16_t aNextChar = 0;
 		if (p_fread(&aNextChar, 2, 1, mFile) != 1) return false;
 
-		aNextChar = WORD_BIGE_TO_NATIVE(aNextChar);
+		aNextChar = FromBE16(aNextChar);
 		if ((aNextChar & 0xDC00) == 0xDC00)
 			codepoint = (((aTempChar & ~0xD800) << 10) | (aNextChar & ~0xDC00)) + 0x10000;
 		else

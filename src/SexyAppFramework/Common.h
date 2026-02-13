@@ -82,10 +82,6 @@ inline int nanosleep(const struct timespec* ts, struct timespec* rem)
 #define unreachable __builtin_unreachable
 #endif
 
-#define LONG_BIGE_TO_NATIVE(l) (((l >> 24) & 0xFF) | ((l >> 8) & 0xFF00) | ((l << 8) & 0xFF0000) | ((l << 24) & 0xFF000000))
-#define WORD_BIGE_TO_NATIVE(w) (((w >> 8) & 0xFF) | ((w << 8) & 0xFF00))
-#define WORD_LITTLEE_TO_NATIVE(w) (w)
-
 #define LENGTH(anyarray) (sizeof(anyarray) / sizeof(anyarray[0]))
 
 typedef unsigned char uchar;
@@ -238,11 +234,11 @@ inline constexpr uint64_t ByteSwap64(uint64_t v) noexcept
 	       ((v & 0xFF00000000000000ULL) >> 56);
 }
 
-// Little-endian conversion helpers (file format is always little-endian)
-template <typename T>
-inline constexpr T LEConvert(T v) noexcept
+// Endian conversion helpers
+template <typename T, std::endian TargetEndian>
+inline constexpr T EndianConvert(T v) noexcept
 {
-	if constexpr (std::endian::native == std::endian::big)
+	if constexpr (std::endian::native != TargetEndian)
 	{
 		if constexpr (sizeof(T) == 2)
 			return static_cast<T>(ByteSwap16(static_cast<uint16_t>(v)));
@@ -254,12 +250,18 @@ inline constexpr T LEConvert(T v) noexcept
 	return v;
 }
 
-inline constexpr uint16_t FromLE16(uint16_t v) noexcept { return LEConvert(v); }
-inline constexpr uint16_t ToLE16(uint16_t v) noexcept { return LEConvert(v); }
-inline constexpr uint32_t FromLE32(uint32_t v) noexcept { return LEConvert(v); }
-inline constexpr uint32_t ToLE32(uint32_t v) noexcept { return LEConvert(v); }
-inline constexpr uint64_t FromLE64(uint64_t v) noexcept { return LEConvert(v); }
-inline constexpr uint64_t ToLE64(uint64_t v) noexcept { return LEConvert(v); }
+inline constexpr uint16_t FromLE16(uint16_t v) noexcept { return EndianConvert<uint16_t, std::endian::little>(v); }
+inline constexpr uint16_t ToLE16(uint16_t v) noexcept { return EndianConvert<uint16_t, std::endian::little>(v); }
+inline constexpr uint32_t FromLE32(uint32_t v) noexcept { return EndianConvert<uint32_t, std::endian::little>(v); }
+inline constexpr uint32_t ToLE32(uint32_t v) noexcept { return EndianConvert<uint32_t, std::endian::little>(v); }
+inline constexpr uint64_t FromLE64(uint64_t v) noexcept { return EndianConvert<uint64_t, std::endian::little>(v); }
+inline constexpr uint64_t ToLE64(uint64_t v) noexcept { return EndianConvert<uint64_t, std::endian::little>(v); }
+inline constexpr uint16_t FromBE16(uint16_t v) noexcept { return EndianConvert<uint16_t, std::endian::big>(v); }
+inline constexpr uint16_t ToBE16(uint16_t v) noexcept { return EndianConvert<uint16_t, std::endian::big>(v); }
+inline constexpr uint32_t FromBE32(uint32_t v) noexcept { return EndianConvert<uint32_t, std::endian::big>(v); }
+inline constexpr uint32_t ToBE32(uint32_t v) noexcept { return EndianConvert<uint32_t, std::endian::big>(v); }
+inline constexpr uint64_t FromBE64(uint64_t v) noexcept { return EndianConvert<uint64_t, std::endian::big>(v); }
+inline constexpr uint64_t ToBE64(uint64_t v) noexcept { return EndianConvert<uint64_t, std::endian::big>(v); }
 
 struct StringLessNoCase { bool operator()(const std::string &s1, const std::string &s2) const { return strcasecmp(s1.c_str(),s2.c_str())<0; } };
 
