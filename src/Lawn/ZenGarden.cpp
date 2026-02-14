@@ -1526,14 +1526,8 @@ void ZenGarden::ResetStinkyTimers()
 void ZenGarden::StinkyUpdate(GridItem* theStinky)
 {
     Reanimation* aStinkyReanim = mApp->ReanimationGet(theStinky->mGridItemReanimID);
-
-    uint32_t aNow = static_cast<uint32_t>(time(0));
-    if (mApp->mPlayerInfo->mLastStinkyChocolateTime > aNow || 
-        static_cast<uint32_t>(mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_STINKY_THE_SNAIL]) > aNow)
-    {
-        ResetStinkyTimers();
-    }
-
+    // Unsigned delta checks already treat "time moved before event" as expired.
+    // Extra reset-on-future-time logic is unnecessary now.
     bool aStinkyHighOnChocolate = IsStinkyHighOnChocolate();
     UpdateStinkyMotionTrail(theStinky, aStinkyHighOnChocolate);
 
