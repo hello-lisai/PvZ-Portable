@@ -1,3 +1,4 @@
+#define GLAD_GLES2_IMPLEMENTATION
 #include "graphics/GLPlatform.h"
 
 #ifndef NINTENDO_SWITCH

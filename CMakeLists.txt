@@ -42,7 +42,7 @@ set(DOWNSCALE_COUNT 1 CACHE STRING "Image downscale count")
 if(NINTENDO_SWITCH)
 	set(VORBIS_LIB vorbisfile vorbis)
 	list(APPEND SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/switch/graphics/Window.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/switch/Window.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/switch/Input.cpp
 	)
 	list(APPEND PLAT_INCLUDES
@@ -85,7 +85,7 @@ else()
 		set(MPG123_LIB ${MPG123_LIBRARY})
 	endif()
 	list(APPEND SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/pc/graphics/Window.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/pc/Window.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/pc/Input.cpp
 	)
 	list(APPEND PLAT_INCLUDES
@@ -110,9 +110,6 @@ find_package(ZLIB REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
-if(NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS)
-	find_library(GLES2_LIBRARY GLESv2 REQUIRED)
-endif()
 
 set(SDL_MIXER_X_STATIC ON CACHE BOOL "Build static library of SDL Mixer X")
 set(SDL_MIXER_X_SHARED OFF CACHE BOOL "Build shared library of SDL Mixer X")
@@ -129,6 +126,7 @@ target_include_directories(pvz-portable PRIVATE
 	${PLAT_INCLUDES}
 	${PROJECT_SOURCE_DIR}/src
 	${PROJECT_SOURCE_DIR}/src/SexyAppFramework
+	${PROJECT_SOURCE_DIR}/src/SexyAppFramework/glad/include
 	${PROJECT_SOURCE_DIR}/src/SexyAppFramework/sound/SDL-Mixer-X/include
 	${SDL2_INCLUDE_DIRS}
 )
@@ -171,7 +169,7 @@ if (WIN32)
 			OBJECT_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/icon.ico"
 	)
 
-	target_link_libraries(pvz-portable PRIVATE ${GLES2_LIBRARY} ws2_32 user32 gdi32 winmm imm32 shlwapi)
+	target_link_libraries(pvz-portable PRIVATE ws2_32 user32 gdi32 winmm imm32 shlwapi)
 	target_compile_definitions(pvz-portable PRIVATE WINDOWS)
 
 	if(NOT CONSOLE)
@@ -182,7 +180,7 @@ if (WIN32)
 		endif()
 	endif()
 elseif (NINTENDO_SWITCH)
-	target_link_libraries(pvz-portable PRIVATE GLESv2 EGL glapi drm_nouveau)
+	target_link_libraries(pvz-portable PRIVATE EGL glapi drm_nouveau)
 
 	nx_generate_nacp(pvz-portable.nacp
 		NAME "PvZ Portable"
@@ -208,6 +206,4 @@ elseif (NINTENDO_3DS)
 	ctr_create_3dsx(pvz-portable
 		SMDH pvz-portable.smdh
 	)
-else()
-	target_link_libraries(pvz-portable PRIVATE ${GLES2_LIBRARY})
 endif()

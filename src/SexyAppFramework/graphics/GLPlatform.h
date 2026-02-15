@@ -1,10 +1,8 @@
 #ifndef __GLPLATFORM_H__
 #define __GLPLATFORM_H__
 
-#include <SDL_opengles2.h>
+#include <glad/gles2.h>
 
-// GLSL ES 1.00 preamble — matches the ES 2.0 context
-// Uses: attribute, varying, gl_FragColor, texture2D
 #define GLSL_VERT_PREAMBLE \
 	"#version 100\n" \
 	"precision mediump float;\n" \
@@ -18,9 +16,26 @@
 	"#define FRAG_OUT gl_FragColor\n" \
 	"#define TEX2D texture2D\n"
 
+#ifdef NINTENDO_SWITCH
+
+#include <switch.h>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
 inline void PlatformGLInit()
 {
-	// SDL loads all GLES2 functions automatically when an ES context is created.
+	gladLoadGLES2((GLADloadfunc)eglGetProcAddress);
 }
+
+#else
+
+#include <SDL.h>
+
+inline void PlatformGLInit()
+{
+	gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress);
+}
+
+#endif
 
 #endif // __GLPLATFORM_H__
