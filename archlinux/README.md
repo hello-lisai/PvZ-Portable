@@ -6,8 +6,8 @@ This directory contains build scripts for Arch Linux to facilitate testing PvZ-P
 
 **This package contains ENGINE CODE ONLY.**
 
-To comply with copyright laws and the project's [License](../LICENSE), this build script **DOES NOT** include any game assets.
-*   **You MUST own a legal copy** of *Plants vs. Zombies: Game of the Year Edition* (e.g., from Steam or EA App).
+To comply with copyright laws and the project's [license](../LICENSE), this build script **DOES NOT** include any game assets.
+*   **You MUST own a legal copy** of *Plants vs. Zombies: Game of the Year Edition* (e.g., from Steam or EA's official website).
 *   This project is for **educational and research purposes**, specifically to study cross-platform compatibility, OpenGL/SDL rendering techniques, and engine behavior on Linux architectures (x86_64, aarch64, riscv64, etc.).
 
 ## Testing Focus: Wayland vs. X11
@@ -15,8 +15,8 @@ To comply with copyright laws and the project's [License](../LICENSE), this buil
 The primary goal of this package is to test the engine's behavior under different display servers. Current known issues we are investigating:
 
 *   **Fixed Aspect Ratio**: The engine enforces a 4:3 aspect ratio. On widescreen monitors, this results in black bars (letterboxing).
-*   **XWayland Flickering**: When running via XWayland (default behavior on some compositors if not forced), users may experience flickering in the black bar areas when maximizing the window.
-*   **Wayland Native**: Running natively on Wayland appears to resolve the flickering, but testing is needed across different compositors (KWin, Mutter, Hyprland, etc.).
+*   **~~XWayland Flickering~~** *(Fixed)*: Previously, running via XWayland could cause flickering in the black bar areas. This has been resolved by the OpenGL ES 2.0 backend refactor.
+*   **Wayland Native**: Running natively on Wayland is recommended and works well across different compositors (KWin, Mutter, Hyprland, etc.).
 
 ## Build Instructions
 
