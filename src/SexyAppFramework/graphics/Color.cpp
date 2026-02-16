@@ -122,10 +122,21 @@ int Color::operator[](int theIdx) const
 // Returns standard ARGB format (0xAARRGGBB)
 uint32_t Color::ToInt() const
 {
-	return (static_cast<uint32_t>(mAlpha) << 24) |
-	       (static_cast<uint32_t>(mRed) << 16) |
-	       (static_cast<uint32_t>(mGreen) << 8) |
-	       static_cast<uint32_t>(mBlue);
+	return
+		(static_cast<uint32_t>(mAlpha) << 24) |
+		(static_cast<uint32_t>(mRed) << 16) |
+		(static_cast<uint32_t>(mGreen) << 8) |
+		(static_cast<uint32_t>(mBlue));
+}
+
+// For GL_RGBA/GL_UNSIGNED_BYTE: RGBA in memory <=> little-endian's 0xAABBGGRR
+uint32_t Color::ToGLColor() const
+{
+	uint32_t aGLColor = (static_cast<uint32_t>(mAlpha) << 24) |
+						(static_cast<uint32_t>(mBlue) << 16) |
+						(static_cast<uint32_t>(mGreen) << 8) |
+						(static_cast<uint32_t>(mRed));
+	return ToLE32(aGLColor);
 }
 
 bool Sexy::operator==(const Color& theColor1, const Color& theColor2)

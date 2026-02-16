@@ -24,8 +24,8 @@ bool gDesktopGLFallback = false;
 static inline uint32_t ArgbToRgba(uint32_t argb) noexcept
 {
 	uint32_t abgr = (argb & 0xFF00FF00u)
-	              | ((argb >> 16) & 0x000000FFu)
-	              | ((argb << 16) & 0x00FF0000u);
+					| ((argb >> 16) & 0x000000FFu)
+					| ((argb << 16) & 0x00FF0000u);
 	return ToLE32(abgr);
 }
 
@@ -33,8 +33,8 @@ static inline uint32_t RgbaToArgb(uint32_t rgba) noexcept
 {
 	uint32_t abgr = FromLE32(rgba);
 	return (abgr & 0xFF00FF00u)
-	     | ((abgr >> 16) & 0x000000FFu)
-	     | ((abgr << 16) & 0x00FF0000u);
+		| ((abgr >> 16) & 0x000000FFu)
+		| ((abgr << 16) & 0x00FF0000u);
 }
 
 static inline uint32_t VertexColor(uint32_t triVertexColor, uint32_t fallback) noexcept
@@ -146,31 +146,32 @@ static void GfxAddVertices(const TriVertex arr[][3], int arrCount, unsigned int 
 }
 
 // Unified GLSL body; VERT_IN / V2F / FRAG_OUT / TEX2D macros from GLPlatform.h.
-static const char *SHADER_CODE =
-"\n V2F vec4 v_color;"
-"\n V2F vec2 v_uv;"
-"\n"
-"\n #ifdef VERTEX"
-"\n     uniform mat4 u_viewProj;"
-"\n     VERT_IN vec3 a_position;"
-"\n     VERT_IN vec4 a_color;"
-"\n     VERT_IN vec2 a_uv;"
-"\n     void main() {"
-"\n         v_color = a_color;"
-"\n         v_uv = a_uv;"
-"\n         gl_Position = u_viewProj * vec4(a_position, 1.0);"
-"\n     }"
-"\n #endif"
-"\n #ifdef FRAGMENT"
-"\n     uniform sampler2D u_texture;"
-"\n     uniform int u_useTexture;"
-"\n     void main() {"
-"\n         if (u_useTexture == 1)"
-"\n             FRAG_OUT = TEX2D(u_texture, v_uv) * v_color;"
-"\n         else"
-"\n             FRAG_OUT = v_color;"
-"\n     }"
-"\n #endif";
+static constexpr const char *SHADER_CODE = R"DELIMITER(
+V2F vec4 v_color;
+V2F vec2 v_uv;
+
+#ifdef VERTEX
+	uniform mat4 u_viewProj;
+	VERT_IN vec3 a_position;
+	VERT_IN vec4 a_color;
+	VERT_IN vec2 a_uv;
+	void main() {
+		v_color = a_color;
+		v_uv = a_uv;
+		gl_Position = u_viewProj * vec4(a_position, 1.0);
+	}
+#endif
+#ifdef FRAGMENT
+	uniform sampler2D u_texture;
+	uniform int u_useTexture;
+	void main() {
+		if (u_useTexture == 1)
+			FRAG_OUT = TEX2D(u_texture, v_uv) * v_color;
+		else
+			FRAG_OUT = v_color;
+	}
+#endif
+)DELIMITER";
 
 static GLuint shaderCompile(const char *src, uint32_t srcLen, GLenum type)
 {
@@ -686,7 +687,7 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 	int srcBottom = srcTop  + theSrcRect.mHeight;
 	if (srcLeft >= srcRight || srcTop >= srcBottom) return;
 
-	uint32_t aColor = ArgbToRgba(theColor.ToInt());
+	uint32_t aColor = theColor.ToGLColor();
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(gUfUseTexture, 1);
 
@@ -835,7 +836,7 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 		pixelcorrect = 0.0f;
 	}
 
-	uint32_t aColor = ArgbToRgba(theColor.ToInt());
+	uint32_t aColor = theColor.ToGLColor();
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(gUfUseTexture, 1);
 
@@ -1364,7 +1365,7 @@ void GLInterface::DrawLine(double x1, double y1, double x2, double y2,
 	}
 
 	glUniform1i(gUfUseTexture, 0);
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	GLVertex v[3] = {
 		{ fx1, fy1, 0, c, 0, 0 },
 		{ fx2, fy2, 0, c, 0, 0 },
@@ -1382,7 +1383,7 @@ void GLInterface::FillRect(const Rect& theRect, const Color& theColor, int theDr
 
 	float x = theRect.mX - 0.5f, y = theRect.mY - 0.5f;
 	float w = theRect.mWidth,     h = theRect.mHeight;
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 
 	GLVertex v[4] = {
 		{ x,     y,     0, c, 0, 0 },
@@ -1414,7 +1415,7 @@ void GLInterface::DrawTriangle(const TriVertex &p1, const TriVertex &p2, const T
 	if (!PreDraw()) return;
 	SetDrawMode(theDrawMode);
 
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	glUniform1i(gUfUseTexture, 0);
 
 	GLVertex v[3] = {
@@ -1445,7 +1446,7 @@ void GLInterface::DrawTrianglesTex(const TriVertex theVertices[][3], int theNumT
 	SetDrawMode(theDrawMode);
 	SetLinearFilter(blend);
 
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	((TextureData*)mem->mRenderData)->BltTriangles(theVertices, theNumTriangles, c, tx, ty);
 }
 
@@ -1475,7 +1476,7 @@ void GLInterface::FillPoly(const Point theVertices[], int theNumVertices,
 	if (!PreDraw()) return;
 	SetDrawMode(theDrawMode);
 
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	glUniform1i(gUfUseTexture, 0);
 
 	VertexList vl;

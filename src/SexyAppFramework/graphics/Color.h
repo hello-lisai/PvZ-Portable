@@ -31,6 +31,7 @@ public:
 	int						GetBlue() const;
 	int						GetAlpha() const;
 	uint32_t				ToInt() const;
+	uint32_t				ToGLColor() const;
 
 	int&					operator[](int theIdx);
 	int						operator[](int theIdx) const;	
