@@ -56,7 +56,7 @@ Graphics::Graphics(Image* theDestImage)
 	mColorizeImages = false;
 	mFastStretch = false;
 	mWriteColoredString = true;
-	mLinearBlend = false;
+	mLinearBlend = true; // Default to linear filtering
 
 	if (mDestImage == nullptr)
 	{

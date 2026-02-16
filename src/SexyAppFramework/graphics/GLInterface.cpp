@@ -422,8 +422,6 @@ static void CopyImageToTexturePalette8(MemoryImage *img, int offx, int offy,
 static void CopyImageToTexture(MemoryImage *img, int offx, int offy,
 	int texW, int texH, PixelFormat fmt, bool create)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gLinearFilter ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gLinearFilter ? GL_LINEAR : GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -669,13 +667,15 @@ GLuint& TextureData::GetTextureF(float x, float y, float &width, float &height,
 
 static void SetLinearFilter(bool linear)
 {
-	if (gLinearFilter != linear)
-	{
-		int f = linear ? GL_LINEAR : GL_NEAREST;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f);
-		gLinearFilter = linear;
-	}
+	gLinearFilter = linear;
+}
+
+static void GfxBindTexture(GLuint tex)
+{
+	glBindTexture(GL_TEXTURE_2D, tex);
+	int f = gLinearFilter ? GL_LINEAR : GL_NEAREST;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f);
 }
 
 void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Color& theColor)
@@ -711,7 +711,7 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 				{ x + w, y,     0, aColor, u2, v1 },
 				{ x + w, y + h, 0, aColor, u2, v2 },
 			};
-			glBindTexture(GL_TEXTURE_2D, tex);
+			GfxBindTexture(tex);
 			GfxBegin(GL_TRIANGLE_STRIP);
 			GfxAddVertices(v, 4);
 			GfxEnd();
@@ -879,7 +879,7 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 				{ tp[2].x, tp[2].y, 0, aColor, u2, v1 },
 				{ tp[3].x, tp[3].y, 0, aColor, u2, v2 },
 			};
-			glBindTexture(GL_TEXTURE_2D, tex);
+			GfxBindTexture(tex);
 
 			if (!clipped)
 			{
@@ -908,7 +908,7 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 	{
 		// Single-texture fast path
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, mTextures[0].mTexture);
+		GfxBindTexture(mTextures[0].mTexture);
 		glUniform1i(gUfUseTexture, 1);
 
 		GfxBegin(GL_TRIANGLES);
@@ -961,7 +961,7 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 				DoPolyTextureClip(vl);
 				if (vl.size() >= 3)
 				{
-					glBindTexture(GL_TEXTURE_2D, piece.mTexture);
+					GfxBindTexture(piece.mTexture);
 					GfxBegin(GL_TRIANGLE_FAN);
 					GfxAddVertices(vl);
 					GfxEnd();
@@ -1145,9 +1145,6 @@ void GLInterface::SetCursorPos(int x, int y)
 
 bool GLInterface::PreDraw()
 {
-	gLinearFilter = false;
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	return true;
 }
@@ -1325,11 +1322,11 @@ void GLInterface::BltTransformed(Image* theImage, const Rect* theClipRect,
 	if (!CreateImageTexture(mem)) return;
 
 	SetDrawMode(theDrawMode);
+	SetLinearFilter(linearFilter);
 	TextureData *data = (TextureData*)mem->mRenderData;
 
 	if (!mTransformStack.empty())
 	{
-		SetLinearFilter(true);
 		if (theX != 0 || theY != 0)
 		{
 			SexyTransform2D t;
@@ -1347,7 +1344,6 @@ void GLInterface::BltTransformed(Image* theImage, const Rect* theClipRect,
 	}
 	else
 	{
-		SetLinearFilter(linearFilter);
 		data->BltTransformed(theTransform, theSrcRect, theColor, theClipRect, theX, theY, center);
 	}
 }
