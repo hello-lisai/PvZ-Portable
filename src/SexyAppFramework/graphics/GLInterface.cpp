@@ -1257,7 +1257,7 @@ void GLInterface::Blt(Image* theImage, float theX, float theY,
 {
 	if (!mTransformStack.empty())
 	{
-		BltClipF(theImage, theX, theY, theSrcRect, nullptr, theColor, theDrawMode);
+		BltClipF(theImage, theX, theY, theSrcRect, nullptr, theColor, theDrawMode, linearFilter);
 		return;
 	}
 	if (!PreDraw()) return;
@@ -1271,11 +1271,11 @@ void GLInterface::Blt(Image* theImage, float theX, float theY,
 }
 
 void GLInterface::BltClipF(Image* theImage, float theX, float theY,
-	const Rect& theSrcRect, const Rect *theClipRect, const Color& theColor, int theDrawMode)
+	const Rect& theSrcRect, const Rect *theClipRect, const Color& theColor, int theDrawMode, bool linearFilter)
 {
 	SexyTransform2D t;
 	t.Translate(theX, theY);
-	BltTransformed(theImage, theClipRect, theColor, theDrawMode, theSrcRect, t, true);
+	BltTransformed(theImage, theClipRect, theColor, theDrawMode, theSrcRect, t, linearFilter);
 }
 
 void GLInterface::BltMirror(Image* theImage, float theX, float theY,

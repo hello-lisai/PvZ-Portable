@@ -1445,8 +1445,9 @@ void MemoryImage::NormalBlt(Image* theImage, int theX, int theY, const Rect& the
 	}
 }
 
-void MemoryImage::Blt(Image* theImage, int theX, int theY, const Rect& theSrcRect, const Color& theColor, int theDrawMode)
+void MemoryImage::Blt(Image* theImage, int theX, int theY, const Rect& theSrcRect, const Color& theColor, int theDrawMode, bool linearFilter)
 {
+	(void)linearFilter;  // Software rendering does not use texture filtering
 	theImage->mDrawn = true;
 
 	DBG_ASSERTE((theColor.mRed >= 0) && (theColor.mRed <= 255));

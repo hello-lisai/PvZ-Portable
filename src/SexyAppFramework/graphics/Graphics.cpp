@@ -661,7 +661,7 @@ void Graphics::DrawImage(Sexy::Image* theImage, int theX, int theY)
 	Rect aSrcRect(aDestRect.mX - theX, aDestRect.mY - theY, aDestRect.mWidth, aDestRect.mHeight);
 
 	if ((aSrcRect.mWidth > 0) && (aSrcRect.mHeight > 0))
-		mDestImage->Blt(theImage, aDestRect.mX, aDestRect.mY, aSrcRect, mColorizeImages ? mColor : Color::White, mDrawMode);
+		mDestImage->Blt(theImage, aDestRect.mX, aDestRect.mY, aSrcRect, mColorizeImages ? mColor : Color::White, mDrawMode, mLinearBlend);
 }
 
 void Graphics::DrawImage(Image* theImage, int theX, int theY, const Rect& theSrcRect)
@@ -687,7 +687,7 @@ void Graphics::DrawImage(Image* theImage, int theX, int theY, const Rect& theSrc
 	Rect aSrcRect(theSrcRect.mX + aDestRect.mX - theX, theSrcRect.mY + aDestRect.mY - theY, aDestRect.mWidth, aDestRect.mHeight);
 
 	if ((aSrcRect.mWidth > 0) && (aSrcRect.mHeight > 0))
-		mDestImage->Blt(theImage, aDestRect.mX, aDestRect.mY, aSrcRect, mColorizeImages ? mColor : Color::White, mDrawMode);
+		mDestImage->Blt(theImage, aDestRect.mX, aDestRect.mY, aSrcRect, mColorizeImages ? mColor : Color::White, mDrawMode, mLinearBlend);
 }
 
 void Graphics::DrawImageMirror(Image* theImage, int theX, int theY, bool mirror)
@@ -722,7 +722,7 @@ void Graphics::DrawImageMirror(Image* theImage, int theX, int theY, const Rect& 
 	Rect aSrcRect(theSrcRect.mX + aRightClip, theSrcRect.mY + aDestRect.mY - theY, aDestRect.mWidth, aDestRect.mHeight);
 
 	if ((aSrcRect.mWidth > 0) && (aSrcRect.mHeight > 0))
-		mDestImage->BltMirror(theImage, aDestRect.mX, aDestRect.mY, aSrcRect, mColorizeImages ? mColor : Color::White, mDrawMode);
+		mDestImage->BltMirror(theImage, aDestRect.mX, aDestRect.mY, aSrcRect, mColorizeImages ? mColor : Color::White, mDrawMode, mLinearBlend);
 }
 
 void Graphics::DrawImageMirror(Image* theImage, const Rect& theDestRect, const Rect& theSrcRect, bool mirror)
