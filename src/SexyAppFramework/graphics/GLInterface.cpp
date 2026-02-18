@@ -708,7 +708,7 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 		{
 			w = srcRight - srcX; h = srcBottom - srcY;
 			GLuint &tex = GetTexture(srcX, srcY, w, h, u1, v1, u2, v2);
-			float x = dstX - 0.5f, y = dstY - 0.5f;
+			float x = dstX, y = dstY;
 
 			GLVertex v[4] = {
 				{ x,     y,     0, aColor, u1, v1 },
@@ -832,12 +832,11 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 	int srcBottom = srcTop  + theSrcRect.mHeight;
 	if (srcLeft >= srcRight || srcTop >= srcBottom) return;
 
-	float startx = 0, starty = 0, pixelcorrect = 0.5f;
+	float startx = 0, starty = 0;
 	if (center)
 	{
 		startx = -theSrcRect.mWidth  / 2.0f;
 		starty = -theSrcRect.mHeight / 2.0f;
-		pixelcorrect = 0.0f;
 	}
 
 	uint32_t aColor = theColor.ToGLColor();
@@ -864,8 +863,8 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 			for (int i = 0; i < 4; i++)
 			{
 				tp[i] = theTrans * p[i];
-				tp[i].x -= pixelcorrect - theX;
-				tp[i].y -= pixelcorrect - theY;
+				tp[i].x += theX;
+				tp[i].y += theY;
 			}
 
 			bool clipped = false;
@@ -1107,7 +1106,7 @@ int GLInterface::Init(bool IsWindowed)
 
 	glUseProgram(gProgram);
 	float ortho[16];
-	MakeOrthoMatrix(0, (float)(mWidth - 1), (float)(mHeight - 1), 0, -10, 10, ortho);
+	MakeOrthoMatrix(0, (float)mWidth, (float)mHeight, 0, -10, 10, ortho);
 	glUniformMatrix4fv(gUfViewProjMtx, 1, GL_FALSE, ortho);
 	glUniform1i(gUfTexture, 0);
 
@@ -1257,7 +1256,7 @@ void GLInterface::Blt(Image* theImage, float theX, float theY,
 {
 	if (!mTransformStack.empty())
 	{
-		BltClipF(theImage, theX, theY, theSrcRect, nullptr, theColor, theDrawMode);
+		BltClipF(theImage, theX, theY, theSrcRect, nullptr, theColor, theDrawMode, linearFilter);
 		return;
 	}
 	if (!PreDraw()) return;
@@ -1271,11 +1270,11 @@ void GLInterface::Blt(Image* theImage, float theX, float theY,
 }
 
 void GLInterface::BltClipF(Image* theImage, float theX, float theY,
-	const Rect& theSrcRect, const Rect *theClipRect, const Color& theColor, int theDrawMode)
+	const Rect& theSrcRect, const Rect *theClipRect, const Color& theColor, int theDrawMode, bool linearFilter)
 {
 	SexyTransform2D t;
 	t.Translate(theX, theY);
-	BltTransformed(theImage, theClipRect, theColor, theDrawMode, theSrcRect, t, true);
+	BltTransformed(theImage, theClipRect, theColor, theDrawMode, theSrcRect, t, linearFilter);
 }
 
 void GLInterface::BltMirror(Image* theImage, float theX, float theY,
@@ -1387,7 +1386,7 @@ void GLInterface::FillRect(const Rect& theRect, const Color& theColor, int theDr
 	if (!PreDraw()) return;
 	SetDrawMode(theDrawMode);
 
-	float x = theRect.mX - 0.5f, y = theRect.mY - 0.5f;
+	float x = theRect.mX, y = theRect.mY;
 	float w = theRect.mWidth,     h = theRect.mHeight;
 	uint32_t c = theColor.ToGLColor();
 
@@ -1404,8 +1403,8 @@ void GLInterface::FillRect(const Rect& theRect, const Color& theColor, int theDr
 		for (int i = 0; i < 4; i++)
 		{
 			p[i] = mTransformStack.back() * p[i];
-			v[i].sx = p[i].x - 0.5f;
-			v[i].sy = p[i].y - 0.5f;
+			v[i].sx = p[i].x;
+			v[i].sy = p[i].y;
 		}
 	}
 

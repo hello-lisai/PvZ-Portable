@@ -101,7 +101,7 @@ void GLImage::DrawLineAA(double theStartX, double theStartY, double theEndX, dou
 	mGLInterface->DrawLine(theStartX,theStartY,theEndX,theEndY,theColor,theDrawMode);
 }
 
-void GLImage::Blt(Image* theImage, int theX, int theY, const Rect& theSrcRect, const Color& theColor, int theDrawMode)
+void GLImage::Blt(Image* theImage, int theX, int theY, const Rect& theSrcRect, const Color& theColor, int theDrawMode, bool linearFilter)
 {
 	theImage->mDrawn = true;
 
@@ -115,7 +115,7 @@ void GLImage::Blt(Image* theImage, int theX, int theY, const Rect& theSrcRect, c
 
 	CommitBits();
 
-	mGLInterface->Blt(theImage,theX,theY,theSrcRect,theColor,theDrawMode);
+	mGLInterface->Blt(theImage,theX,theY,theSrcRect,theColor,theDrawMode,linearFilter);
 }
 
 void GLImage::BltF(Image* theImage, float theX, float theY, const Rect& theSrcRect, const Rect &theClipRect, const Color& theColor, int theDrawMode)
@@ -170,7 +170,7 @@ void GLImage::BltTrianglesTex(Image *theTexture, const TriVertex theVertices[][3
 	mGLInterface->DrawTrianglesTex(theVertices,theNumTriangles,theColor,theDrawMode,theTexture,tx,ty,blend);
 }
 
-void GLImage::BltMirror(Image* theImage, int theX, int theY, const Rect& theSrcRect, const Color& theColor, int theDrawMode)
+void GLImage::BltMirror(Image* theImage, int theX, int theY, const Rect& theSrcRect, const Color& theColor, int theDrawMode, bool linearFilter)
 {
 	DBG_ASSERTE((theColor.mRed >= 0) && (theColor.mRed <= 255));
 	DBG_ASSERTE((theColor.mGreen >= 0) && (theColor.mGreen <= 255));
@@ -179,7 +179,7 @@ void GLImage::BltMirror(Image* theImage, int theX, int theY, const Rect& theSrcR
 
 	CommitBits();
 
-	mGLInterface->BltMirror(theImage,theX,theY,theSrcRect,theColor,theDrawMode);
+	mGLInterface->BltMirror(theImage,theX,theY,theSrcRect,theColor,theDrawMode,linearFilter);
 }
 
 void GLImage::StretchBltMirror(Image* theImage, const Rect& theDestRectOrig, const Rect& theSrcRect, const Rect& theClipRect, const Color& theColor, int theDrawMode, bool fastStretch)

@@ -5,12 +5,11 @@
 #include "MemoryImage.h"
 #include "graphics/GLImage.h"
 #include <algorithm>
+#include <cstring>
 #include <mutex>
 #include "fcaseopen/fcaseopen.h"
 
 using namespace Sexy;
-
-////
 
 DataElement::DataElement() :
 	mIsList(false)
@@ -1214,15 +1213,26 @@ ActiveFontLayer::ActiveFontLayer(const ActiveFontLayer& theActiveFontLayer) :
 	mOwnsImage(theActiveFontLayer.mOwnsImage)
 {
 	if (mOwnsImage)
-		mScaledImage = mBaseFontLayer->mFontData->mApp->CopyImage(mScaledImage);
-
-	//for (int aCharNum = 0; aCharNum < 256; aCharNum++)
-	//	mScaledCharImageRects[aCharNum] = theActiveFontLayer.mScaledCharImageRects[aCharNum];
-	
-	for (auto anItr = theActiveFontLayer.mScaledCharImageRects.begin(); anItr != theActiveFontLayer.mScaledCharImageRects.end(); anItr++)
 	{
-		mScaledCharImageRects.insert(CharRectMap::value_type(anItr->first, anItr->second));
+		// CopyImage() uses GL rendering, which fails for non-uploaded MemoryImages.
+		auto* aSrc = dynamic_cast<MemoryImage*>(mScaledImage);
+		if (aSrc != nullptr)
+		{
+			auto* aDst = new MemoryImage(mBaseFontLayer->mFontData->mApp);
+			aDst->Create(aSrc->GetWidth(), aSrc->GetHeight());
+			std::size_t aPixelCount = static_cast<std::size_t>(aSrc->GetWidth()) * aSrc->GetHeight();
+			memcpy(aDst->GetBits(), aSrc->GetBits(), aPixelCount * sizeof(uint32_t));
+			aDst->BitsChanged();
+			mScaledImage = aDst;
+		}
+		else
+		{
+			mScaledImage = mBaseFontLayer->mFontData->mApp->CopyImage(mScaledImage);
+		}
 	}
+
+	for (const auto& [aChar, aRect] : theActiveFontLayer.mScaledCharImageRects)
+		mScaledCharImageRects.emplace(aChar, aRect);
 }
 
 ActiveFontLayer::~ActiveFontLayer()
@@ -1348,104 +1358,105 @@ void ImageFont::GenerateActiveFontLayers()
 				double aLayerPointSize = 1;
 				double aPointSize = mScale;
 
-				if ((mScale == 1.0) && ((aFontLayer->mPointSize == 0) || (mPointSize == aFontLayer->mPointSize)))
+				// Pad each glyph by 1px to prevent GL_LINEAR bleed between adjacent glyphs.
+				static constexpr int PAD = 1;
+
+				bool noScale = (mScale == 1.0) &&
+				               ((aFontLayer->mPointSize == 0) || (mPointSize == aFontLayer->mPointSize));
+
+				if (!noScale && aFontLayer->mPointSize != 0)
 				{
-					anActiveFontLayer->mScaledImage = aFontLayer->mImage;
-					anActiveFontLayer->mOwnsImage = false;
+					aLayerPointSize = aFontLayer->mPointSize;
+					aPointSize = mPointSize * mScale;
+				}
 
-					// Use the specified point size
+				auto* aMemoryImage = new MemoryImage(mFontData->mApp);
 
-					//for (int aCharNum = 0; aCharNum < 256; aCharNum++)
-					//	anActiveFontLayer->mScaledCharImageRects[aCharNum] = aFontLayer->GetCharData(aCharNum)->mImageRect;aFontLayer->mCharData[aCharNum].mImageRect;
-					for (auto anItr = aFontLayer->mCharDataMap.begin(); anItr != aFontLayer->mCharDataMap.end(); anItr++)
-					{
-						anActiveFontLayer->mScaledCharImageRects.insert(CharRectMap::value_type(anItr->first, anItr->second.mImageRect));
-					}
+				int aCurX = 0;
+				int aMaxHeight = 0;
+
+				for (const auto& [aChar, aCharData] : aFontLayer->mCharDataMap)
+				{
+					const Rect& anOrigRect = aCharData.mImageRect;
+
+					int aW = noScale ? anOrigRect.mWidth
+					                 : static_cast<int>(anOrigRect.mWidth  * aPointSize / aLayerPointSize);
+					int aH = noScale ? anOrigRect.mHeight
+					                 : static_cast<int>(anOrigRect.mHeight * aPointSize / aLayerPointSize);
+
+					anActiveFontLayer->mScaledCharImageRects[aChar] = Rect(aCurX + PAD, PAD, aW, aH);
+
+					if (aH > aMaxHeight)
+						aMaxHeight = aH;
+
+					aCurX += aW + 2 * PAD;
+				}
+
+				anActiveFontLayer->mScaledImage = aMemoryImage;
+				anActiveFontLayer->mOwnsImage = true;
+
+				if (aCurX == 0)
+				{
+					aMemoryImage->Create(1, 1);
 				}
 				else
 				{
-					if (aFontLayer->mPointSize != 0)
+					int aAtlasHeight = aMaxHeight + 2 * PAD;
+					aMemoryImage->Create(aCurX, aAtlasHeight);
+
+					// Zero-initialize so padding is transparent.
+					uint32_t* aDstBits = aMemoryImage->GetBits();
+					memset(aDstBits, 0, static_cast<std::size_t>(aCurX) * aAtlasHeight * sizeof(uint32_t));
+					int aDstStride = aMemoryImage->GetWidth();
+
+					if (noScale)
 					{
-						aLayerPointSize = aFontLayer->mPointSize;
-						aPointSize = mPointSize * mScale;
-					}
-
-					// Resize font elements
-					int aCharNum = 0;
-
-					MemoryImage* aMemoryImage = new MemoryImage(mFontData->mApp);
-
-					int aCurX = 0;
-					int aMaxHeight = 0;
-
-					//for (aCharNum = 0; aCharNum < 256; aCharNum++)
-					//{
-					//	Rect* anOrigRect = &aFontLayer->mCharData[aCharNum].mImageRect;
-					//
-					//	Rect aScaledRect(aCurX, 0,  
-					//		(int) ((anOrigRect->mWidth * aPointSize) / aLayerPointSize),
-					//		(int) ((anOrigRect->mHeight * aPointSize) / aLayerPointSize));
-					//
-					//	anActiveFontLayer->mScaledCharImageRects[aCharNum] = aScaledRect;
-					//
-					//	if (aScaledRect.mHeight > aMaxHeight)
-					//		aMaxHeight = aScaledRect.mHeight;
-					//
-					//	aCurX += aScaledRect.mWidth;
-					//}
-					for (auto anItr = aFontLayer->mCharDataMap.begin(); anItr != aFontLayer->mCharDataMap.end(); anItr++)
-					{
-						aCharNum++;
-						Rect* anOrigRect = &anItr->second.mImageRect;
-
-						Rect aScaledRect(aCurX, 0,
-							(int)((anOrigRect->mWidth * aPointSize) / aLayerPointSize),
-							(int)((anOrigRect->mHeight * aPointSize) / aLayerPointSize));
-
-						anActiveFontLayer->mScaledCharImageRects[aCharNum] = aScaledRect;
-
-						if (aScaledRect.mHeight > aMaxHeight)
-							aMaxHeight = aScaledRect.mHeight;
-
-						aCurX += aScaledRect.mWidth;
-					}
-
-					anActiveFontLayer->mScaledImage = aMemoryImage;
-					anActiveFontLayer->mOwnsImage = true;
-
-					// Create the image now
-
-					aMemoryImage->Create(aCurX, aMaxHeight);
-
-					Graphics g(aMemoryImage);
-
-					//for (aCharNum = 0; aCharNum < 256; aCharNum++)
-					//{
-					//	if ((Image*) aFontLayer->mImage != nullptr)
-					//		g.DrawImage(aFontLayer->mImage, anActiveFontLayer->mScaledCharImageRects[aCharNum], aFontLayer->mCharData[aCharNum].mImageRect);						
-					//}
-					for (auto anItr = aFontLayer->mCharDataMap.begin(); anItr != aFontLayer->mCharDataMap.end(); anItr++)
-					{
-						if ((Image*)aFontLayer->mImage != nullptr)
+						auto* aSrcMem = static_cast<MemoryImage*>(aFontLayer->mImage);
+						if (aSrcMem != nullptr)
 						{
-							g.DrawImage(aFontLayer->mImage, anActiveFontLayer->mScaledCharImageRects[aCharNum], anItr->second.mImageRect);
+							uint32_t* aSrcBits = aSrcMem->GetBits();
+							int aSrcStride = aSrcMem->GetWidth();
+
+							for (const auto& [aChar, aCharData] : aFontLayer->mCharDataMap)
+							{
+								const Rect& aDst = anActiveFontLayer->mScaledCharImageRects[aChar];
+								const Rect& aSrc = aCharData.mImageRect;
+
+								for (int y = 0; y < aSrc.mHeight; y++)
+								{
+									memcpy(&aDstBits[(aDst.mY + y) * aDstStride + aDst.mX],
+									       &aSrcBits[(aSrc.mY + y) * aSrcStride + aSrc.mX],
+									       aSrc.mWidth * sizeof(uint32_t));
+								}
+							}
 						}
 					}
-
-
-					if (mForceScaledImagesWhite)
+					else
 					{
-						int aCount = aMemoryImage->mWidth * aMemoryImage->mHeight;
-						uint32_t* aBits = aMemoryImage->GetBits();
-
-						for (int i = 0; i < aCount; i++) {
-							// *(aBits++) = *aBits | 0x00FFFFFF; ambiguous
-							*(aBits) = *aBits | 0x00FFFFFF;
-							aBits++;
+						Graphics g(aMemoryImage);
+						if (static_cast<Image*>(aFontLayer->mImage) != nullptr)
+						{
+							for (const auto& [aChar, aCharData] : aFontLayer->mCharDataMap)
+							{
+								g.DrawImage(aFontLayer->mImage,
+									anActiveFontLayer->mScaledCharImageRects[aChar],
+									aCharData.mImageRect);
+							}
 						}
-					}
 
-					aMemoryImage->Palletize();
+						if (mForceScaledImagesWhite)
+						{
+							int aCount = aMemoryImage->mWidth * aMemoryImage->mHeight;
+							uint32_t* aBits = aMemoryImage->GetBits();
+							for (int i = 0; i < aCount; i++)
+							{
+								*aBits |= 0x00FFFFFF;
+								aBits++;
+							}
+						}
+
+						aMemoryImage->Palletize();
+					}
 				}
 
 				int aLayerAscent = (aFontLayer->mAscent * aPointSize) / aLayerPointSize;
@@ -1753,7 +1764,12 @@ void ImageFont::DrawStringEx(Graphics* g, int theX, int theY, const std::string&
 				g->SetDrawMode(aRenderCommand->mMode);
 			g->SetColor(Color(aRenderCommand->mColor));
 			if (aRenderCommand->mImage != nullptr)
-				g->DrawImage(aRenderCommand->mImage, aRenderCommand->mDest[0], aRenderCommand->mDest[1], Rect(aRenderCommand->mSrc[0], aRenderCommand->mSrc[1], aRenderCommand->mSrc[2], aRenderCommand->mSrc[3]));
+			{
+				Rect aSrcRect(aRenderCommand->mSrc[0], aRenderCommand->mSrc[1],
+					aRenderCommand->mSrc[2], aRenderCommand->mSrc[3]);
+				g->DrawImage(aRenderCommand->mImage,
+					aRenderCommand->mDest[0], aRenderCommand->mDest[1], aSrcRect);
+			}
 			g->SetDrawMode(anOldDrawMode);
 
 			aRenderCommand = aRenderCommand->mNext;

@@ -245,11 +245,11 @@ bool Image::PolyFill3D(const Point*, int, const Rect*, const Color&,int ,int, in
 {
 	return false;
 }
-void Image::Blt(Image*, int, int, const Rect&, const Color&, int){}
+void Image::Blt(Image*, int, int, const Rect&, const Color&, int, bool){}
 void Image::BltF(Image*, float, float, const Rect&, const Rect&, const Color&, int){}
 void Image::BltRotated(Image*, float, float, const Rect &, const Rect&, const Color&, int, double, float, float){}
 void Image::StretchBlt(Image*, const Rect&, const Rect&, const Rect&, const Color&, int, bool){}
 void Image::BltMatrix(Image*, float, float, const SexyMatrix3&, const Rect&, const Color&, int, const Rect&, bool){}
 void Image::BltTrianglesTex(Image*, const TriVertex (*)[3], int, const Rect&, const Color &, int, float, float, bool){}
-void Image::BltMirror(Image*, int, int, const Rect&, const Color&, int){}
+void Image::BltMirror(Image*, int, int, const Rect&, const Color&, int, bool){}
 void Image::StretchBltMirror(Image*, const Rect&, const Rect&, const Rect&, const Color&, int, bool){}
