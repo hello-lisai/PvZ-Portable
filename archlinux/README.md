@@ -34,6 +34,8 @@ sudo pacman -S --needed base-devel
 
 Locate your legally installed copy of Plants vs. Zombies 1.2.0.1073 GOTY (or 1.2.0.1096 GOTY in Steam). If you have not bought the game yet, you can purchase it on [Steam](https://store.steampowered.com/app/3590/Plants_vs_Zombies_Game_of_the_Year_Edition/) or [EA App](https://www.ea.com/games/plants-vs-zombies/plants-vs-zombies-game-of-the-year). You need two items:
 
+> **Note on game version compatibility:** This engine is designed for **1.2.0.1073** (the standalone PopCap release). Using **1.2.0.1096** (Steam GOTY) assets works for general gameplay, but has known issues: the Almanac blue description text will not appear, the "Restart" button label may be missing, unencountered zombies show `???` instead of `(not encountered yet)`, and Crazy Dave's plant sell price displays as 1/10 of the correct value. These are caused by breaking changes in 1.2.0.1096's `LawnStrings.txt` format. **Using 1.2.0.1073 assets is recommended.**
+
 1.  The file `main.pak`
 2.  The folder `properties/`
 

@@ -79,6 +79,21 @@ You can customize these paths via command-line parameters:
 
 **Note:** You **MUST** use the format `-param="<Your Path>"`. Space-separated values (e.g. `-resdir path`) are **NOT** supported.
 
+## Game Version Compatibility
+
+This project is designed and tested against Plants vs. Zombies **GOTY Edition 1.2.0.1073** (the standalone PopCap release). Using the **Steam GOTY Edition 1.2.0.1096** assets is largely supported — the gameplay is fully functional — but there are some known cosmetic issues due to breaking changes in the 1.2.0.1096 `LawnStrings.txt` format.
+
+**Note:** The following issues **only occur when using 1.2.0.1096 (Steam) assets**. They **do not affect 1.2.0.1073 users**.
+
+| Issue (1.2.0.1096 only) | Cause |
+| :---: | :---: |
+| **Almanac blue description text missing** | In 1.2.0.1096, the plain-text introductory paragraph was split out from `[XXX_DESCRIPTION]` into a new `[XXX_DESCRIPTION_HEADER]` key. The engine only reads `[XXX_DESCRIPTION]`, so the header text is never displayed. |
+| **"Restart" button label missing** | The key `[RESTART_LEVEL]` (used for the button label) was renamed to `[RESTART_LEVEL_BUTTON]` in 1.2.0.1096. |
+| **Unencountered zombie shows `???`** instead of `(not encountered yet)` | The string `[NOT_ENCOUNTERED_YET]` changed its value to `???` in 1.2.0.1096; the old text was moved to a new key `[NOT_ENCOUNTERED_YET_DESCRIPTION]`. |
+| **Crazy Dave's plant sell price shows 1/10 of the correct value** | In 1.2.0.1073, the string template `[CRAZY_DAVE_1700]` contains a trailing `0` after `{SELL_PRICE}` (i.e. `${SELL_PRICE}0`) because the engine passes the price divided by 10. In 1.2.0.1096 the trailing `0` was removed, so the displayed price becomes 1/10 of the intended amount. |
+
+**Recommendation: use the 1.2.0.1073 asset package whenever possible.** The 1.2.0.1096 (Steam) version works as a fallback, but the issues listed above will affect the in-game UI.
+
 ## Dependencies
 
 Before building on PC, ensure you have the necessary dependencies installed:
