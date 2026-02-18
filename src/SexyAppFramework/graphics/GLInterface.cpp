@@ -63,13 +63,6 @@ static GLenum gVertexMode;
 static GLuint gProgram;
 static GLuint gVbo;
 static GLint gUfViewProjMtx, gUfTexture, gUfUseTexture, gUfUvBounds;
-static float gUvBounds[4] = {0.f, 0.f, 1.f, 1.f};
-
-static inline void GfxSetUvBounds(const float *uvb)
-{
-	gUvBounds[0] = uvb[0]; gUvBounds[1] = uvb[1];
-	gUvBounds[2] = uvb[2]; gUvBounds[3] = uvb[3];
-}
 
 static void GfxBegin(GLenum vertexMode)
 {
@@ -91,11 +84,7 @@ static void GfxEnd()
 	glVertexAttribPointer(2, 2, GL_FLOAT,         GL_FALSE, sizeof(GLVertex), (const void*)(sizeof(float)*3 + sizeof(uint32_t)));
 	glEnableVertexAttribArray(2);
 
-	glUniform4fv(gUfUvBounds, 1, gUvBounds);
 	glDrawArrays(gVertexMode, 0, gNumVertices);
-
-	gUvBounds[0] = 0.f; gUvBounds[1] = 0.f;
-	gUvBounds[2] = 1.f; gUvBounds[3] = 1.f;
 
 	gVertexMode = (GLenum)-1;
 	gNumVertices = 0;
@@ -700,12 +689,15 @@ static void SetLinearFilter(bool linear)
 	gLinearFilter = linear;
 }
 
-static void GfxBindTexture(GLuint tex)
+static constexpr float kDefaultUvBounds[4] = { 0.f, 0.f, 1.f, 1.f };
+
+static void GfxBindTexture(GLuint tex, const float *uvBounds = kDefaultUvBounds)
 {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	int f = gLinearFilter ? GL_LINEAR : GL_NEAREST;
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f);
+	glUniform4fv(gUfUvBounds, 1, uvBounds);
 }
 
 void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Color& theColor)
@@ -734,7 +726,6 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 		{
 			w = srcRight - srcX; h = srcBottom - srcY;
 			GLuint &tex = GetTexture(srcX, srcY, w, h, u1, v1, u2, v2, uvb);
-			GfxSetUvBounds(uvb);
 			float x = dstX, y = dstY;
 
 			GLVertex v[4] = {
@@ -743,7 +734,7 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 				{ x + w, y,     0, aColor, u2, v1 },
 				{ x + w, y + h, 0, aColor, u2, v2 },
 			};
-			GfxBindTexture(tex);
+			GfxBindTexture(tex, uvb);
 			GfxBegin(GL_TRIANGLE_STRIP);
 			GfxAddVertices(v, 4);
 			GfxEnd();
@@ -884,7 +875,6 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 		{
 			w = srcRight - srcX; h = srcBottom - srcY;
 			GLuint &tex = GetTexture(srcX, srcY, w, h, u1, v1, u2, v2, uvb);
-			GfxSetUvBounds(uvb);
 
 			float x = dstX, y = dstY;
 			SexyVector2 p[4] = { {x, y}, {x, y+h}, {x+w, y}, {x+w, y+h} };
@@ -912,7 +902,7 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 				{ tp[2].x, tp[2].y, 0, aColor, u2, v1 },
 				{ tp[3].x, tp[3].y, 0, aColor, u2, v2 },
 			};
-			GfxBindTexture(tex);
+			GfxBindTexture(tex, uvb);
 
 			if (!clipped)
 			{
@@ -940,8 +930,19 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 	if (mMaxTotalU <= 1.0 && mMaxTotalV <= 1.0)
 	{
 		// Single-texture fast path
+		TextureDataPiece& piece = mTextures[0];
+		float halfU = 0.5f / piece.mWidth;
+		float halfV = 0.5f / piece.mHeight;
+		float midU = mMaxTotalU * 0.5f;
+		float midV = mMaxTotalV * 0.5f;
+		float uvb[4] = {
+			std::min(halfU, midU),
+			std::min(halfV, midV),
+			std::max(mMaxTotalU - halfU, midU),
+			std::max(mMaxTotalV - halfV, midV)
+		};
 		glActiveTexture(GL_TEXTURE0);
-		GfxBindTexture(mTextures[0].mTexture);
+		GfxBindTexture(piece.mTexture, uvb);
 		glUniform1i(gUfUseTexture, 1);
 
 		GfxBegin(GL_TRIANGLES);
@@ -981,6 +982,14 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 			for (int j = aLeft; j < aRight; j++)
 			{
 				TextureDataPiece &piece = mTextures[i * mTexVecWidth + j];
+				float halfU = 0.5f / piece.mWidth;
+				float halfV = 0.5f / piece.mHeight;
+				float uvb[4] = {
+					std::min(halfU, 0.5f),
+					std::min(halfV, 0.5f),
+					std::max(1.0f - halfU, 0.5f),
+					std::max(1.0f - halfV, 0.5f)
+				};
 				VertexList vl = master;
 				for (int k = 0; k < 3; k++)
 				{
@@ -994,7 +1003,7 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 				DoPolyTextureClip(vl);
 				if (vl.size() >= 3)
 				{
-					GfxBindTexture(piece.mTexture);
+					GfxBindTexture(piece.mTexture, uvb);
 					GfxBegin(GL_TRIANGLE_FAN);
 					GfxAddVertices(vl);
 					GfxEnd();
