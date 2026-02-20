@@ -47,6 +47,7 @@ typedef struct
 	size_t (*openmpt_module_read_stereo)(openmpt_module *mod, int32_t samplerate, size_t count, int16_t *left, int16_t *right);
 	double (*openmpt_module_set_position_order_row)(openmpt_module *mod, int32_t order, int32_t row);
 	int32_t (*openmpt_module_get_current_order)(openmpt_module *mod);
+	int32_t (*openmpt_module_get_current_row)(openmpt_module *mod);
 	double (*openmpt_module_set_position_seconds)(openmpt_module *mod, double seconds);
 	double (*openmpt_module_get_position_seconds)(openmpt_module *mod);
 	double (*openmpt_module_get_duration_seconds)(openmpt_module *mod);
@@ -96,6 +97,7 @@ static int OPENMPT_Load(void)
 		FUNCTION_LOADER(openmpt_module_read_stereo, size_t (*)(openmpt_module *mod, int32_t samplerate, size_t count, int16_t *left, int16_t *right))
 		FUNCTION_LOADER(openmpt_module_set_position_order_row, double (*)(openmpt_module *mod, int32_t order, int32_t row))
 		FUNCTION_LOADER(openmpt_module_get_current_order, int32_t (*)(openmpt_module *mod))
+		FUNCTION_LOADER(openmpt_module_get_current_row, int32_t (*)(openmpt_module *mod))
 		FUNCTION_LOADER(openmpt_module_set_position_seconds, double (*)(openmpt_module *mod, double seconds))
 		FUNCTION_LOADER(openmpt_module_get_position_seconds, double (*)(openmpt_module *mod))
 		FUNCTION_LOADER(openmpt_module_get_duration_seconds, double (*)(openmpt_module *mod))
@@ -351,19 +353,23 @@ static int OPENMPT_GetAudio(void *context, void *data, int bytes)
     return music_pcm_getaudio(context, data, bytes, MIX_MAX_VOLUME, OPENMPT_GetSome);
 }
 
-/* Jump to a given order */
+/* Jump to a given order (packed: LOWORD=order, HIWORD=row) */
 static int OPENMPT_Jump(void *context, int order)
 {
     OPENMPT_Music *music = (OPENMPT_Music *)context;
-	openmpt.openmpt_module_set_position_order_row(music->file, order, 0);
+	int32_t ord = (int32_t)((uint32_t)order & 0xFFFF);
+	int32_t row = (int32_t)(((uint32_t)order >> 16) & 0xFFFF);
+	openmpt.openmpt_module_set_position_order_row(music->file, ord, row);
     return 0;
 }
 
-/* Get current order */
+/* Get current order (packed: LOWORD=order, HIWORD=row) */
 static int OPENMPT_GetOrder(void *context, int *outOrder)
 {
 	OPENMPT_Music *music = (OPENMPT_Music *)context;
-	*outOrder = openmpt.openmpt_module_get_current_order(music->file);
+	int32_t order = openmpt.openmpt_module_get_current_order(music->file);
+	int32_t row = openmpt.openmpt_module_get_current_row(music->file);
+	*outOrder = (int)((((uint32_t)row & 0xFFFF) << 16) | ((uint32_t)order & 0xFFFF));
 	return 0;
 }
 
