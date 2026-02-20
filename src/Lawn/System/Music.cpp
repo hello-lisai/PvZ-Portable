@@ -746,28 +746,25 @@ void Music::GameMusicPause(bool thePause)
 	{
 		if (!mPaused && mCurMusicTune != MusicTune::MUSIC_TUNE_NONE)
 		{
-			if (mCurMusicTune == MusicTune::MUSIC_TUNE_CREDITS_ZOMBIES_ON_YOUR_LAWN)
-			{
-				// Credits music is in OGG format and doesn't support MOD order, so we use SDL's pause/resume
-				mMusicInterface->PauseMusic(mCurMusicFileMain);
-			}
-			else
+			// Keep offsets for save/load compatibility
+			if (mCurMusicFileMain != MusicFile::MUSIC_FILE_NONE &&
+				mCurMusicTune != MusicTune::MUSIC_TUNE_CREDITS_ZOMBIES_ON_YOUR_LAWN)
 			{
 				mPauseOffset = GetMusicOrder(mCurMusicFileMain);
-				mMusicInterface->StopMusic(mCurMusicFileMain);
-
-				if (mCurMusicTune == MusicTune::MUSIC_TUNE_DAY_GRASSWALK || mCurMusicTune == MusicTune::MUSIC_TUNE_POOL_WATERYGRAVES ||
-					mCurMusicTune == MusicTune::MUSIC_TUNE_FOG_RIGORMORMIST || mCurMusicTune == MusicTune::MUSIC_TUNE_ROOF_GRAZETHEROOF)
-				{
-					mMusicInterface->StopMusic(mCurMusicFileDrums);
-					mMusicInterface->StopMusic(mCurMusicFileHihats);
-				}
-				else if (mCurMusicTune == MusicTune::MUSIC_TUNE_NIGHT_MOONGRAINS)
-				{
-					mPauseOffsetDrums = GetMusicOrder(mCurMusicFileDrums);
-					mMusicInterface->StopMusic(mCurMusicFileDrums);
-				}
 			}
+			if (mCurMusicTune == MusicTune::MUSIC_TUNE_NIGHT_MOONGRAINS &&
+				mCurMusicFileDrums != MusicFile::MUSIC_FILE_NONE)
+			{
+				mPauseOffsetDrums = GetMusicOrder(mCurMusicFileDrums);
+			}
+
+			if (mCurMusicFileMain != MusicFile::MUSIC_FILE_NONE)
+				mMusicInterface->PauseMusic(mCurMusicFileMain);
+			if (mCurMusicFileDrums != MusicFile::MUSIC_FILE_NONE)
+				mMusicInterface->PauseMusic(mCurMusicFileDrums);
+			if (mCurMusicFileHihats != MusicFile::MUSIC_FILE_NONE)
+				mMusicInterface->PauseMusic(mCurMusicFileHihats);
+
 			mPaused = true;
 		}
 	}
@@ -775,12 +772,21 @@ void Music::GameMusicPause(bool thePause)
 	{
 		if (mCurMusicTune != MusicTune::MUSIC_TUNE_NONE)
 		{
-			if (mCurMusicTune == MusicTune::MUSIC_TUNE_CREDITS_ZOMBIES_ON_YOUR_LAWN)
+			Mix_Music* aHandle = (mCurMusicFileMain != MusicFile::MUSIC_FILE_NONE) ?
+								  GetMusicHandle(mCurMusicFileMain) : nullptr;
+			if (mCurMusicTune == MusicTune::MUSIC_TUNE_CREDITS_ZOMBIES_ON_YOUR_LAWN ||
+				(aHandle && Mix_PlayingMusicStream(aHandle)))
 			{
-				mMusicInterface->ResumeMusic(mCurMusicFileMain);
+				if (mCurMusicFileMain != MusicFile::MUSIC_FILE_NONE)
+					mMusicInterface->ResumeMusic(mCurMusicFileMain);
+				if (mCurMusicFileDrums != MusicFile::MUSIC_FILE_NONE)
+					mMusicInterface->ResumeMusic(mCurMusicFileDrums);
+				if (mCurMusicFileHihats != MusicFile::MUSIC_FILE_NONE)
+					mMusicInterface->ResumeMusic(mCurMusicFileHihats);
 			}
 			else
 			{
+				// Save-load resume path
 				PlayMusic(mCurMusicTune, mPauseOffset, mPauseOffsetDrums);
 			}
 		}
