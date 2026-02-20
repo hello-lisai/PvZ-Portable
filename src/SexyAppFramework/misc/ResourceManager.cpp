@@ -815,7 +815,7 @@ bool ResourceManager::DoLoadSound(SoundRes* theRes)
 	SoundRes *aRes = theRes;
 
 	SEXY_PERF_BEGIN("ResourceManager:LoadSound");
-	int aSoundId = mApp->mSoundManager->GetFreeSoundId();
+	intptr_t aSoundId = mApp->mSoundManager->GetFreeSoundId();
 	if (aSoundId<0)
 		return Fail("Out of free sound ids");
 
@@ -1108,7 +1108,7 @@ SharedImageRef ResourceManager::GetImage(const std::string &theId)
 	
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-int	ResourceManager::GetSound(const std::string &theId)
+intptr_t	ResourceManager::GetSound(const std::string &theId)
 {
 	ResMap::iterator anItr = mSoundMap.find(theId);
 	if (anItr != mSoundMap.end())
@@ -1150,7 +1150,7 @@ SharedImageRef ResourceManager::GetImageThrow(const std::string &theId)
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-int	ResourceManager::GetSoundThrow(const std::string &theId)
+intptr_t	ResourceManager::GetSoundThrow(const std::string &theId)
 {
 	ResMap::iterator anItr = mSoundMap.find(theId);
 	if (anItr != mSoundMap.end())
@@ -1212,7 +1212,7 @@ bool ResourceManager::ReplaceImage(const std::string &theId, Image *theImage)
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-bool ResourceManager::ReplaceSound(const std::string &theId, int theSound)
+bool ResourceManager::ReplaceSound(const std::string &theId, intptr_t theSound)
 {
 	ResMap::iterator anItr = mSoundMap.find(theId);
 	if (anItr != mSoundMap.end())

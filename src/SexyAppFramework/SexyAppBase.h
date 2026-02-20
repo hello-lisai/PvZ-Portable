@@ -418,8 +418,8 @@ public:
 	virtual void			PreGLInterfaceInitHook();
 	virtual void			PostGLInterfaceInitHook();
 	virtual bool			ChangeDirHook(const char *theIntendedPath);
-	virtual void			PlaySample(int theSoundNum);
-	virtual void			PlaySample(int theSoundNum, int thePan);
+	virtual void			PlaySample(intptr_t theSoundNum);
+	virtual void			PlaySample(intptr_t theSoundNum, int thePan);
 
 	virtual double			GetMasterVolume();
 	virtual double			GetMusicVolume();

@@ -29,7 +29,7 @@ protected:
 
 protected:
 	int						FindFreeChannel();
-	bool					LoadAUSound(unsigned int theSfxID, const std::string& theFilename);
+	bool					LoadAUSound(intptr_t theSfxID, const std::string& theFilename);
 	void					ReleaseFreeChannels();
 
 public:
@@ -38,15 +38,15 @@ public:
 
 	virtual bool			Initialized();
 
-	virtual bool			LoadSound(unsigned int theSfxID, const std::string& theFilename);
-	virtual int				LoadSound(const std::string& theFilename);
-	virtual void			ReleaseSound(unsigned int theSfxID);
+	virtual bool			LoadSound(intptr_t theSfxID, const std::string& theFilename);
+	virtual intptr_t		LoadSound(const std::string& theFilename);
+	virtual void			ReleaseSound(intptr_t theSfxID);
 
 	virtual void			SetVolume(double theVolume);
-	virtual bool			SetBaseVolume(unsigned int theSfxID, double theBaseVolume);
-	virtual bool			SetBasePan(unsigned int theSfxID, int theBasePan);
+	virtual bool			SetBaseVolume(intptr_t theSfxID, double theBaseVolume);
+	virtual bool			SetBasePan(intptr_t theSfxID, int theBasePan);
 
-	virtual SoundInstance*	GetSoundInstance(unsigned int theSfxID);
+	virtual SoundInstance*	GetSoundInstance(intptr_t theSfxID);
 
 	virtual void			ReleaseSounds();
 	virtual void			ReleaseChannels();
@@ -56,7 +56,7 @@ public:
 
 	virtual void			Flush();
 	virtual void			StopAllSounds();
-	virtual int				GetFreeSoundId();
+	virtual intptr_t		GetFreeSoundId();
 	virtual int				GetNumSounds();
 };
 

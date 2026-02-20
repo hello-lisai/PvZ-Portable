@@ -214,7 +214,7 @@ public:
 	void							ToggleFastMo();
 	void							PlayFoley(FoleyType theFoleyType);
 	void							PlayFoleyPitch(FoleyType theFoleyType, float thePitch);
-	void							PlaySample(int theSoundNum);
+	void							PlaySample(intptr_t theSoundNum);
 	void							FastLoad(GameMode theGameMode);
 	static std::string				GetStageString(int theLevel);
 	/*inline*/ void					KillChallengeScreen();

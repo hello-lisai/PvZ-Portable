@@ -3476,7 +3476,7 @@ bool LawnApp::CanDoDaisyMode()
 }
 
 //0x4560C0
-void LawnApp::PlaySample(int theSoundNum)
+void LawnApp::PlaySample(intptr_t theSoundNum)
 {
 	if (!mMuteSoundsForCutscene)
 	{

@@ -3612,7 +3612,7 @@ void SexyAppBase::PrecacheNative(MemoryImage* theImage)
 }
 
 
-void SexyAppBase::PlaySample(int theSoundNum)
+void SexyAppBase::PlaySample(intptr_t theSoundNum)
 {
 	if (!mSoundManager)
 		return;
@@ -3625,7 +3625,7 @@ void SexyAppBase::PlaySample(int theSoundNum)
 }
 
 
-void SexyAppBase::PlaySample(int theSoundNum, int thePan)
+void SexyAppBase::PlaySample(intptr_t theSoundNum, int thePan)
 {
 	if (!mSoundManager)
 		return;

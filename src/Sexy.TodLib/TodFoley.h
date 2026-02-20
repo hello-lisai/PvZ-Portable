@@ -135,7 +135,7 @@ class FoleyParams
 public:
     FoleyType           mFoleyType;
     float               mPitchRange;
-    int*                mSfxID[10];
+    intptr_t*           mSfxID[10];
     unsigned int        mFoleyFlags;
 };
 

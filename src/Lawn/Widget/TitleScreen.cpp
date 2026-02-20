@@ -60,8 +60,10 @@ TitleScreen::~TitleScreen()
 	FONT_BRIANNETOD16 = mApp->mResourceManager->LoadFont("FONT_BRIANNETOD16");
 	IMAGE_PVZ_LOGO = mApp->mResourceManager->LoadImage("IMAGE_PVZ_LOGO");
 	IMAGE_REANIM_SODROLLCAP = mApp->mResourceManager->LoadImage("IMAGE_REANIM_SODROLLCAP");
-	SOUND_LOADINGBAR_FLOWER = mApp->mSoundManager->LoadSound(mApp->mSoundManager->GetFreeSoundId(), "sounds/loadingbar_flower");
-	SOUND_BUTTONCLICK = mApp->mSoundManager->LoadSound(mApp->mSoundManager->GetFreeSoundId(), "sounds/buttonclick");
+	SOUND_LOADINGBAR_FLOWER = mApp->mSoundManager->GetFreeSoundId();
+	mApp->mSoundManager->LoadSound(SOUND_LOADINGBAR_FLOWER, "sounds/loadingbar_flower");
+	SOUND_BUTTONCLICK = mApp->mSoundManager->GetFreeSoundId();
+	mApp->mSoundManager->LoadSound(SOUND_BUTTONCLICK, "sounds/buttonclick");
 #endif
 }
 
