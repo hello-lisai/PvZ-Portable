@@ -288,7 +288,7 @@ int SDLMusicInterface::GetMusicOrder(int theSongId)
 {
 	SDLMusicMap::iterator anItr = mMusicMap.find(theSongId);
 	if (anItr != mMusicMap.end())
-	{		
+	{
 		SDLMusicInfo* aMusicInfo = &anItr->second;
 		int aPosition = -1;
 		Mix_ModMusicStreamGetOrder(aMusicInfo->mHMusic, &aPosition);
