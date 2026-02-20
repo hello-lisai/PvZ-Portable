@@ -56,7 +56,7 @@ bool SDLSoundManager::Initialized()
 	return SDL_WasInit(SDL_INIT_AUDIO) && mInitializedMixer;
 }
 
-bool SDLSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theFilename)
+bool SDLSoundManager::LoadAUSound(intptr_t theSfxID, const std::string& theFilename)
 {
 	PFILE* fp;
 
@@ -229,7 +229,7 @@ bool SDLSoundManager::LoadAUSound(unsigned int theSfxID, const std::string& theF
 	return true;
 }
 
-bool SDLSoundManager::LoadSound(unsigned int theSfxID, const std::string& theFilename)
+bool SDLSoundManager::LoadSound(intptr_t theSfxID, const std::string& theFilename)
 {
 	if ((theSfxID < 0) || (theSfxID >= MAX_SOURCE_SOUNDS))
 		return false;
@@ -268,9 +268,9 @@ bool SDLSoundManager::LoadSound(unsigned int theSfxID, const std::string& theFil
 	return !!mSourceSounds[theSfxID];
 }
 
-int SDLSoundManager::LoadSound(const std::string& theFilename)
+intptr_t SDLSoundManager::LoadSound(const std::string& theFilename)
 {
-	int i;
+	intptr_t i;
 	for (i = 0; i < MAX_SOURCE_SOUNDS; i++)
 		if (mSourceFileNames[i] == theFilename)
 			return i;
@@ -289,8 +289,11 @@ int SDLSoundManager::LoadSound(const std::string& theFilename)
 	return -1;
 }
 
-void SDLSoundManager::ReleaseSound(unsigned int theSfxID)
+void SDLSoundManager::ReleaseSound(intptr_t theSfxID)
 {
+	if ((theSfxID < 0) || (theSfxID >= MAX_SOURCE_SOUNDS))
+		return;
+
 	if (mSourceSounds[theSfxID] != nullptr)
 	{
 		Mix_FreeChunk(mSourceSounds[theSfxID]);
@@ -308,7 +311,7 @@ void SDLSoundManager::SetVolume(double theVolume)
 			mPlayingSounds[i]->RehupVolume();
 }
 
-bool SDLSoundManager::SetBaseVolume(unsigned int theSfxID, double theBaseVolume)
+bool SDLSoundManager::SetBaseVolume(intptr_t theSfxID, double theBaseVolume)
 {
 	if ((theSfxID < 0) || (theSfxID >= MAX_SOURCE_SOUNDS))
 		return false;
@@ -317,7 +320,7 @@ bool SDLSoundManager::SetBaseVolume(unsigned int theSfxID, double theBaseVolume)
 	return true;
 }
 
-bool SDLSoundManager::SetBasePan(unsigned int theSfxID, int theBasePan)
+bool SDLSoundManager::SetBasePan(intptr_t theSfxID, int theBasePan)
 {
 	if ((theSfxID < 0) || (theSfxID >= MAX_SOURCE_SOUNDS))
 		return false;
@@ -326,9 +329,9 @@ bool SDLSoundManager::SetBasePan(unsigned int theSfxID, int theBasePan)
 	return true;
 }
 
-SoundInstance* SDLSoundManager::GetSoundInstance(unsigned int theSfxID)
+SoundInstance* SDLSoundManager::GetSoundInstance(intptr_t theSfxID)
 {
-	if (theSfxID > MAX_SOURCE_SOUNDS)
+	if ((theSfxID < 0) || (theSfxID >= MAX_SOURCE_SOUNDS))
 		return nullptr;
 
 	int aFreeChannel = FindFreeChannel();
@@ -398,9 +401,9 @@ void SDLSoundManager::StopAllSounds()
 	}
 }
 
-int SDLSoundManager::GetFreeSoundId()
+intptr_t SDLSoundManager::GetFreeSoundId()
 {
-	for (int i=0; i<MAX_SOURCE_SOUNDS; i++)
+	for (intptr_t i=0; i<MAX_SOURCE_SOUNDS; i++)
 	{
 		if (mSourceSounds[i]==nullptr)
 			return i;

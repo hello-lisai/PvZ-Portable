@@ -75,7 +75,7 @@ public: // @Patoke todo: revert to protected
 
 	struct SoundRes : public BaseRes
 	{
-		int mSoundId;
+		intptr_t mSoundId;
 		double mVolume;
 		int mPanning;
 
@@ -173,7 +173,7 @@ public:
 	virtual bool			LoadResources(const std::string &theGroup);
 
 	bool					ReplaceImage(const std::string &theId, Image *theImage);
-	bool					ReplaceSound(const std::string &theId, int theSound);
+	bool					ReplaceSound(const std::string &theId, intptr_t theSound);
 	bool					ReplaceFont(const std::string &theId, _Font *theFont);
 
 	void					DeleteImage(const std::string &theName);
@@ -183,7 +183,7 @@ public:
 	_Font*					LoadFont(const std::string &theName);
 
 	SharedImageRef			GetImage(const std::string &theId);
-	int						GetSound(const std::string &theId);
+	intptr_t					GetSound(const std::string &theId);
 	_Font*					GetFont(const std::string &theId);
 	
 	// Returns all the XML attributes associated with the image
@@ -191,7 +191,7 @@ public:
 
 	// These throw a ResourceManagerException if the resource is not found
 	virtual SharedImageRef	GetImageThrow(const std::string &theId);
-	virtual int				GetSoundThrow(const std::string &theId);
+	virtual intptr_t			GetSoundThrow(const std::string &theId);
 	virtual _Font*			GetFontThrow(const std::string &theId);
 
 	void					SetAllowMissingProgramImages(bool allow);

@@ -1,4 +1,5 @@
 #include <map>
+#include <cstring>
 #include "Resources.h"
 #include "misc/ResourceManager.h"
 
@@ -1118,9 +1119,9 @@ Image* Sexy::IMAGE_LOADBAR_GRASS;
 Image* Sexy::IMAGE_PVZ_LOGO;
 Image* Sexy::IMAGE_REANIM_SODROLLCAP;
 Image* Sexy::IMAGE_TITLESCREEN;
-int Sexy::SOUND_BUTTONCLICK;
-int Sexy::SOUND_LOADINGBAR_FLOWER;
-int Sexy::SOUND_LOADINGBAR_ZOMBIE;
+intptr_t Sexy::SOUND_BUTTONCLICK;
+intptr_t Sexy::SOUND_LOADINGBAR_FLOWER;
+intptr_t Sexy::SOUND_LOADINGBAR_ZOMBIE;
 
 bool Sexy::ExtractLoaderBarResources(ResourceManager* theManager)
 {
@@ -1951,171 +1952,171 @@ bool Sexy::ExtractLoadingImagesResources(ResourceManager* theManager)
 }
 
 // LoadingSounds Resources
-int Sexy::SOUND_ACHIEVEMENT;
-int Sexy::SOUND_AWOOGA;
-int Sexy::SOUND_BALLOONINFLATE;
-int Sexy::SOUND_BALLOON_POP;
-int Sexy::SOUND_BASKETBALL;
-int Sexy::SOUND_BIGCHOMP;
-int Sexy::SOUND_BLEEP;
-int Sexy::SOUND_BLOVER;
-int Sexy::SOUND_BOING;
-int Sexy::SOUND_BONK;
-int Sexy::SOUND_BOSSBOULDERATTACK;
-int Sexy::SOUND_BOSSEXPLOSION;
-int Sexy::SOUND_BOWLING;
-int Sexy::SOUND_BOWLINGIMPACT;
-int Sexy::SOUND_BOWLINGIMPACT2;
-int Sexy::SOUND_BUGSPRAY;
-int Sexy::SOUND_BUNGEE_SCREAM;
-int Sexy::SOUND_BUNGEE_SCREAM2;
-int Sexy::SOUND_BUNGEE_SCREAM3;
-int Sexy::SOUND_BUTTER;
-int Sexy::SOUND_BUZZER;
-int Sexy::SOUND_CERAMIC;
-int Sexy::SOUND_CHERRYBOMB;
-int Sexy::SOUND_CHIME;
-int Sexy::SOUND_CHOMP;
-int Sexy::SOUND_CHOMP2;
-int Sexy::SOUND_CHOMPSOFT;
-int Sexy::SOUND_COBLAUNCH;
-int Sexy::SOUND_COFFEE;
-int Sexy::SOUND_COIN;
-int Sexy::SOUND_CRAZYDAVECRAZY;
-int Sexy::SOUND_CRAZYDAVEEXTRALONG1;
-int Sexy::SOUND_CRAZYDAVEEXTRALONG2;
-int Sexy::SOUND_CRAZYDAVEEXTRALONG3;
-int Sexy::SOUND_CRAZYDAVELONG1;
-int Sexy::SOUND_CRAZYDAVELONG2;
-int Sexy::SOUND_CRAZYDAVELONG3;
-int Sexy::SOUND_CRAZYDAVESCREAM;
-int Sexy::SOUND_CRAZYDAVESCREAM2;
-int Sexy::SOUND_CRAZYDAVESHORT1;
-int Sexy::SOUND_CRAZYDAVESHORT2;
-int Sexy::SOUND_CRAZYDAVESHORT3;
-int Sexy::SOUND_DANCER;
-int Sexy::SOUND_DIAMOND;
-int Sexy::SOUND_DIGGER_ZOMBIE;
-int Sexy::SOUND_DIRT_RISE;
-int Sexy::SOUND_DOLPHIN_APPEARS;
-int Sexy::SOUND_DOLPHIN_BEFORE_JUMPING;
-int Sexy::SOUND_DOOMSHROOM;
-int Sexy::SOUND_EVILLAUGH;
-int Sexy::SOUND_EXPLOSION;
-int Sexy::SOUND_FERTILIZER;
-int Sexy::SOUND_FINALFANFARE;
-int Sexy::SOUND_FINALWAVE;
-int Sexy::SOUND_FIREPEA;
-int Sexy::SOUND_FLOOP;
-int Sexy::SOUND_FROZEN;
-int Sexy::SOUND_FUME;
-int Sexy::SOUND_GARGANTUAR_THUMP;
-int Sexy::SOUND_GARGANTUDEATH;
-int Sexy::SOUND_GRASSSTEP;
-int Sexy::SOUND_GRAVEBUSTERCHOMP;
-int Sexy::SOUND_GRAVEBUTTON;
-int Sexy::SOUND_GRAVESTONE_RUMBLE;
-int Sexy::SOUND_GROAN;
-int Sexy::SOUND_GROAN2;
-int Sexy::SOUND_GROAN3;
-int Sexy::SOUND_GROAN4;
-int Sexy::SOUND_GROAN5;
-int Sexy::SOUND_GROAN6;
-int Sexy::SOUND_GULP;
-int Sexy::SOUND_HATCHBACK_CLOSE;
-int Sexy::SOUND_HATCHBACK_OPEN;
-int Sexy::SOUND_HUGE_WAVE;
-int Sexy::SOUND_HYDRAULIC;
-int Sexy::SOUND_HYDRAULIC_SHORT;
-int Sexy::SOUND_IGNITE;
-int Sexy::SOUND_IGNITE2;
-int Sexy::SOUND_IMP;
-int Sexy::SOUND_IMP2;
-int Sexy::SOUND_JACKINTHEBOX;
-int Sexy::SOUND_JACK_SURPRISE;
-int Sexy::SOUND_JACK_SURPRISE2;
-int Sexy::SOUND_JALAPENO;
-int Sexy::SOUND_JUICY;
-int Sexy::SOUND_KERNELPULT;
-int Sexy::SOUND_KERNELPULT2;
-int Sexy::SOUND_LADDER_ZOMBIE;
-int Sexy::SOUND_LAWNMOWER;
-int Sexy::SOUND_LIGHTFILL;
-int Sexy::SOUND_LIMBS_POP;
-int Sexy::SOUND_LOSEMUSIC;
-int Sexy::SOUND_LOWGROAN;
-int Sexy::SOUND_LOWGROAN2;
-int Sexy::SOUND_MAGNETSHROOM;
-int Sexy::SOUND_MELONIMPACT;
-int Sexy::SOUND_MELONIMPACT2;
-int Sexy::SOUND_MINDCONTROLLED;
-int Sexy::SOUND_MONEYFALLS;
-int Sexy::SOUND_NEWSPAPER_RARRGH;
-int Sexy::SOUND_NEWSPAPER_RARRGH2;
-int Sexy::SOUND_NEWSPAPER_RIP;
-int Sexy::SOUND_PAPER;
-int Sexy::SOUND_PAUSE;
-int Sexy::SOUND_PHONOGRAPH;
-int Sexy::SOUND_PLANT;
-int Sexy::SOUND_PLANT2;
-int Sexy::SOUND_PLANTERN;
-int Sexy::SOUND_PLANTGROW;
-int Sexy::SOUND_PLANT_WATER;
-int Sexy::SOUND_PLASTICHIT;
-int Sexy::SOUND_PLASTICHIT2;
-int Sexy::SOUND_POGO_ZOMBIE;
-int Sexy::SOUND_POINTS;
-int Sexy::SOUND_POLEVAULT;
-int Sexy::SOUND_POOL_CLEANER;
-int Sexy::SOUND_PORTAL;
-int Sexy::SOUND_POTATO_MINE;
-int Sexy::SOUND_PRIZE;
-int Sexy::SOUND_PUFF;
-int Sexy::SOUND_RAIN;
-int Sexy::SOUND_READYSETPLANT;
-int Sexy::SOUND_REVERSE_EXPLOSION;
-int Sexy::SOUND_ROLL_IN;
-int Sexy::SOUND_RVTHROW;
-int Sexy::SOUND_SCREAM;
-int Sexy::SOUND_SEEDLIFT;
-int Sexy::SOUND_SHIELDHIT;
-int Sexy::SOUND_SHIELDHIT2;
-int Sexy::SOUND_SHOOP;
-int Sexy::SOUND_SHOVEL;
-int Sexy::SOUND_SIREN;
-int Sexy::SOUND_SLOT_MACHINE;
-int Sexy::SOUND_SLURP;
-int Sexy::SOUND_SNOW_PEA_SPARKLES;
-int Sexy::SOUND_SPLAT;
-int Sexy::SOUND_SPLAT2;
-int Sexy::SOUND_SPLAT3;
-int Sexy::SOUND_SQUASH_HMM;
-int Sexy::SOUND_SQUASH_HMM2;
-int Sexy::SOUND_SUKHBIR;
-int Sexy::SOUND_SUKHBIR2;
-int Sexy::SOUND_SUKHBIR3;
-int Sexy::SOUND_SUKHBIR4;
-int Sexy::SOUND_SUKHBIR5;
-int Sexy::SOUND_SUKHBIR6;
-int Sexy::SOUND_SWING;
-int Sexy::SOUND_TAP;
-int Sexy::SOUND_TAP2;
-int Sexy::SOUND_TAPGLASS;
-int Sexy::SOUND_THROW;
-int Sexy::SOUND_THROW2;
-int Sexy::SOUND_THUNDER;
-int Sexy::SOUND_VASE_BREAKING;
-int Sexy::SOUND_WAKEUP;
-int Sexy::SOUND_WATERING;
-int Sexy::SOUND_WINMUSIC;
-int Sexy::SOUND_YUCK;
-int Sexy::SOUND_YUCK2;
-int Sexy::SOUND_ZAMBONI;
-int Sexy::SOUND_ZOMBAQUARIUM_DIE;
-int Sexy::SOUND_ZOMBIESPLASH;
-int Sexy::SOUND_ZOMBIE_ENTERING_WATER;
-int Sexy::SOUND_ZOMBIE_FALLING_1;
-int Sexy::SOUND_ZOMBIE_FALLING_2;
+intptr_t Sexy::SOUND_ACHIEVEMENT;
+intptr_t Sexy::SOUND_AWOOGA;
+intptr_t Sexy::SOUND_BALLOONINFLATE;
+intptr_t Sexy::SOUND_BALLOON_POP;
+intptr_t Sexy::SOUND_BASKETBALL;
+intptr_t Sexy::SOUND_BIGCHOMP;
+intptr_t Sexy::SOUND_BLEEP;
+intptr_t Sexy::SOUND_BLOVER;
+intptr_t Sexy::SOUND_BOING;
+intptr_t Sexy::SOUND_BONK;
+intptr_t Sexy::SOUND_BOSSBOULDERATTACK;
+intptr_t Sexy::SOUND_BOSSEXPLOSION;
+intptr_t Sexy::SOUND_BOWLING;
+intptr_t Sexy::SOUND_BOWLINGIMPACT;
+intptr_t Sexy::SOUND_BOWLINGIMPACT2;
+intptr_t Sexy::SOUND_BUGSPRAY;
+intptr_t Sexy::SOUND_BUNGEE_SCREAM;
+intptr_t Sexy::SOUND_BUNGEE_SCREAM2;
+intptr_t Sexy::SOUND_BUNGEE_SCREAM3;
+intptr_t Sexy::SOUND_BUTTER;
+intptr_t Sexy::SOUND_BUZZER;
+intptr_t Sexy::SOUND_CERAMIC;
+intptr_t Sexy::SOUND_CHERRYBOMB;
+intptr_t Sexy::SOUND_CHIME;
+intptr_t Sexy::SOUND_CHOMP;
+intptr_t Sexy::SOUND_CHOMP2;
+intptr_t Sexy::SOUND_CHOMPSOFT;
+intptr_t Sexy::SOUND_COBLAUNCH;
+intptr_t Sexy::SOUND_COFFEE;
+intptr_t Sexy::SOUND_COIN;
+intptr_t Sexy::SOUND_CRAZYDAVECRAZY;
+intptr_t Sexy::SOUND_CRAZYDAVEEXTRALONG1;
+intptr_t Sexy::SOUND_CRAZYDAVEEXTRALONG2;
+intptr_t Sexy::SOUND_CRAZYDAVEEXTRALONG3;
+intptr_t Sexy::SOUND_CRAZYDAVELONG1;
+intptr_t Sexy::SOUND_CRAZYDAVELONG2;
+intptr_t Sexy::SOUND_CRAZYDAVELONG3;
+intptr_t Sexy::SOUND_CRAZYDAVESCREAM;
+intptr_t Sexy::SOUND_CRAZYDAVESCREAM2;
+intptr_t Sexy::SOUND_CRAZYDAVESHORT1;
+intptr_t Sexy::SOUND_CRAZYDAVESHORT2;
+intptr_t Sexy::SOUND_CRAZYDAVESHORT3;
+intptr_t Sexy::SOUND_DANCER;
+intptr_t Sexy::SOUND_DIAMOND;
+intptr_t Sexy::SOUND_DIGGER_ZOMBIE;
+intptr_t Sexy::SOUND_DIRT_RISE;
+intptr_t Sexy::SOUND_DOLPHIN_APPEARS;
+intptr_t Sexy::SOUND_DOLPHIN_BEFORE_JUMPING;
+intptr_t Sexy::SOUND_DOOMSHROOM;
+intptr_t Sexy::SOUND_EVILLAUGH;
+intptr_t Sexy::SOUND_EXPLOSION;
+intptr_t Sexy::SOUND_FERTILIZER;
+intptr_t Sexy::SOUND_FINALFANFARE;
+intptr_t Sexy::SOUND_FINALWAVE;
+intptr_t Sexy::SOUND_FIREPEA;
+intptr_t Sexy::SOUND_FLOOP;
+intptr_t Sexy::SOUND_FROZEN;
+intptr_t Sexy::SOUND_FUME;
+intptr_t Sexy::SOUND_GARGANTUAR_THUMP;
+intptr_t Sexy::SOUND_GARGANTUDEATH;
+intptr_t Sexy::SOUND_GRASSSTEP;
+intptr_t Sexy::SOUND_GRAVEBUSTERCHOMP;
+intptr_t Sexy::SOUND_GRAVEBUTTON;
+intptr_t Sexy::SOUND_GRAVESTONE_RUMBLE;
+intptr_t Sexy::SOUND_GROAN;
+intptr_t Sexy::SOUND_GROAN2;
+intptr_t Sexy::SOUND_GROAN3;
+intptr_t Sexy::SOUND_GROAN4;
+intptr_t Sexy::SOUND_GROAN5;
+intptr_t Sexy::SOUND_GROAN6;
+intptr_t Sexy::SOUND_GULP;
+intptr_t Sexy::SOUND_HATCHBACK_CLOSE;
+intptr_t Sexy::SOUND_HATCHBACK_OPEN;
+intptr_t Sexy::SOUND_HUGE_WAVE;
+intptr_t Sexy::SOUND_HYDRAULIC;
+intptr_t Sexy::SOUND_HYDRAULIC_SHORT;
+intptr_t Sexy::SOUND_IGNITE;
+intptr_t Sexy::SOUND_IGNITE2;
+intptr_t Sexy::SOUND_IMP;
+intptr_t Sexy::SOUND_IMP2;
+intptr_t Sexy::SOUND_JACKINTHEBOX;
+intptr_t Sexy::SOUND_JACK_SURPRISE;
+intptr_t Sexy::SOUND_JACK_SURPRISE2;
+intptr_t Sexy::SOUND_JALAPENO;
+intptr_t Sexy::SOUND_JUICY;
+intptr_t Sexy::SOUND_KERNELPULT;
+intptr_t Sexy::SOUND_KERNELPULT2;
+intptr_t Sexy::SOUND_LADDER_ZOMBIE;
+intptr_t Sexy::SOUND_LAWNMOWER;
+intptr_t Sexy::SOUND_LIGHTFILL;
+intptr_t Sexy::SOUND_LIMBS_POP;
+intptr_t Sexy::SOUND_LOSEMUSIC;
+intptr_t Sexy::SOUND_LOWGROAN;
+intptr_t Sexy::SOUND_LOWGROAN2;
+intptr_t Sexy::SOUND_MAGNETSHROOM;
+intptr_t Sexy::SOUND_MELONIMPACT;
+intptr_t Sexy::SOUND_MELONIMPACT2;
+intptr_t Sexy::SOUND_MINDCONTROLLED;
+intptr_t Sexy::SOUND_MONEYFALLS;
+intptr_t Sexy::SOUND_NEWSPAPER_RARRGH;
+intptr_t Sexy::SOUND_NEWSPAPER_RARRGH2;
+intptr_t Sexy::SOUND_NEWSPAPER_RIP;
+intptr_t Sexy::SOUND_PAPER;
+intptr_t Sexy::SOUND_PAUSE;
+intptr_t Sexy::SOUND_PHONOGRAPH;
+intptr_t Sexy::SOUND_PLANT;
+intptr_t Sexy::SOUND_PLANT2;
+intptr_t Sexy::SOUND_PLANTERN;
+intptr_t Sexy::SOUND_PLANTGROW;
+intptr_t Sexy::SOUND_PLANT_WATER;
+intptr_t Sexy::SOUND_PLASTICHIT;
+intptr_t Sexy::SOUND_PLASTICHIT2;
+intptr_t Sexy::SOUND_POGO_ZOMBIE;
+intptr_t Sexy::SOUND_POINTS;
+intptr_t Sexy::SOUND_POLEVAULT;
+intptr_t Sexy::SOUND_POOL_CLEANER;
+intptr_t Sexy::SOUND_PORTAL;
+intptr_t Sexy::SOUND_POTATO_MINE;
+intptr_t Sexy::SOUND_PRIZE;
+intptr_t Sexy::SOUND_PUFF;
+intptr_t Sexy::SOUND_RAIN;
+intptr_t Sexy::SOUND_READYSETPLANT;
+intptr_t Sexy::SOUND_REVERSE_EXPLOSION;
+intptr_t Sexy::SOUND_ROLL_IN;
+intptr_t Sexy::SOUND_RVTHROW;
+intptr_t Sexy::SOUND_SCREAM;
+intptr_t Sexy::SOUND_SEEDLIFT;
+intptr_t Sexy::SOUND_SHIELDHIT;
+intptr_t Sexy::SOUND_SHIELDHIT2;
+intptr_t Sexy::SOUND_SHOOP;
+intptr_t Sexy::SOUND_SHOVEL;
+intptr_t Sexy::SOUND_SIREN;
+intptr_t Sexy::SOUND_SLOT_MACHINE;
+intptr_t Sexy::SOUND_SLURP;
+intptr_t Sexy::SOUND_SNOW_PEA_SPARKLES;
+intptr_t Sexy::SOUND_SPLAT;
+intptr_t Sexy::SOUND_SPLAT2;
+intptr_t Sexy::SOUND_SPLAT3;
+intptr_t Sexy::SOUND_SQUASH_HMM;
+intptr_t Sexy::SOUND_SQUASH_HMM2;
+intptr_t Sexy::SOUND_SUKHBIR;
+intptr_t Sexy::SOUND_SUKHBIR2;
+intptr_t Sexy::SOUND_SUKHBIR3;
+intptr_t Sexy::SOUND_SUKHBIR4;
+intptr_t Sexy::SOUND_SUKHBIR5;
+intptr_t Sexy::SOUND_SUKHBIR6;
+intptr_t Sexy::SOUND_SWING;
+intptr_t Sexy::SOUND_TAP;
+intptr_t Sexy::SOUND_TAP2;
+intptr_t Sexy::SOUND_TAPGLASS;
+intptr_t Sexy::SOUND_THROW;
+intptr_t Sexy::SOUND_THROW2;
+intptr_t Sexy::SOUND_THUNDER;
+intptr_t Sexy::SOUND_VASE_BREAKING;
+intptr_t Sexy::SOUND_WAKEUP;
+intptr_t Sexy::SOUND_WATERING;
+intptr_t Sexy::SOUND_WINMUSIC;
+intptr_t Sexy::SOUND_YUCK;
+intptr_t Sexy::SOUND_YUCK2;
+intptr_t Sexy::SOUND_ZAMBONI;
+intptr_t Sexy::SOUND_ZOMBAQUARIUM_DIE;
+intptr_t Sexy::SOUND_ZOMBIESPLASH;
+intptr_t Sexy::SOUND_ZOMBIE_ENTERING_WATER;
+intptr_t Sexy::SOUND_ZOMBIE_FALLING_1;
+intptr_t Sexy::SOUND_ZOMBIE_FALLING_2;
 
 bool Sexy::ExtractLoadingSoundsResources(ResourceManager* theManager)
 {
@@ -3197,9 +3198,9 @@ Sexy::_Font* Sexy::GetFontById(ResourceId theId)
 	return *reinterpret_cast<Sexy::_Font**>(gResources[static_cast<int>(theId)]);
 }
 
-int Sexy::GetSoundById(ResourceId theId)
+intptr_t Sexy::GetSoundById(ResourceId theId)
 {
-	return *reinterpret_cast<int*>(gResources[static_cast<int>(theId)]);
+	return *reinterpret_cast<intptr_t*>(gResources[static_cast<int>(theId)]);
 }
 
 Image*& Sexy::GetImageRefById(ResourceId theId)
@@ -3212,9 +3213,9 @@ _Font*& Sexy::GetFontRefById(ResourceId theId)
 	return *reinterpret_cast<_Font**>(gResources[static_cast<int>(theId)]);
 }
 
-int& Sexy::GetSoundRefById(ResourceId theId)
+intptr_t& Sexy::GetSoundRefById(ResourceId theId)
 {
-	return *reinterpret_cast<int*>(gResources[static_cast<int>(theId)]);
+	return *reinterpret_cast<intptr_t*>(gResources[static_cast<int>(theId)]);
 }
 
 Sexy::ResourceId Sexy::GetIdByImage(Image* theImage)
@@ -3242,21 +3243,13 @@ Sexy::ResourceId Sexy::GetIdByVariable(void* theVariable)
 		gNeedRecalcVariableToIdMap = false;
 		aMap.clear();
 		for (int i = 0; i < static_cast<int>(ResourceId::RESOURCE_ID_MAX); i++)
-			aMap[gResources[i]] = i;
+		{
+			void* value;
+			std::memcpy(&value, gResources[i], sizeof(void*));
+			aMap[value] = i;
+		}
 	}
 
 	auto anIter = aMap.find(theVariable);
 	return anIter == aMap.end() ? ResourceId::RESOURCE_ID_MAX : (ResourceId)anIter->second;
 }
-/*
-	*aMap.end() => __asm 
-	{ 
-		mov eax,[aMap+04]
-	}
-	anIter == aMap.end() => __asm
-	{ 
-		mov edi,[aMap+04]  ; edi = *aMap.end()
-		mov ebx,[anIter]   ; ebx = *anIter
-		cmp ebx,edi        ; this 与 other 的 “==”操作，比较 *this 与 *other 是否相同
-	}
-*/

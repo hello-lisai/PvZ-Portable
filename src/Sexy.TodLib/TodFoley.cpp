@@ -255,7 +255,7 @@ void TodFoley::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
 		return;
 
 	int aVariations = 0;
-	intptr_t aVariationsArray[10];
+	int aVariationsArray[10];
 	FoleyTypeData* aFoleyData = &mFoleyTypeData[theFoleyType];
 	for (int i = 0; i < 10; i++)
 	{
