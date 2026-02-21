@@ -472,7 +472,8 @@ bool LawnApp::TryLoadGame()
 		if (mBoard->LoadGame(aSaveName))
 		{
 			mFirstTimeGameSelector = false;
-			mBoardResult = BoardResult::BOARDRESULT_NONE;
+			if (mBoard->mLevelAwardSpawned) // Ensure save cleanup after award collection
+				mBoardResult = BoardResult::BOARDRESULT_WON;
 			DoContinueDialog();
 			return true;
 		}
@@ -489,7 +490,8 @@ bool LawnApp::TryLoadGame()
 				EraseFile(aLegacySaveName);
 			}
 			mFirstTimeGameSelector = false;
-			mBoardResult = BoardResult::BOARDRESULT_NONE;
+			if (mBoard->mLevelAwardSpawned) // Ensure save cleanup after award collection
+				mBoardResult = BoardResult::BOARDRESULT_WON;
 			DoContinueDialog();
 			return true;
 		}
