@@ -1,6 +1,3 @@
-#ifndef _MSC_VER
-#include <unistd.h>
-#endif
 #include <algorithm>
 #include <filesystem>
 #include "Common.h"

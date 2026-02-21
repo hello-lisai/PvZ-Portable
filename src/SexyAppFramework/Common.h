@@ -2,6 +2,7 @@
 #define __SEXYAPPFRAMEWORK_COMMON_H__
 
 #include <string>
+#include <cstring>
 #include <vector>
 #include <map>
 #include <cstdlib>
@@ -27,11 +28,7 @@
 #include <shellapi.h>
 #include <mmsystem.h>
 #else
-
-#include <string.h>
 #include <strings.h>
-#include <stdint.h>
-
 #endif
 
 // fallback if NOMINMAX fails (somehow?)
@@ -42,7 +39,7 @@
 #ifdef _MSC_VER
 #include <direct.h>
 #include <io.h>
-#define unreachable [](){ __assume(0); }
+#define unreachable() __assume(0)
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #define getcwd _getcwd
@@ -78,8 +75,10 @@ inline int nanosleep(const struct timespec* ts, struct timespec* rem)
 
 	return 0;
 }
+#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)) || defined(__clang__)
+#define unreachable() __builtin_unreachable()
 #else
-#define unreachable __builtin_unreachable
+#define unreachable() ((void)0)
 #endif
 
 #define LENGTH(anyarray) (sizeof(anyarray) / sizeof(anyarray[0]))
