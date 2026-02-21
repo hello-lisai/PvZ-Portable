@@ -353,7 +353,7 @@ static int OPENMPT_GetAudio(void *context, void *data, int bytes)
     return music_pcm_getaudio(context, data, bytes, MIX_MAX_VOLUME, OPENMPT_GetSome);
 }
 
-/* Jump to a given order (packed: LOWORD=order, HIWORD=row) */
+/* Jump to a given order pack in mod music (low 16 bits = order, high 16 bits = row) */
 static int OPENMPT_Jump(void *context, int order)
 {
     OPENMPT_Music *music = (OPENMPT_Music *)context;
@@ -363,13 +363,13 @@ static int OPENMPT_Jump(void *context, int order)
     return 0;
 }
 
-/* Get current order (packed: LOWORD=order, HIWORD=row) */
-static int OPENMPT_GetOrder(void *context, int *outOrder)
+/* Get current order pack in mod music (low 16 bits = order, high 16 bits = row) */
+static int OPENMPT_GetOrder(void *context, int *order)
 {
 	OPENMPT_Music *music = (OPENMPT_Music *)context;
-	int32_t order = openmpt.openmpt_module_get_current_order(music->file);
+	int32_t ord = openmpt.openmpt_module_get_current_order(music->file);
 	int32_t row = openmpt.openmpt_module_get_current_row(music->file);
-	*outOrder = (int)((((uint32_t)row & 0xFFFF) << 16) | ((uint32_t)order & 0xFFFF));
+	*order = (int)((((uint32_t)row & 0xFFFF) << 16) | ((uint32_t)ord & 0xFFFF));
 	return 0;
 }
 

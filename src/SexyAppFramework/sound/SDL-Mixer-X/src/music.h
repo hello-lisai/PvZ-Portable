@@ -129,11 +129,11 @@ typedef struct
     /* Get music data, returns the number of bytes left */
     int (*GetAudio)(void *music, void *data, int bytes);
 
-    /* Jump to a given order in mod music */
+    /* Jump to a given order pack in mod music (low 16 bits = order, high 16 bits = row) */
     int (*Jump)(void *music, int order);
 
-	/* Get current order in mod music */
-    int (*GetOrder)(void *music, int* outOrder);
+	/* Get current order pack in mod music (low 16 bits = order, high 16 bits = row) */
+    int (*GetOrder)(void *music, int *order);
 
     /* Mod music: Toggle muted channel */
     int (*MuteChannel)(void *music, int channel, int mute);

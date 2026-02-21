@@ -2398,15 +2398,15 @@ int MIXCALLCC Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order)
     return retval;
 }
 
-/* Get current order in mod music. */
-int Mix_ModMusicGetOrder(int *outOrder)
+/* Get current order pack in mod music (low 16 bits = order, high 16 bits = row). */
+int Mix_ModMusicGetOrder(int *order)
 {
     int retval = -1;
 
     Mix_LockAudio();
     if (music_playing) {
         if (music_playing->interface->GetOrder) {
-            retval = music_playing->interface->GetOrder(music_playing->context, outOrder);
+            retval = music_playing->interface->GetOrder(music_playing->context, order);
         } else {
             Mix_SetError("GetOrder not implemented for music type");
         }
@@ -2417,14 +2417,14 @@ int Mix_ModMusicGetOrder(int *outOrder)
 
     return retval;
 }
-int Mix_ModMusicStreamGetOrder(Mix_Music *music, int *outOrder)
+int Mix_ModMusicStreamGetOrder(Mix_Music *music, int *order)
 {
     int retval = -1;
 
     Mix_LockAudio();
     if (music && (music->is_multimusic || music_playing)) {
         if (music->interface->GetOrder) {
-            retval = music->interface->GetOrder(music->context, outOrder);
+            retval = music->interface->GetOrder(music->context, order);
         } else {
             Mix_SetError("GetOrder not implemented for music type");
         }

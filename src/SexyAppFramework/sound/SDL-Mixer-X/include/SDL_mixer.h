@@ -3242,17 +3242,18 @@ extern DECLSPEC int MIXCALL Mix_ModMusicJumpToOrder(int order);
 extern DECLSPEC int MIXCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order);/*MixerX*/
 
 /**
- * Get current order in mod music.
+ * Get current order pack in mod music.
  *
  * This only applies to MOD music formats.
+ * The returned value packs order and row: low 16 bits = order, high 16 bits = row.
  *
- * \param outOrder pointer to an int variable to store the current order to
+ * \param order pointer to an int variable to store the current order pack to
  * \returns 0 if successful, or -1 if failed or isn't implemented.
  *
  * \since SDL_mixer 2.8.0 fork
  */
-extern DECLSPEC int SDLCALL Mix_ModMusicGetOrder(int *outOrder);
-extern DECLSPEC int MIXCALL Mix_ModMusicStreamGetOrder(Mix_Music *music, int *outOrder);
+extern DECLSPEC int SDLCALL Mix_ModMusicGetOrder(int *order);
+extern DECLSPEC int MIXCALL Mix_ModMusicStreamGetOrder(Mix_Music *music, int *order);
 
 /**
  * Set a mod music's channel's mute status
