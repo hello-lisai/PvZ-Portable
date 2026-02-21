@@ -277,7 +277,7 @@ static int OPENMPT_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 
 	int framesize = settings.mBits/8*settings.mChannels;
 	int framecount = music->buffer_size/framesize;
-	int rendered, totalrendered = 0;
+	int rendered = 0, totalrendered = 0;
 
 	uint8_t* buf8 = (uint8_t*)music->buffer;
 	int16_t* buf16 = music->buffer;
