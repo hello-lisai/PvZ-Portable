@@ -19,30 +19,31 @@
 #include "DataSync.h"
 #include "misc/Buffer.h"
 #include <algorithm>
+#include <cstdint>
 #include <vector>
 
-static const char* FILE_COMPILE_TIME_STRING = "Jul  2 201011:47:03"; // The compile time of 1.2.0.1073 GOTY
-//static const char* FILE_COMPILE_TIME_STRING = "Dec 10 201014:56:46" // The compile time of 1.2.0.1096 GOTY Steam
-static const unsigned int SAVE_FILE_MAGIC_NUMBER = 0xFEEDDEAD;
-static const unsigned int SAVE_FILE_VERSION = 2U;
-static unsigned int SAVE_FILE_DATE = crc32(0, (Bytef*)FILE_COMPILE_TIME_STRING, strlen(FILE_COMPILE_TIME_STRING));  //[0x6AA7EC]
+static constexpr const char* FILE_COMPILE_TIME_STRING = "Jul  2 201011:47:03"; // The compile time of 1.2.0.1073 GOTY
+//static constexpr const char* FILE_COMPILE_TIME_STRING = "Dec 10 201014:56:46" // The compile time of 1.2.0.1096 GOTY Steam
+static constexpr const uint32_t SAVE_FILE_MAGIC_NUMBER = 0xFEEDDEAD;
+static constexpr const uint32_t SAVE_FILE_VERSION = 2U;
+static const uint32_t SAVE_FILE_DATE = crc32(0, (Bytef*)FILE_COMPILE_TIME_STRING, strlen(FILE_COMPILE_TIME_STRING));  //[0x6AA7EC]
 
-static const char SAVE_FILE_MAGIC_V4[12] = "PVZP_SAVE4";
-static const unsigned int SAVE_FILE_V4_VERSION = 1U;
+static constexpr const char SAVE_FILE_MAGIC_V4[12] = "PVZP_SAVE4";
+static constexpr const uint32_t SAVE_FILE_V4_VERSION = 1U;
 
 struct SaveFileHeaderV4
 {
-	char			mMagic[12];
-	unsigned int	mVersion;
-	unsigned int	mPayloadSize;
-	unsigned int	mPayloadCrc;
+	char		mMagic[12];
+	uint32_t	mVersion;
+	uint32_t	mPayloadSize;
+	uint32_t	mPayloadCrc;
 };
 
 struct SaveFileHeader
 {
-	unsigned int	mMagicNumber;
-	unsigned int	mBuildVersion;
-	unsigned int	mBuildDate;
+	uint32_t	mMagicNumber;
+	uint32_t	mBuildVersion;
+	uint32_t	mBuildDate;
 };
 
 enum SaveChunkTypeV4
@@ -69,7 +70,7 @@ enum SaveChunkTypeV4
 	SAVE4_CHUNK_MUSIC = 20
 };
 
-static const unsigned int SAVE4_CHUNK_VERSION = 1U;
+static constexpr const uint32_t SAVE4_CHUNK_VERSION = 1U;
 
 static void AppendU32LE(std::vector<unsigned char>& theOut, uint32_t theValue)
 {
@@ -482,7 +483,7 @@ static void SyncImagePortable(PortableSaveContext& theContext, Image*& theImage)
 	}
 }
 
-static void SyncDataIDListPortable(TodList<unsigned int>* theDataIDList, PortableSaveContext& theContext, TodAllocator* theAllocator)
+static void SyncDataIDListPortable(TodList<uint32_t>* theDataIDList, PortableSaveContext& theContext, TodAllocator* theAllocator)
 {
 	try
 	{
@@ -509,7 +510,7 @@ static void SyncDataIDListPortable(TodList<unsigned int>* theDataIDList, Portabl
 		{
 			int aCount = theDataIDList->mSize;
 			theContext.SyncInt32(aCount);
-			for (TodListNode<unsigned int>* aNode = theDataIDList->mHead; aNode != nullptr; aNode = aNode->mNext)
+			for (TodListNode<uint32_t>* aNode = theDataIDList->mHead; aNode != nullptr; aNode = aNode->mNext)
 			{
 				uint32_t aDataID = aNode->mValue;
 				theContext.SyncUInt32(aDataID);
@@ -533,7 +534,7 @@ static void SyncGameObjectPortable(PortableSaveContext& theContext, GameObject& 
 	theContext.SyncInt32(theObject.mRenderOrder);
 }
 
-static const uint32_t PORTABLE_FIELD_TAIL = 100U;
+static constexpr const uint32_t PORTABLE_FIELD_TAIL = 100U;
 
 template <typename T>
 static void ResetItemForRead(T& theItem)
@@ -1251,7 +1252,7 @@ static void SyncParticleEmitterPortable(TodParticleSystem* theParticleSystem, To
 		theContext.SyncInt32(aEmitterDefIndex);
 	}
 
-	SyncDataIDListPortable((TodList<unsigned int>*)&theParticleEmitter->mParticleList, theContext, &theParticleSystem->mParticleHolder->mParticleListNodeAllocator);
+	SyncDataIDListPortable((TodList<uint32_t>*)&theParticleEmitter->mParticleList, theContext, &theParticleSystem->mParticleHolder->mParticleListNodeAllocator);
 	SyncVector2Portable(theContext, theParticleEmitter->mSystemCenter);
 	SyncColorPortable(theContext, theParticleEmitter->mColorOverride);
 	SyncImagePortable(theContext, theParticleEmitter->mImageOverride);
@@ -1264,7 +1265,7 @@ static void SyncParticleEmitterPortable(TodParticleSystem* theParticleSystem, To
 	theContext.SyncBool(theParticleEmitter->mDead);
 	theContext.SyncBool(theParticleEmitter->mExtraAdditiveDrawOverride);
 	theContext.SyncFloat(theParticleEmitter->mScaleOverride);
-		theContext.SyncInt32(reinterpret_cast<int&>(theParticleEmitter->mCrossFadeEmitterID));
+	theContext.SyncInt32(reinterpret_cast<int&>(theParticleEmitter->mCrossFadeEmitterID));
 	theContext.SyncInt32(theParticleEmitter->mEmitterCrossFadeCountDown);
 	theContext.SyncInt32(theParticleEmitter->mFrameOverride);
 	for (int i = 0; i < ParticleSystemTracks::NUM_SYSTEM_TRACKS; i++)
@@ -1277,7 +1278,7 @@ static void SyncParticleEmitterPortable(TodParticleSystem* theParticleSystem, To
 
 	for (TodListNode<ParticleID>* aNode = theParticleEmitter->mParticleList.mHead; aNode != nullptr; aNode = aNode->mNext)
 	{
-		TodParticle* aParticle = theParticleSystem->mParticleHolder->mParticles.DataArrayGet(static_cast<unsigned int>(aNode->mValue));
+		TodParticle* aParticle = theParticleSystem->mParticleHolder->mParticles.DataArrayGet(static_cast<uint32_t>(aNode->mValue));
 		if (theContext.mReading)
 		{
 			aParticle->mParticleEmitter = theParticleEmitter;
@@ -1294,10 +1295,10 @@ static void SyncParticleSystemPortable(Board* theBoard, TodParticleSystem* thePa
 		theParticleSystem->mParticleHolder = theBoard->mApp->mEffectSystem->mParticleHolder;
 	}
 
-	SyncDataIDListPortable((TodList<unsigned int>*)&theParticleSystem->mEmitterList, theContext, &theParticleSystem->mParticleHolder->mEmitterListNodeAllocator);
+	SyncDataIDListPortable((TodList<uint32_t>*)&theParticleSystem->mEmitterList, theContext, &theParticleSystem->mParticleHolder->mEmitterListNodeAllocator);
 	for (TodListNode<ParticleEmitterID>* aNode = theParticleSystem->mEmitterList.mHead; aNode != nullptr; aNode = aNode->mNext)
 	{
-		TodParticleEmitter* aEmitter = theParticleSystem->mParticleHolder->mEmitters.DataArrayGet(static_cast<unsigned int>(aNode->mValue));
+		TodParticleEmitter* aEmitter = theParticleSystem->mParticleHolder->mEmitters.DataArrayGet(static_cast<uint32_t>(aNode->mValue));
 		SyncParticleEmitterPortable(theParticleSystem, aEmitter, theContext);
 	}
 
@@ -1344,7 +1345,7 @@ static void SyncDataArrayPortable(PortableSaveContext& theContext, DataArray<T>&
 		theContext.mFailed = true;
 	}
 
-	for (unsigned int i = 0; i < theDataArray.mMaxUsedCount; i++)
+	for (uint32_t i = 0; i < theDataArray.mMaxUsedCount; i++)
 	{
 		theContext.SyncUInt32(theDataArray.mBlock[i].mID);
 		theSyncFn(theDataArray.mBlock[i].mItem);
@@ -1365,7 +1366,7 @@ static void SyncDataArrayIdsOnlyPortable(PortableSaveContext& theContext, DataAr
 		theContext.mFailed = true;
 	}
 
-	for (unsigned int i = 0; i < theDataArray.mMaxUsedCount; i++)
+	for (uint32_t i = 0; i < theDataArray.mMaxUsedCount; i++)
 	{
 		theContext.SyncUInt32(theDataArray.mBlock[i].mID);
 	}
@@ -1385,7 +1386,7 @@ static void SyncDataArrayPortableTLV(PortableSaveContext& theContext, DataArray<
 		theContext.mFailed = true;
 	}
 
-	for (unsigned int i = 0; i < theDataArray.mMaxUsedCount; i++)
+	for (uint32_t i = 0; i < theDataArray.mMaxUsedCount; i++)
 	{
 		theContext.SyncUInt32(theDataArray.mBlock[i].mID);
 		if (theContext.mReading)
@@ -2557,7 +2558,7 @@ static bool LawnLoadGameV4(Board* theBoard, const std::string& theFilePath)
 	Buffer aBuffer;
 	if (!gSexyAppBase->ReadBufferFromFile(theFilePath, &aBuffer, false))
 		return false;
-	if (static_cast<unsigned int>(aBuffer.GetDataLen()) < sizeof(SaveFileHeaderV4))
+	if (static_cast<uint32_t>(aBuffer.GetDataLen()) < sizeof(SaveFileHeaderV4))
 		return false;
 
 	SaveFileHeaderV4 aHeader;
@@ -2569,11 +2570,11 @@ static bool LawnLoadGameV4(Board* theBoard, const std::string& theFilePath)
 		return false;
 	if (aHeader.mVersion != SAVE_FILE_V4_VERSION)
 		return false;
-	if (aHeader.mPayloadSize + sizeof(SaveFileHeaderV4) > static_cast<unsigned int>(aBuffer.GetDataLen()))
+	if (aHeader.mPayloadSize + sizeof(SaveFileHeaderV4) > static_cast<uint32_t>(aBuffer.GetDataLen()))
 		return false;
 
 	unsigned char* aPayload = (unsigned char*)aBuffer.GetDataPtr() + sizeof(SaveFileHeaderV4);
-	unsigned int aCrc = crc32(0, (Bytef*)aPayload, aHeader.mPayloadSize);
+	uint32_t aCrc = crc32(0, (Bytef*)aPayload, aHeader.mPayloadSize);
 	if (aCrc != aHeader.mPayloadCrc)
 		return false;
 
@@ -2615,7 +2616,7 @@ public:
 	inline int		ByteLeftToRead() { return (mBuffer.mDataBitSize - mBuffer.mReadBitPos + 7) / 8; }
 	void			SyncBytes(void* theDest, int theReadSize);
 	void			SyncInt(int& theInt);
-	inline void		SyncUint(unsigned int& theInt) { SyncInt((signed int&)theInt); }
+	inline void		SyncUint(uint32_t& theInt) { SyncInt((signed int&)theInt); }
 	void			SyncReanimationDef(ReanimatorDefinition*& theDefinition);
 	void			SyncParticleDef(TodParticleDefinition*& theDefinition);
 	void			SyncTrailDef(TrailDefinition*& theDefinition);
@@ -2628,7 +2629,7 @@ void SaveGameContext::SyncBytes(void* theDest, int theReadSize)
 	int aReadSize = theReadSize;
 	if (mReading)
 	{
-		if ((unsigned long)ByteLeftToRead() < 4)
+		if (ByteLeftToRead() < 4)
 		{
 			mFailed = true;
 		}
@@ -2667,7 +2668,7 @@ void SaveGameContext::SyncInt(int& theInt)
 {
 	if (mReading)
 	{
-		if ((unsigned long)ByteLeftToRead() < 4)
+		if (ByteLeftToRead() < 4)
 		{
 			mFailed = true;
 		}
@@ -2821,7 +2822,7 @@ void SaveGameContext::SyncImage(Image*& theImage)
 }
 
 //0x481710
-static void SyncDataIDList(TodList<unsigned int>* theDataIDList, SaveGameContext& theContext, TodAllocator* theAllocator)
+static void SyncDataIDList(TodList<uint32_t>* theDataIDList, SaveGameContext& theContext, TodAllocator* theAllocator)
 {
 	try
 	{
@@ -2839,7 +2840,7 @@ static void SyncDataIDList(TodList<unsigned int>* theDataIDList, SaveGameContext
 			theContext.SyncInt(aCount);
 			for (int i = 0; i < aCount; i++)
 			{
-				unsigned int aDataID;
+				uint32_t aDataID;
 				theContext.SyncBytes(&aDataID, sizeof(aDataID));
 				theDataIDList->AddTail(aDataID);
 			}
@@ -2848,9 +2849,9 @@ static void SyncDataIDList(TodList<unsigned int>* theDataIDList, SaveGameContext
 		{
 			int aCount = theDataIDList->mSize;
 			theContext.SyncInt(aCount);
-			for (TodListNode<unsigned int>* aNode = theDataIDList->mHead; aNode != nullptr; aNode = aNode->mNext)
+			for (TodListNode<uint32_t>* aNode = theDataIDList->mHead; aNode != nullptr; aNode = aNode->mNext)
 			{
-				unsigned int aDataID = aNode->mValue;
+				uint32_t aDataID = aNode->mValue;
 				theContext.SyncBytes(&aDataID, sizeof(aDataID));
 			}
 		}
@@ -2879,10 +2880,10 @@ static void SyncParticleEmitter(TodParticleSystem* theParticleSystem, TodParticl
 	}
 
 	theContext.SyncImage(theParticleEmitter->mImageOverride);
-	SyncDataIDList((TodList<unsigned int>*)&theParticleEmitter->mParticleList, theContext, &theParticleSystem->mParticleHolder->mParticleListNodeAllocator);
+	SyncDataIDList((TodList<uint32_t>*)&theParticleEmitter->mParticleList, theContext, &theParticleSystem->mParticleHolder->mParticleListNodeAllocator);
 	for (TodListNode<ParticleID>* aNode = theParticleEmitter->mParticleList.mHead; aNode != nullptr; aNode = aNode->mNext)
 	{
-		TodParticle* aParticle = theParticleSystem->mParticleHolder->mParticles.DataArrayGet(static_cast<unsigned int>(aNode->mValue));
+		TodParticle* aParticle = theParticleSystem->mParticleHolder->mParticles.DataArrayGet(static_cast<uint32_t>(aNode->mValue));
 		if (theContext.mReading)
 		{
 			aParticle->mParticleEmitter = theParticleEmitter;
@@ -2899,10 +2900,10 @@ static void SyncParticleSystem(Board* theBoard, TodParticleSystem* theParticleSy
 		theParticleSystem->mParticleHolder = theBoard->mApp->mEffectSystem->mParticleHolder;
 	}
 
-	SyncDataIDList((TodList<unsigned int>*)&theParticleSystem->mEmitterList, theContext, &theParticleSystem->mParticleHolder->mEmitterListNodeAllocator);
+	SyncDataIDList((TodList<uint32_t>*)&theParticleSystem->mEmitterList, theContext, &theParticleSystem->mParticleHolder->mEmitterListNodeAllocator);
 	for (TodListNode<ParticleEmitterID>* aNode = theParticleSystem->mEmitterList.mHead; aNode != nullptr; aNode = aNode->mNext)
 	{
-		TodParticleEmitter* aEmitter = theParticleSystem->mParticleHolder->mEmitters.DataArrayGet(static_cast<unsigned int>(aNode->mValue));
+		TodParticleEmitter* aEmitter = theParticleSystem->mParticleHolder->mEmitters.DataArrayGet(static_cast<uint32_t>(aNode->mValue));
 		SyncParticleEmitter(theParticleSystem, aEmitter, theContext);
 	}
 }
@@ -3014,12 +3015,12 @@ static void SyncBoard(SaveGameContext& theContext, Board* theBoard)
 	
 	if (theContext.mReading)
 	{
-		if ((unsigned long)theContext.ByteLeftToRead() < 4)
+		if (theContext.ByteLeftToRead() < 4)
 		{
 			theContext.mFailed = true;
 		}
 
-		if (theContext.mFailed || static_cast<unsigned int>(theContext.mBuffer.ReadLong()) != SAVE_FILE_MAGIC_NUMBER)
+		if (theContext.mFailed || static_cast<uint32_t>(theContext.mBuffer.ReadLong()) != SAVE_FILE_MAGIC_NUMBER)
 		{
 			theContext.mFailed = true;
 		}
@@ -3095,8 +3096,8 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
 	SaveFileHeaderV4 aHeader{};
 	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));
 	aHeader.mVersion = ToLE32(SAVE_FILE_V4_VERSION);
-	aHeader.mPayloadSize = ToLE32(static_cast<unsigned int>(aPayload.size()));
-	aHeader.mPayloadCrc = ToLE32(crc32(0, reinterpret_cast<Bytef*>(aPayload.data()), static_cast<unsigned int>(aPayload.size())));
+	aHeader.mPayloadSize = ToLE32(static_cast<uint32_t>(aPayload.size()));
+	aHeader.mPayloadCrc = ToLE32(crc32(0, reinterpret_cast<Bytef*>(aPayload.data()), static_cast<uint32_t>(aPayload.size())));
 
 	std::vector<unsigned char> aOutBuffer;
 	aOutBuffer.resize(sizeof(aHeader) + aPayload.size());
