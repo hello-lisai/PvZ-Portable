@@ -1,6 +1,7 @@
 #ifndef __TODFOLEY_H__
 #define __TODFOLEY_H__
 
+#include <cstdint>
 #include "../Resources.h"
 #include "sound/SDLSoundInstance.h"
 using namespace Sexy;
@@ -12,7 +13,7 @@ using namespace Sexy;
 // ############################################################# 以下为拟音音效定义相关内容 #############################################################
 // ######################################################################################################################################################
 
-enum FoleyFlags
+enum FoleyFlags : int32_t
 {
     FOLEYFLAGS_LOOP,                // 循环播放
     FOLEYFLAGS_ONE_AT_A_TIME,       // 禁止叠加播放：指定该种类的音效同时至多存在 1 个实例，重复播放时仅增加引用计数并刷新开始时间
@@ -21,7 +22,7 @@ enum FoleyFlags
     FOLEYFLAGS_DONT_REPEAT          // 禁止变式重复，指定该种类的音效每次实际播放的变式不得与上一次相同
 };
 
-enum FoleyType
+enum FoleyType : int32_t
 {
     FOLEY_SUN,
     FOLEY_SPLAT,

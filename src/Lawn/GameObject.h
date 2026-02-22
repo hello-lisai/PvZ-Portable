@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include "../ConstEnums.h"
 #include "../SexyAppFramework/graphics/Graphics.h"
 
@@ -13,13 +15,13 @@ class GameObject
 public:
 	LawnApp*                        mApp;
 	Board*                          mBoard;
-    int                             mX;
-    int                             mY;
-    int                             mWidth;
-    int                             mHeight;
+    int32_t                         mX;
+    int32_t                         mY;
+    int32_t                         mWidth;
+    int32_t                         mHeight;
     bool                            mVisible;
-    int                             mRow;
-    int                             mRenderOrder;
+    int32_t                         mRow;
+    int32_t                         mRenderOrder;
 
 public:
     /*inline*/                      GameObject();

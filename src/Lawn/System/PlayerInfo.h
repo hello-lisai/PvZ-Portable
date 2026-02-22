@@ -13,7 +13,7 @@
 class PottedPlant
 {
 public:
-    enum FacingDirection
+    enum FacingDirection : int32_t
     {
         FACING_RIGHT,
         FACING_LEFT

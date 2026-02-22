@@ -104,11 +104,8 @@ public:
 	}
 };
 
-typedef TRect<int> Rect;
+typedef TRect<int32_t> Rect;
 typedef TRect<double> FRect;
-
-
-
 }
 
 #endif //__TRectANGLE_H__

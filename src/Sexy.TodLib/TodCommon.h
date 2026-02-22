@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <stdlib.h>
 #include <cmath>
 #include <cfloat>
@@ -26,20 +27,20 @@ using namespace Sexy;
 struct TodWeightedArray
 {
     intptr_t mItem;
-	int mWeight;
+	int32_t mWeight;
 };
 
 struct TodWeightedGridArray
 {
-	int mX;
-	int mY;
-	int mWeight;
+	int32_t mX;
+	int32_t mY;
+	int32_t mWeight;
 };
 
 class TodSmoothArray
 {
 public:
-	int			mItem;
+	int32_t		mItem;
 	float		mWeight;
 	float		mLastPicked;
 	float		mSecondLastPicked;

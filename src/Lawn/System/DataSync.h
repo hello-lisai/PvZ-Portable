@@ -107,25 +107,25 @@ public:
 	void					SyncUInt32(unsigned char& theNum);
 	void					SyncUInt32(unsigned short& theNum);
 	void					SyncUInt32(uint32_t& theNum);
-	void					SyncUInt32(int& theNum);
+	void					SyncUInt32(int32_t& theNum);
 	template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
 	void					SyncUInt32(E& theEnum) { SyncUInt32(reinterpret_cast<std::underlying_type_t<E>&>(theEnum)); }
 	void					SyncUInt16(char& theNum);
 	void					SyncUInt16(short& theNum);
 	void					SyncUInt16(long& theNum);
 	void					SyncUInt16(unsigned char& theNum);
-	void					SyncUInt16(unsigned short& theNum);
+	void					SyncUInt16(uint16_t& theNum);
 	void					SyncUInt16(uint32_t& theNum);
-	void					SyncUInt16(int& theNum);
+	void					SyncUInt16(int32_t& theNum);
 	template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
 	void					SyncUInt16(E& theEnum) { SyncUInt16(reinterpret_cast<std::underlying_type_t<E>&>(theEnum)); }
+	void					SyncUInt8(uint8_t& theChar);
 	void					SyncUInt8(char& theChar);
 	void					SyncUInt8(short& theChar);
 	void					SyncUInt8(long& theChar);
-	void					SyncUInt8(unsigned char& theChar);
 	void					SyncUInt8(unsigned short& theChar);
 	void					SyncUInt8(uint32_t& theChar);
-	void					SyncUInt8(int& theChar);
+	void					SyncUInt8(int32_t& theChar);
 	template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
 	void					SyncUInt8(E& theEnum) { SyncUInt8(reinterpret_cast<std::underlying_type_t<E>&>(theEnum)); }
 	void					SyncBool(bool& theBool);

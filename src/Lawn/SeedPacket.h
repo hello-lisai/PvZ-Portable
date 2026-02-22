@@ -1,6 +1,7 @@
 #ifndef __SEEDPACKET_H__
 #define __SEEDPACKET_H__
 
+#include <cstdint>
 #include "GameObject.h"
 #include "../GameConstants.h"
 
@@ -11,18 +12,18 @@ class HitResult;
 class SeedPacket : public GameObject
 {
 public:
-    int                 mRefreshCounter;                            //+0x24
-    int                 mRefreshTime;                               //+0x28
-    int                 mIndex;                                     //+0x2C
-    int                 mOffsetX;                                   //+0x30
+    int32_t             mRefreshCounter;                            //+0x24
+    int32_t             mRefreshTime;                               //+0x28
+    int32_t             mIndex;                                     //+0x2C
+    int32_t             mOffsetX;                                   //+0x30
     SeedType            mPacketType;                                //+0x34
     SeedType            mImitaterType;                              //+0x38
-    int                 mSlotMachineCountDown;                      //+0x3C
+    int32_t             mSlotMachineCountDown;                      //+0x3C
     SeedType            mSlotMachiningNextSeed;                     //+0x40
     float               mSlotMachiningPosition;                     //+0x44
     bool                mActive;                                    //+0x48
     bool                mRefreshing;                                //+0x49
-    int                 mTimesUsed;                                 //+0x4C
+    int32_t             mTimesUsed;                                 //+0x4C
 
 public:
     SeedPacket();
@@ -45,10 +46,10 @@ public:
 class SeedBank : public GameObject
 {
 public:
-    int				    mNumPackets;                    //+0x24
+    int32_t			    mNumPackets;                    //+0x24
     SeedPacket		    mSeedPackets[SEEDBANK_MAX];     //+0x28
-    int				    mCutSceneDarken;                //+0x348
-    int				    mConveyorBeltCounter;           //+0x34C
+    int32_t			    mCutSceneDarken;                //+0x348
+    int32_t			    mConveyorBeltCounter;           //+0x34C
 
 public:
     SeedBank();

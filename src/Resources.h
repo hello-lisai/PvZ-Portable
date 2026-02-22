@@ -11,7 +11,7 @@ namespace Sexy
     class Image;
     class ResourceManager;
 
-    enum class ResourceId : int
+    enum class ResourceId : int32_t
     {
 		IMAGE_BLANK_ID,
 		IMAGE_POPCAP_LOGO_ID,

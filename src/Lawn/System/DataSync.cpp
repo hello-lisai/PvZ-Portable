@@ -258,12 +258,12 @@ void DataSync::SyncUInt32(unsigned short& theNum)
 	SyncUInt32((uint32_t&)theNum);
 }
 
-void DataSync::SyncUInt32(int& theNum)
+void DataSync::SyncUInt32(int32_t& theNum)
 {
 	SyncUInt32((uint32_t&)theNum);
 }
 
-void DataSync::SyncUInt16(unsigned short& theNum)
+void DataSync::SyncUInt16(uint16_t& theNum)
 {
 	if (mReader)
 	{
@@ -277,35 +277,35 @@ void DataSync::SyncUInt16(unsigned short& theNum)
 
 void DataSync::SyncUInt16(char& theNum)
 {
-	SyncUInt16((unsigned short&)theNum);
+	SyncUInt16((uint16_t&)theNum);
 }
 
 void DataSync::SyncUInt16(short& theNum)
 {
-	SyncUInt16((unsigned short&)theNum);
+	SyncUInt16((uint16_t&)theNum);
 }
 
 void DataSync::SyncUInt16(long& theNum)
 {
-	SyncUInt16((unsigned short&)theNum);
+	SyncUInt16((uint16_t&)theNum);
 }
 
 void DataSync::SyncUInt16(unsigned char& theNum)
 {
-	SyncUInt16((unsigned short&)theNum);
+	SyncUInt16((uint16_t&)theNum);
 }
 
 void DataSync::SyncUInt16(uint32_t& theNum)
 {
-	SyncUInt16((unsigned short&)theNum);
+	SyncUInt16((uint16_t&)theNum);
 }
 
-void DataSync::SyncUInt16(int& theNum)
+void DataSync::SyncUInt16(int32_t& theNum)
 {
-	SyncUInt16((unsigned short&)theNum);
+	SyncUInt16((uint16_t&)theNum);
 }
 
-void DataSync::SyncUInt8(unsigned char& theChar)
+void DataSync::SyncUInt8(uint8_t& theChar)
 {
 	if (mReader)
 	{
@@ -319,32 +319,32 @@ void DataSync::SyncUInt8(unsigned char& theChar)
 
 void DataSync::SyncUInt8(char& theChar)
 {
-	SyncUInt8((unsigned char&)theChar);
+	SyncUInt8((uint8_t&)theChar);
 }
 
 void DataSync::SyncUInt8(short& theChar)
 {
-	SyncUInt8((unsigned char&)theChar);
+	SyncUInt8((uint8_t&)theChar);
 }
 
 void DataSync::SyncUInt8(long& theChar)
 {
-	SyncUInt8((unsigned char&)theChar);
+	SyncUInt8((uint8_t&)theChar);
 }
 
 void DataSync::SyncUInt8(unsigned short& theChar)
 {
-	SyncUInt8((unsigned char&)theChar);
+	SyncUInt8((uint8_t&)theChar);
 }
 
 void DataSync::SyncUInt8(uint32_t& theChar)
 {
-	SyncUInt8((unsigned char&)theChar);
+	SyncUInt8((uint8_t&)theChar);
 }
 
-void DataSync::SyncUInt8(int& theChar)
+void DataSync::SyncUInt8(int32_t& theChar)
 {
-	SyncUInt8((unsigned char&)theChar);
+	SyncUInt8((uint8_t&)theChar);
 }
 
 void DataSync::SyncBool(bool& theBool)

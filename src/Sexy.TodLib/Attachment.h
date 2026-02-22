@@ -1,6 +1,7 @@
 #ifndef __ATTACHMENT_H__
 #define __ATTACHMENT_H__
 
+#include <cstdint>
 #include "../ConstEnums.h"
 #include "DataArray.h"
 #include "misc/SexyMatrix.h"
@@ -43,7 +44,7 @@ class Attachment
 {
 public:
     AttachEffect            mEffectArray[MAX_EFFECTS_PER_ATTACHMENT];
-    int                     mNumEffects;
+    int32_t                 mNumEffects;
     bool                    mDead;
 
 public:

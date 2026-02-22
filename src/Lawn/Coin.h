@@ -1,6 +1,7 @@
 #ifndef __COIN_H__
 #define __COIN_H__
 
+#include <cstdint>
 #include "GameObject.h"
 #include "System/PlayerInfo.h"
 
@@ -20,13 +21,13 @@ public:
     float                   mVelY;                  //+0x30
     float                   mScale;                 //+0x34
     bool                    mDead;                  //+0x38
-    int                     mFadeCount;             //+0x3C
+    int32_t                 mFadeCount;             //+0x3C
     float                   mCollectX;              //+0x40
     float                   mCollectY;              //+0x44
-    int                     mGroundY;               //+0x48
-    int                     mCoinAge;               //+0x4C
+    int32_t                 mGroundY;               //+0x48
+    int32_t                 mCoinAge;               //+0x4C
     bool                    mIsBeingCollected;      //+0x50
-    int                     mDisappearCounter;      //+0x54
+    int32_t                 mDisappearCounter;      //+0x54
     CoinType                mType;                  //+0x58
     CoinMotion              mCoinMotion;            //+0x5C
     AttachmentID            mAttachmentID;          //+0x60
@@ -36,7 +37,7 @@ public:
     bool                    mNeedsBouncyArrow;      //+0xC8
     bool                    mHasBouncyArrow;        //+0xC9
     bool                    mHitGround;             //+0xCA
-    int                     mTimesDropped;          //+0xCC
+    int32_t                 mTimesDropped;          //+0xCC
 
 public:
     Coin();

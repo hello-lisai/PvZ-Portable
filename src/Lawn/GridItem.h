@@ -1,6 +1,7 @@
 #ifndef __GRIDITEM_H__
 #define __GRIDITEM_H__
 
+#include <cstdint>
 #include "../ConstEnums.h"
 
 #define NUM_MOTION_TRAIL_FRAMES 12
@@ -28,10 +29,10 @@ public:
 	Board*					mBoard;											//+0x4
 	GridItemType			mGridItemType;									//+0x8
 	GridItemState			mGridItemState;									//+0xC
-	int						mGridX;											//+0x10
-	int						mGridY;											//+0x14
-	int						mGridItemCounter;								//+0x18
-	int						mRenderOrder;									//+0x1C
+	int32_t					mGridX;											//+0x10
+	int32_t					mGridY;											//+0x14
+	int32_t					mGridItemCounter;								//+0x18
+	int32_t					mRenderOrder;									//+0x1C
 	bool					mDead;											//+0x20
 	float					mPosX;											//+0x24
 	float					mPosY;											//+0x28
@@ -43,10 +44,10 @@ public:
 	SeedType				mSeedType;										//+0x40
 	ScaryPotType			mScaryPotType;									//+0x44
 	bool					mHighlighted;									//+0x48
-	int						mTransparentCounter;							//+0x4C
-	int						mSunCount;										//+0x50
+	int32_t					mTransparentCounter;							//+0x4C
+	int32_t					mSunCount;										//+0x50
 	MotionTrailFrame		mMotionTrailFrames[NUM_MOTION_TRAIL_FRAMES];	//+0x54
-	int						mMotionTrailCount;								//+0xE4
+	int32_t					mMotionTrailCount;								//+0xE4
 
 public:
 	GridItem();

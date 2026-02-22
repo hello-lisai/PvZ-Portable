@@ -1,6 +1,7 @@
 #ifndef __CHALLENGE_H__
 #define __CHALLENGE_H__
 
+#include <cstdint>
 #include "../ConstEnums.h"
 #include "../GameConstants.h"
 #include "../Sexy.TodLib/FilterEffect.h"
@@ -31,7 +32,7 @@ class SeedPacket;
 class HitResult;
 struct TodWeightedGridArray;
 
-enum BeghouledUpgrade
+enum BeghouledUpgrade : int32_t
 {
     BEGHOULED_UPGRADE_REPEATER,
     BEGHOULED_UPGRADE_FUMESHROOM,
@@ -49,28 +50,28 @@ class Challenge
 public:
 	LawnApp*				mApp;                                               //+0x0
 	Board*					mBoard;                                             //+0x4
-	int					mBeghouledMouseCapture;                             //+0x8
-    int                     mBeghouledMouseDownX;                               //+0xC
-    int                     mBeghouledMouseDownY;                               //+0x10
-    int                    mBeghouledEated[9][6];                              //+0x14
-    int                    mBeghouledPurcasedUpgrade[NUM_BEGHOULED_UPGRADES];  //+0x4A
-    int                     mBeghouledMatchesThisMove;                          //+0x50
+	int32_t					mBeghouledMouseCapture;                             //+0x8
+    int32_t                 mBeghouledMouseDownX;                               //+0xC
+    int32_t                 mBeghouledMouseDownY;                               //+0x10
+    int32_t                mBeghouledEated[9][6];                              //+0x14
+    int32_t                mBeghouledPurcasedUpgrade[NUM_BEGHOULED_UPGRADES];  //+0x4A
+    int32_t                 mBeghouledMatchesThisMove;                          //+0x50
     ChallengeState          mChallengeState;                                    //+0x54
-    int                     mChallengeStateCounter;                             //+0x58
-    int                     mConveyorBeltCounter;                               //+0x5C
-    int                     mChallengeScore;                                    //+0x60
-    int                    mShowBowlingLine;                                   //+0x64
+    int32_t                 mChallengeStateCounter;                             //+0x58
+    int32_t                 mConveyorBeltCounter;                               //+0x5C
+    int32_t                 mChallengeScore;                                    //+0x60
+    int32_t                mShowBowlingLine;                                   //+0x64
     SeedType                mLastConveyorSeedType;                              //+0x68
-    int                     mSurvivalStage;                                     //+0x6C
-    int                     mSlotMachineRollCount;                              //+0x70
+    int32_t                 mSurvivalStage;                                     //+0x6C
+    int32_t                 mSlotMachineRollCount;                              //+0x70
     ReanimationID           mReanimChallenge;                                   //+0x74
     ReanimationID           mReanimClouds[6];                                   //+0x78
-    int                     mCloudsCounter[6];                                  //+0x90
-    int                     mChallengeGridX;                                    //+0xA8
-    int                     mChallengeGridY;                                    //+0xAC
-    int                     mScaryPotterPots;                                   //+0xB0
-    int                     mRainCounter;                                       //+0xB4
-    int                     mTreeOfWisdomTalkIndex;                             //+0xB8
+    int32_t                 mCloudsCounter[6];                                  //+0x90
+    int32_t                 mChallengeGridX;                                    //+0xA8
+    int32_t                 mChallengeGridY;                                    //+0xAC
+    int32_t                 mScaryPotterPots;                                   //+0xB0
+    int32_t                 mRainCounter;                                       //+0xB4
+    int32_t                 mTreeOfWisdomTalkIndex;                             //+0xB8
 
 public:
     Challenge();
@@ -243,7 +244,7 @@ class ZombieAllowedLevels
 {
 public:
     ZombieType                      mZombieType;
-    int                             mAllowedOnLevel[50];
+    int32_t                         mAllowedOnLevel[50];
 };
 extern int gZombieWaves[NUM_LEVELS]; //0x6A34E8
 extern ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES];  //0x6A35B0

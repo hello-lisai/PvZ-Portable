@@ -13,7 +13,7 @@ Color::Color() :
 {
 }
 
-Color::Color(int theColor) :
+Color::Color(int32_t theColor) :
 	mRed((theColor >> 16) & 0xFF),
 	mGreen((theColor >> 8) & 0xFF),
 	mBlue(theColor & 0xFF),
@@ -23,7 +23,7 @@ Color::Color(int theColor) :
 		mAlpha = 0xff;
 }
 
-Color::Color(int theColor, int theAlpha) :
+Color::Color(int32_t theColor, int32_t theAlpha) :
 	mRed((theColor >> 16) & 0xFF),
 	mGreen((theColor >> 8) & 0xFF),
 	mBlue(theColor & 0xFF),
@@ -31,7 +31,7 @@ Color::Color(int theColor, int theAlpha) :
 {
 }
 
-Color::Color(int theRed, int theGreen, int theBlue) :
+Color::Color(int32_t theRed, int32_t theGreen, int32_t theBlue) :
 	mRed(theRed),
 	mGreen(theGreen),
 	mBlue(theBlue),
@@ -39,7 +39,7 @@ Color::Color(int theRed, int theGreen, int theBlue) :
 {
 }
 
-Color::Color(int theRed, int theGreen, int theBlue, int theAlpha) :
+Color::Color(int32_t theRed, int32_t theGreen, int32_t theBlue, int32_t theAlpha) :
 	mRed(theRed),
 	mGreen(theGreen),
 	mBlue(theBlue),
@@ -55,7 +55,7 @@ Color::Color(const uchar* theElements) :
 {
 }
 
-Color::Color(const int* theElements) :
+Color::Color(const int32_t* theElements) :
 	mRed(theElements[0]),
 	mGreen(theElements[1]),
 	mBlue(theElements[2]),
@@ -63,29 +63,29 @@ Color::Color(const int* theElements) :
 {
 }
 
-int	Color::GetRed() const
+int32_t	Color::GetRed() const
 {
 	return mRed;	
 }
 
-int Color::GetGreen() const
+int32_t Color::GetGreen() const
 {
 	return mGreen;
 }
 
-int	Color::GetBlue() const
+int32_t	Color::GetBlue() const
 {
 	return mBlue;
 }
 
-int	Color::GetAlpha() const
+int32_t	Color::GetAlpha() const
 {
 	return mAlpha;
 }
 
-int& Color::operator[](int theIdx)
+int32_t& Color::operator[](int32_t theIdx)
 {
-	static int aJunk = 0;
+	static int32_t aJunk = 0;
 
 	switch (theIdx)
 	{
@@ -102,7 +102,7 @@ int& Color::operator[](int theIdx)
 	}
 }
 
-int Color::operator[](int theIdx) const
+int32_t Color::operator[](int32_t theIdx) const
 {
 	switch (theIdx)
 	{

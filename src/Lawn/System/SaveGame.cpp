@@ -231,13 +231,13 @@ public:
 		}
 	}
 
-	void SyncInt32(int& theValue)
+	void SyncInt32(int32_t& theValue)
 	{
 		if (mReading)
 		{
 			try
 			{
-				theValue = static_cast<int>(mReader->ReadUInt32());
+				theValue = static_cast<int32_t>(mReader->ReadUInt32());
 			}
 			catch (DataReaderException&)
 			{
@@ -292,7 +292,7 @@ public:
 	template <typename TEnum>
 	void SyncEnum(TEnum& theEnum)
 	{
-		int aValue = static_cast<int>(theEnum);
+		int32_t aValue = static_cast<int32_t>(theEnum);
 		SyncInt32(aValue);
 		if (mReading)
 			theEnum = static_cast<TEnum>(aValue);
@@ -458,7 +458,7 @@ static void SyncImagePortable(PortableSaveContext& theContext, Image*& theImage)
 	if (theContext.mReading)
 	{
 		ResourceId aResID;
-		theContext.SyncInt32(reinterpret_cast<int&>(aResID));
+		theContext.SyncInt32(reinterpret_cast<int32_t&>(aResID));
 		if (aResID == Sexy::ResourceId::RESOURCE_ID_MAX)
 		{
 			theImage = nullptr;
@@ -479,7 +479,7 @@ static void SyncImagePortable(PortableSaveContext& theContext, Image*& theImage)
 		{
 			aResID = Sexy::ResourceId::RESOURCE_ID_MAX;
 		}
-		theContext.SyncInt32(reinterpret_cast<int&>(aResID));
+		theContext.SyncInt32(reinterpret_cast<int32_t&>(aResID));
 	}
 }
 
@@ -545,7 +545,7 @@ static void ResetItemForRead(T& theItem)
 template <typename TEnum>
 static void SyncEnum32(PortableSaveContext& theContext, TEnum& theValue)
 {
-	int aValue = static_cast<int>(theValue);
+	int32_t aValue = static_cast<int32_t>(theValue);
 	theContext.SyncInt32(aValue);
 	if (theContext.mReading)
 		theValue = static_cast<TEnum>(aValue);
@@ -574,7 +574,7 @@ static void SyncEnumU32Array(PortableSaveContext& theContext, TEnum* theData, si
 		SyncEnumU32(theContext, theData[i]);
 }
 
-static void SyncInt32Array(PortableSaveContext& theContext, int* theData, size_t theCount)
+static void SyncInt32Array(PortableSaveContext& theContext, int32_t* theData, size_t theCount)
 {
 	for (size_t i = 0; i < theCount; i++)
 		theContext.SyncInt32(theData[i]);
@@ -1111,7 +1111,7 @@ static void SyncReanimTrackInstancePortable(PortableSaveContext& theContext, Rea
 	theContext.SyncFloat(theTrackInstance.mShakeOverride);
 	theContext.SyncFloat(theTrackInstance.mShakeX);
 	theContext.SyncFloat(theTrackInstance.mShakeY);
-	theContext.SyncInt32(reinterpret_cast<int&>(theTrackInstance.mAttachmentID));
+	theContext.SyncInt32(reinterpret_cast<int32_t&>(theTrackInstance.mAttachmentID));
 	SyncImagePortable(theContext, theTrackInstance.mImageOverride);
 	theContext.SyncInt32(theTrackInstance.mRenderGroup);
 	SyncColorPortable(theContext, theTrackInstance.mTrackColor);
@@ -1225,7 +1225,7 @@ static void SyncParticlePortable(TodParticle* theParticle, PortableSaveContext& 
 	theContext.SyncInt32(theParticle->mImageFrame);
 	theContext.SyncFloat(theParticle->mSpinPosition);
 	theContext.SyncFloat(theParticle->mSpinVelocity);
-	theContext.SyncInt32(reinterpret_cast<int&>(theParticle->mCrossFadeParticleID));
+	theContext.SyncInt32(reinterpret_cast<int32_t&>(theParticle->mCrossFadeParticleID));
 	theContext.SyncInt32(theParticle->mCrossFadeDuration);
 	for (int i = 0; i < ParticleTracks::NUM_PARTICLE_TRACKS; i++)
 		theContext.SyncFloat(theParticle->mParticleInterp[i]);
@@ -1265,7 +1265,7 @@ static void SyncParticleEmitterPortable(TodParticleSystem* theParticleSystem, To
 	theContext.SyncBool(theParticleEmitter->mDead);
 	theContext.SyncBool(theParticleEmitter->mExtraAdditiveDrawOverride);
 	theContext.SyncFloat(theParticleEmitter->mScaleOverride);
-	theContext.SyncInt32(reinterpret_cast<int&>(theParticleEmitter->mCrossFadeEmitterID));
+	theContext.SyncInt32(reinterpret_cast<int32_t&>(theParticleEmitter->mCrossFadeEmitterID));
 	theContext.SyncInt32(theParticleEmitter->mEmitterCrossFadeCountDown);
 	theContext.SyncInt32(theParticleEmitter->mFrameOverride);
 	for (int i = 0; i < ParticleSystemTracks::NUM_SYSTEM_TRACKS; i++)

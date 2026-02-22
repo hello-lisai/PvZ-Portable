@@ -1,18 +1,19 @@
 #ifndef __TRAIL_H__
 #define __TRAIL_H__
 
+#include <cstdint>
 #include "TodParticle.h"
 
 #define MAX_TRAIL_TRIANGLES 38
 
-enum TrailType
+enum TrailType : int32_t
 {
 	TRAIL_NONE = -1,
 	TRAIL_ICE,
 	NUM_TRAILS
 };
 
-enum TrailTracks
+enum TrailTracks : int32_t
 {
 	TRACK_WIDTH_OVER_LENGTH,
 	TRACK_WIDTH_OVER_TIME,
@@ -21,7 +22,7 @@ enum TrailTracks
 	NUM_TRAIL_TRACKS
 };
 
-enum TrailFlags
+enum TrailFlags : int32_t
 {
 	TRAIL_FLAG_LOOPS = 0
 };
@@ -79,11 +80,11 @@ class Trail
 {
 public:
 	TrailPoint				mTrailPoints[20];		//+0x0
-	int						mNumTrailPoints;		//+0xA0
+	int32_t					mNumTrailPoints;		//+0xA0
 	bool					mDead;					//+0xA4
-	int						mRenderOrder;			//+0xA8
-	int						mTrailAge;				//+0xAC
-	int						mTrailDuration;			//+0xB0
+	int32_t					mRenderOrder;			//+0xA8
+	int32_t					mTrailAge;				//+0xAC
+	int32_t					mTrailDuration;			//+0xB0
 	TrailDefinition*		mDefinition;			//+0xB4
 	TrailHolder*			mTrailHolder;			//+0xB8
 	float					mTrailInterp[4];		//+0xBC

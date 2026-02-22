@@ -1,6 +1,7 @@
 #ifndef __MUSIC_H__
 #define __MUSIC_H__
 
+#include <cstdint>
 #include <string>
 #include <SDL_mixer_ext/SDL_mixer_ext.h>
 
@@ -10,7 +11,7 @@ namespace Sexy
 	class MusicInterface;
 };
 
-enum MusicTune
+enum MusicTune : int32_t
 {
 	MUSIC_TUNE_NONE = -1,
 	MUSIC_TUNE_DAY_GRASSWALK = 1,				// 白天草地关卡
@@ -29,7 +30,7 @@ enum MusicTune
 	NUM_MUSIC_TUNES
 };
 
-enum MusicFile
+enum MusicFile : int32_t
 {
 	MUSIC_FILE_NONE = -1,
 	MUSIC_FILE_MAIN_MUSIC = 1,
@@ -39,7 +40,7 @@ enum MusicFile
 	NUM_MUSIC_FILES
 };
 
-enum MusicBurstState
+enum MusicBurstState : int32_t
 {
 	MUSIC_BURST_OFF,
 	MUSIC_BURST_STARTING,
@@ -47,7 +48,7 @@ enum MusicBurstState
 	MUSIC_BURST_FINISHING
 };
 
-enum MusicDrumsState
+enum MusicDrumsState : int32_t
 {
 	MUSIC_DRUMS_OFF,
 	MUSIC_DRUMS_ON_QUEUED,
@@ -72,20 +73,20 @@ public:
 	MusicFile					mCurMusicFileMain;					//+0xC
 	MusicFile					mCurMusicFileDrums;					//+0x10
 	MusicFile					mCurMusicFileHihats;				//+0x14
-	int							mBurstOverride;						//+0x18
+	int32_t						mBurstOverride;						//+0x18
 	float						mBaseBPM;							//+0x1C
 	float						mBaseModSpeed;						//+0x20
 	MusicBurstState				mMusicBurstState;					//+0x24
-	int							mBurstStateCounter;					//+0x28
+	int32_t						mBurstStateCounter;					//+0x28
 	MusicDrumsState				mMusicDrumsState;					//+0x2C
-	int							mQueuedDrumTrackPackedOrder;		//+0x30
-	int							mDrumsStateCounter;					//+0x34
-	int							mPauseOffset;						//+0x38
-	int							mPauseOffsetDrums;					//+0x3C
+	int32_t						mQueuedDrumTrackPackedOrder;		//+0x30
+	int32_t						mDrumsStateCounter;					//+0x34
+	int32_t						mPauseOffset;						//+0x38
+	int32_t						mPauseOffsetDrums;					//+0x3C
 	bool						mPaused;							//+0x40
 	bool						mMusicDisabled;						//+0x41
-	int							mFadeOutCounter;					//+0x44
-	int							mFadeOutDuration;					//+0x48
+	int32_t						mFadeOutCounter;					//+0x44
+	int32_t						mFadeOutDuration;					//+0x48
 
 public:
 	Music();

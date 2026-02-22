@@ -1,6 +1,8 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
+#include <cstdint>
+
 #include "../ConstEnums.h"
 #include "../Sexy.TodLib/DataArray.h"
 #include "widget/Widget.h"
@@ -123,75 +125,75 @@ public:
 	Challenge*						mChallenge;												//+0x160
 	bool							mPaused;												//+0x164
 	GridSquareType					mGridSquareType[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y];		//+0x168
-	int								mGridCelLook[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y];			//+0x240
-	int								mGridCelOffset[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y][2];	//+0x318
-	int								mGridCelFog[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y + 1];		//+0x4C8
+	int32_t							mGridCelLook[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y];			//+0x240
+	int32_t							mGridCelOffset[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y][2];	//+0x318
+	int32_t							mGridCelFog[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y + 1];		//+0x4C8
 	bool							mEnableGraveStones;										//+0x5C4
-	int								mSpecialGraveStoneX;									//+0x5C8
-	int								mSpecialGraveStoneY;									//+0x5CC
+	int32_t							mSpecialGraveStoneX;									//+0x5C8
+	int32_t							mSpecialGraveStoneY;									//+0x5CC
 	float							mFogOffset;												//+0x5D0
-	int								mFogBlownCountDown;										//+0x5D4
+	int32_t							mFogBlownCountDown;										//+0x5D4
 	PlantRowType					mPlantRow[MAX_GRID_SIZE_Y];								//+0x5D8
-	int								mWaveRowGotLawnMowered[MAX_GRID_SIZE_Y];				//+0x5F0
-	int								mBonusLawnMowersRemaining;								//+0x608
-	int								mIceMinX[MAX_GRID_SIZE_Y];								//+0x60C
-	int								mIceTimer[MAX_GRID_SIZE_Y];								//+0x624
+	int32_t							mWaveRowGotLawnMowered[MAX_GRID_SIZE_Y];				//+0x5F0
+	int32_t							mBonusLawnMowersRemaining;								//+0x608
+	int32_t							mIceMinX[MAX_GRID_SIZE_Y];								//+0x60C
+	int32_t							mIceTimer[MAX_GRID_SIZE_Y];								//+0x624
 	ParticleSystemID				mIceParticleID[MAX_GRID_SIZE_Y];						//+0x63C
 	TodSmoothArray					mRowPickingArray[MAX_GRID_SIZE_Y];						//+0x654
 	ZombieType						mZombiesInWave[MAX_ZOMBIE_WAVES][MAX_ZOMBIES_IN_WAVE];	//+0x6B4
 	bool							mZombieAllowed[100];									//+0x54D4
-	int								mSunCountDown;											//+0x5538
-	int								mNumSunsFallen;											//+0x553C
-	int								mShakeCounter;											//+0x5540
-	int								mShakeAmountX;											//+0x5544
-	int								mShakeAmountY;											//+0x5548
+	int32_t							mSunCountDown;											//+0x5538
+	int32_t							mNumSunsFallen;											//+0x553C
+	int32_t							mShakeCounter;											//+0x5540
+	int32_t							mShakeAmountX;											//+0x5544
+	int32_t							mShakeAmountY;											//+0x5548
 	BackgroundType					mBackground;											//+0x554C
-	int								mLevel;													//+0x5550
-	int								mSodPosition;											//+0x5554
-	int								mPrevMouseX;											//+0x5558
-	int								mPrevMouseY;											//+0x555C
-	int								mSunMoney;												//+0x5560
-	int								mNumWaves;												//+0x5564
-	int								mMainCounter;											//+0x5568
-	int								mEffectCounter;											//+0x556C
-	int								mDrawCount;												//+0x5570
-	int								mRiseFromGraveCounter;									//+0x5574
-	int								mOutOfMoneyCounter;										//+0x5578
-	int								mCurrentWave;											//+0x557C
-	int								mTotalSpawnedWaves;										//+0x5580
+	int32_t							mLevel;													//+0x5550
+	int32_t							mSodPosition;											//+0x5554
+	int32_t							mPrevMouseX;											//+0x5558
+	int32_t							mPrevMouseY;											//+0x555C
+	int32_t							mSunMoney;												//+0x5560
+	int32_t							mNumWaves;												//+0x5564
+	int32_t							mMainCounter;											//+0x5568
+	int32_t							mEffectCounter;											//+0x556C
+	int32_t							mDrawCount;												//+0x5570
+	int32_t							mRiseFromGraveCounter;									//+0x5574
+	int32_t							mOutOfMoneyCounter;										//+0x5578
+	int32_t							mCurrentWave;											//+0x557C
+	int32_t							mTotalSpawnedWaves;										//+0x5580
 	TutorialState					mTutorialState;											//+0x5584
 	ParticleSystemID				mTutorialParticleID;									//+0x5588
-	int								mTutorialTimer;											//+0x558C
-	int								mLastBungeeWave;										//+0x5590
-	int								mZombieHealthToNextWave;								//+0x5594
-	int								mZombieHealthWaveStart;									//+0x5598
-	int								mZombieCountDown;										//+0x559C
-	int								mZombieCountDownStart;									//+0x55A0
-	int								mHugeWaveCountDown;										//+0x55A4
+	int32_t							mTutorialTimer;											//+0x558C
+	int32_t							mLastBungeeWave;										//+0x5590
+	int32_t							mZombieHealthToNextWave;								//+0x5594
+	int32_t							mZombieHealthWaveStart;									//+0x5598
+	int32_t							mZombieCountDown;										//+0x559C
+	int32_t							mZombieCountDownStart;									//+0x55A0
+	int32_t							mHugeWaveCountDown;										//+0x55A4
 	bool							mHelpDisplayed[NUM_ADVICE_TYPES];						//+0x55A8
 	AdviceType						mHelpIndex;												//+0x55EC
 	bool							mFinalBossKilled;										//+0x55F0
 	bool							mShowShovel;											//+0x55F1
-	int								mCoinBankFadeCount;										//+0x55F4
+	int32_t							mCoinBankFadeCount;										//+0x55F4
 	DebugTextMode					mDebugTextMode;											//+0x55F8
 	bool							mLevelComplete;											//+0x55FC
-	int								mBoardFadeOutCounter;									//+0x5600
-	int								mNextSurvivalStageCounter;								//+0x5604
-	int								mScoreNextMowerCounter;									//+0x5608
+	int32_t							mBoardFadeOutCounter;									//+0x5600
+	int32_t							mNextSurvivalStageCounter;								//+0x5604
+	int32_t							mScoreNextMowerCounter;									//+0x5608
 	bool							mLevelAwardSpawned;										//+0x560C
-	int								mProgressMeterWidth;									//+0x5610
-	int								mFlagRaiseCounter;										//+0x5614
-	int								mIceTrapCounter;										//+0x5618
-	int								mBoardRandSeed;											//+0x561C
+	int32_t							mProgressMeterWidth;										//+0x5610
+	int32_t							mFlagRaiseCounter;										//+0x5614
+	int32_t							mIceTrapCounter;											//+0x5618
+	int32_t							mBoardRandSeed;											//+0x561C
 	ParticleSystemID				mPoolSparklyParticleID;									//+0x5620
 	ReanimationID					mFwooshID[MAX_GRID_SIZE_Y][12];							//+0x5624
-	int								mFwooshCountDown;										//+0x5744
-	int								mTimeStopCounter;										//+0x5748
+	int32_t							mFwooshCountDown;										//+0x5744
+	int32_t							mTimeStopCounter;										//+0x5748
 	bool							mDroppedFirstCoin;										//+0x574C
-	int								mFinalWaveSoundCounter;									//+0x5750
-	int								mCobCannonCursorDelayCounter;							//+0x5754
-	int								mCobCannonMouseX;										//+0x5758
-	int								mCobCannonMouseY;										//+0x575C
+	int32_t							mFinalWaveSoundCounter;									//+0x5750
+	int32_t							mCobCannonCursorDelayCounter;							//+0x5754
+	int32_t							mCobCannonMouseX;										//+0x5758
+	int32_t							mCobCannonMouseY;										//+0x575C
 	bool							mKilledYeti;											//+0x5760
 	bool							mMustacheMode;											//+0x5761
 	bool							mSuperMowerMode;										//+0x5762
@@ -201,29 +203,29 @@ public:
 	bool							mDaisyMode;												//+0x5766
 	bool							mSukhbirMode;											//+0x5767
 	BoardResult						mPrevBoardResult;										//+0x5768
-	int								mTriggeredLawnMowers;									//+0x576C
-	int								mPlayTimeActiveLevel;									//+0x5770
-	int								mPlayTimeInactiveLevel;									//+0x5774
-	int								mMaxSunPlants;											//+0x5778
+	int32_t							mTriggeredLawnMowers;									//+0x576C
+	int32_t							mPlayTimeActiveLevel;									//+0x5770
+	int32_t							mPlayTimeInactiveLevel;									//+0x5774
+	int32_t							mMaxSunPlants;											//+0x5778
 	int64_t							mStartDrawTime;											//+0x577C
 	int64_t							mIntervalDrawTime;										//+0x5780
-	int								mIntervalDrawCountStart;								//+0x5784
+	int32_t							mIntervalDrawCountStart;								//+0x5784
 	float							mMinFPS;												//+0x5788
-	int								mPreloadTime;											//+0x578C
+	int32_t							mPreloadTime;											//+0x578C
 	intptr_t						mGameID;												//+0x5790
-	int								mGravesCleared;											//+0x5794
-	int								mPlantsEaten;											//+0x5798
-	int								mPlantsShoveled;										//+0x579C
+	int32_t							mGravesCleared;											//+0x5794
+	int32_t							mPlantsEaten;											//+0x5798
+	int32_t							mPlantsShoveled;										//+0x579C
 	bool							mPeaShooterUsed;										//+GOTY @Patoke: 0x5784
 	bool							mCatapultPlantsUsed;									//+GOTY @Patoke: 0x5785
 	bool							mMushroomAndCoffeeBeansOnly;							//+GOTY @Patoke: 0x5790
 	bool							mMushroomsUsed;											//+GOTY @Patoke: 0x5791
-	int								mLevelCoinsCollected;									//+GOTY @Patoke: 0x5788
-	int								mGargantuarsKillsByCornCob;								//+GOTY @Patoke: 0x578C
-	int								mCoinsCollected;										//+0x57A0 GOTY @Patoke: 0x57C8
-	int								mDiamondsCollected;										//+0x57A4 GOTY @Patoke: 0x57CC
-	int								mPottedPlantsCollected;									//+0x57A8
-	int								mChocolateCollected;									//+0x57AC
+	int32_t							mLevelCoinsCollected;									//+GOTY @Patoke: 0x5788
+	int32_t							mGargantuarsKillsByCornCob;								//+GOTY @Patoke: 0x578C
+	int32_t							mCoinsCollected;										//+0x57A0 GOTY @Patoke: 0x57C8
+	int32_t							mDiamondsCollected;										//+0x57A4 GOTY @Patoke: 0x57CC
+	int32_t							mPottedPlantsCollected;									//+0x57A8
+	int32_t							mChocolateCollected;									//+0x57AC
 
 public:
 	Board(LawnApp* theApp);

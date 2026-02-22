@@ -1,6 +1,7 @@
 #ifndef __TODPARTICLE_H__
 #define __TODPARTICLE_H__
 
+#include <cstdint>
 #include "TodList.h"
 #include "DataArray.h"
 #include "misc/SexyVector.h"
@@ -19,7 +20,7 @@ using namespace Sexy;
 // ############################################################# 以下为粒子系统定义相关内容 #############################################################
 // ######################################################################################################################################################
 
-enum ParticleFlags
+enum ParticleFlags : int32_t
 {
     PARTICLE_RANDOM_LAUNCH_SPIN,        // 随机发射旋转，指定粒子在发射时使用 [0, 2π] 内随机的初始旋转角度
     PARTICLE_ALIGN_LAUNCH_SPIN,         // 对齐发射角度，指定粒子在发射时的初始旋转角度与发射方向一致（优先级低于随机发射旋转）
@@ -35,7 +36,7 @@ enum ParticleFlags
     PARTICLE_HARDWARE_ONLY              // 仅硬件渲染，指定粒子仅在已开启 3D 加速时可被渲染
 };
 
-enum ParticleFieldType
+enum ParticleFieldType : int32_t
 {
     FIELD_INVALID,
     FIELD_FRICTION,                     // 摩擦力场：该场内粒子的速度按一定比例不断衰减
@@ -87,7 +88,7 @@ class FloatParameterTrack
 {
 public:
     FloatParameterTrackNode*    mNodes;
-    int                         mCountNodes;
+    int32_t                     mCountNodes;
 };
 
 // ====================================================================================================
@@ -107,7 +108,7 @@ struct EmitterFieldArray
 {
 public:
 	ParticleField* Fields;
-	int count;
+	int32_t count;
 };
 
 // ====================================================================================================
@@ -119,11 +120,11 @@ class TodEmitterDefinition
 {
 public:
     Image*                      mImage;
-    int                         mImageCol;
-    int                         mImageRow;
-    int                         mImageFrames;
-    int                         mAnimated;
-    int                         mParticleFlags;
+    int32_t                     mImageCol;
+    int32_t                     mImageRow;
+    int32_t                     mImageFrames;
+    int32_t                     mAnimated;
+    int32_t                     mParticleFlags;
     EmitterType                 mEmitterType;
     const char*                 mName;
     const char*                 mOnDuration;
@@ -178,7 +179,7 @@ class TodParticleDefinition
 {
 public:
     TodEmitterDefinition*       mEmitterDefs;
-    int                         mEmitterDefCount;
+    int32_t                     mEmitterDefCount;
 };
 
 extern int gParticleDefCount;                       // [0x6A9F08]
@@ -208,7 +209,7 @@ extern ParticleParams gLawnParticleArray[static_cast<int>(ParticleEffect::NUM_PA
 // ############################################################ 以下正式开始粒子系统相关声明 ############################################################
 // ######################################################################################################################################################
 
-enum ParticleSystemTracks
+enum ParticleSystemTracks : int32_t
 {
 	TRACK_SPAWN_RATE,
 	TRACK_SPAWN_MIN_ACTIVE,
@@ -223,7 +224,7 @@ enum ParticleSystemTracks
 	NUM_SYSTEM_TRACKS
 };
 
-enum ParticleTracks
+enum ParticleTracks : int32_t
 {
 	TRACK_PARTICLE_RED,
 	TRACK_PARTICLE_GREEN,
@@ -292,18 +293,18 @@ class TodParticle
 {
 public:
 	TodParticleEmitter*				mParticleEmitter;
-	int								mParticleDuration;
-	int								mParticleAge;
+	int32_t							mParticleDuration;
+	int32_t							mParticleAge;
 	float							mParticleTimeValue;
 	float							mParticleLastTimeValue;
 	float							mAnimationTimeValue;
 	SexyVector2						mVelocity;
 	SexyVector2						mPosition;
-	int								mImageFrame;
+	int32_t							mImageFrame;
 	float							mSpinPosition;
 	float							mSpinVelocity;
 	ParticleID						mCrossFadeParticleID;
-	int								mCrossFadeDuration;
+	int32_t							mCrossFadeDuration;
 	float							mParticleInterp[ParticleTracks::NUM_PARTICLE_TRACKS];
 	float							mParticleFieldInterp[MAX_PARTICLE_FIELDS][2];
 };
@@ -317,9 +318,9 @@ public:
 	TodList<ParticleID>				mParticleList;													//+0x8
 	float							mSpawnAccum;													//+0x18
 	Sexy::SexyVector2				mSystemCenter;													//+0x1C
-	int								mParticlesSpawned;												//+0x24
-	int								mSystemAge;														//+0x28
-	int								mSystemDuration;												//+0x2C
+	int32_t							mParticlesSpawned;												//+0x24
+	int32_t							mSystemAge;														//+0x28
+	int32_t							mSystemDuration;												//+0x2C
 	float							mSystemTimeValue;												//+0x30
 	float							mSystemLastTimeValue;											//+0x34
 	bool							mDead;															//+0x38
@@ -328,8 +329,8 @@ public:
 	float							mScaleOverride;													//+0x50
 	Sexy::Image*					mImageOverride;													//+0x54
 	ParticleEmitterID				mCrossFadeEmitterID;											//+0x58
-	int								mEmitterCrossFadeCountDown;										//+0x5C
-	int								mFrameOverride;													//+0x60
+	int32_t							mEmitterCrossFadeCountDown;										//+0x5C
+	int32_t							mFrameOverride;													//+0x60
 	float							mTrackInterp[ParticleSystemTracks::NUM_SYSTEM_TRACKS];			//+0x64
 	float							mSystemFieldInterp[MAX_PARTICLE_FIELDS][2];						//+0x8C
 
@@ -366,7 +367,7 @@ public:
     TodList<ParticleEmitterID>		mEmitterList;					//+0xC
     bool							mDead;							//+0x1C
     bool							mIsAttachment;					//+0x1D
-    int								mRenderOrder;					//+0x20
+    int32_t							mRenderOrder;					//+0x20
     bool							mDontUpdate;					//+0x24
 
 public:

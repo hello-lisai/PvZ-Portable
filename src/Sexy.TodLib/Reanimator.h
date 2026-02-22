@@ -1,6 +1,7 @@
 #ifndef __REANIMATION_H__
 #define __REANIMATION_H__
 
+#include <cstdint>
 #include "DataArray.h"
 #include "FilterEffect.h"
 #include "misc/SexyMatrix.h"
@@ -30,7 +31,7 @@ namespace Sexy
 constexpr const float DEFAULT_FIELD_PLACEHOLDER = -10000.0f;
 constexpr const double SECONDS_PER_UPDATE = 0.01f;
 
-enum ReanimFlags
+enum ReanimFlags : int32_t
 {
     REANIM_NO_ATLAS,
     REANIM_FAST_DRAW_IN_SW_MODE
@@ -38,7 +39,7 @@ enum ReanimFlags
 
 struct ReanimatorTransformArray {
     ReanimatorTransform* mTransforms;
-    int count;
+    int32_t count;
 };
 
 class ReanimatorTrack
@@ -53,7 +54,7 @@ public:
 
 struct ReanimatorTrackArray {
     ReanimatorTrack* tracks;
-    int count;
+    int32_t count;
 };
 
 // ====================================================================================================
@@ -84,7 +85,7 @@ class ReanimationParams
 public:
     ReanimationType                 mReanimationType;
     const char*                     mReanimFileName;
-    int                             mReanimParamFlags;
+    int32_t                         mReanimParamFlags;
 };
 extern unsigned int gReanimationParamArraySize;              //[0x6A9EEC]
 extern ReanimationParams* gReanimationParamArray;   //[0x6A9EF0]
@@ -134,8 +135,8 @@ class ReanimatorFrameTime
 {
 public:
     float                           mFraction;                      //+0x0：两帧之间已经过的比例
-    int                             mAnimFrameBeforeInt;            //+0x4：前一个整数帧
-    int                             mAnimFrameAfterInt;             //+0x8：后一个整数帧
+    int32_t                         mAnimFrameBeforeInt;            //+0x4：前一个整数帧
+    int32_t                         mAnimFrameAfterInt;             //+0x8：后一个整数帧
 };
 
 class ReanimatorTransform
@@ -160,15 +161,15 @@ public:
 class ReanimatorTrackInstance
 {
 public:
-    int                             mBlendCounter;                  //+0x0
-    int                             mBlendTime;                     //+0x4
+    int32_t                         mBlendCounter;                  //+0x0
+    int32_t                         mBlendTime;                     //+0x4
     ReanimatorTransform             mBlendTransform;                //+0x8
     float                           mShakeOverride;                 //+0x34
     float                           mShakeX;                        //+0x38
     float                           mShakeY;                        //+0x3C
     AttachmentID                    mAttachmentID;                  //+0x40
     Image*                          mImageOverride;                 //+0x44
-    int                             mRenderGroup;                   //+0x48
+    int32_t                         mRenderGroup;                   //+0x48
     Color                           mTrackColor;                    //+0x4C
     bool                            mIgnoreClipRect;                //+0x5C
     bool                            mTruncateDisappearingFrames;    //+0x5D
@@ -188,16 +189,16 @@ public:
     ReanimatorDefinition*           mDefinition;
     ReanimLoopType                  mLoopType;
     bool                            mDead;
-    int                             mFrameStart;
-    int                             mFrameCount;
-    int                             mFrameBasePose;
+    int32_t                         mFrameStart;
+    int32_t                         mFrameCount;
+    int32_t                         mFrameBasePose;
     SexyTransform2D                 mOverlayMatrix;
     Color                           mColorOverride;
     ReanimatorTrackInstance*        mTrackInstances;
-    int                             mLoopCount;
+    int32_t                         mLoopCount;
     ReanimationHolder*              mReanimationHolder;
     bool                            mIsAttachment;
-    int                             mRenderOrder;
+    int32_t                         mRenderOrder;
     Color                           mExtraAdditiveColor;
     bool                            mEnableExtraAdditiveDraw;
     Color                           mExtraOverlayColor;

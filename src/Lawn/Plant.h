@@ -1,30 +1,31 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include "GameObject.h"
 
 #define MAX_MAGNET_ITEMS 5
 
-enum PlantSubClass
+enum PlantSubClass : int32_t
 {
     SUBCLASS_NORMAL = 0,
     SUBCLASS_SHOOTER = 1
 };
 
-enum PlantWeapon
+enum PlantWeapon : int32_t
 {
     WEAPON_PRIMARY,
     WEAPON_SECONDARY
 };
 
-enum PlantOnBungeeState
+enum PlantOnBungeeState : int32_t
 {
     NOT_ON_BUNGEE,
     GETTING_GRABBED_BY_BUNGEE,
     RISING_WITH_BUNGEE
 };
 
-enum PlantState
+enum PlantState : int32_t
 {
     STATE_NOTREADY,
     STATE_READY,
@@ -77,7 +78,7 @@ enum PlantState
     STATE_LILYPAD_INVULNERABLE
 };
 
-enum PLANT_LAYER
+enum PLANT_LAYER : int32_t
 {
     PLANT_LAYER_BELOW = -1,
     PLANT_LAYER_MAIN,
@@ -88,7 +89,7 @@ enum PLANT_LAYER
     NUM_PLANT_LAYERS
 };
 
-enum PLANT_ORDER
+enum PLANT_ORDER : int32_t
 {
     PLANT_ORDER_LILYPAD,
     PLANT_ORDER_NORMAL,
@@ -97,7 +98,7 @@ enum PLANT_ORDER
     PLANT_ORDER_CHERRYBOMB
 };
 
-enum MagnetItemType
+enum MagnetItemType : int32_t
 {
     MAGNET_ITEM_NONE,
     MAGNET_ITEM_PAIL_1,
@@ -143,27 +144,27 @@ class Plant : public GameObject
 {
 public:
     SeedType                mSeedType;                      //+0x24
-    int                     mPlantCol;                      //+0x28
-    int                     mAnimCounter;                   //+0x2C
-    int                     mFrame;                         //+0x30
-    int                     mFrameLength;                   //+0x34
-    int                     mNumFrames;                     //+0x38
+    int32_t                 mPlantCol;                      //+0x28
+    int32_t                 mAnimCounter;                   //+0x2C
+    int32_t                 mFrame;                         //+0x30
+    int32_t                 mFrameLength;                   //+0x34
+    int32_t                 mNumFrames;                     //+0x38
     PlantState              mState;                         //+0x3C
-    int                     mPlantHealth;                   //+0x40
-    int                     mPlantMaxHealth;                //+0x44
-    int                     mSubclass;                      //+0x48
-    int                     mDisappearCountdown;            //+0x4C
-    int                     mDoSpecialCountdown;            //+0x50
-    int                     mStateCountdown;                //+0x54
-    int                     mLaunchCounter;                 //+0x58
-    int                     mLaunchRate;                    //+0x5C
+    int32_t                 mPlantHealth;                   //+0x40
+    int32_t                 mPlantMaxHealth;                //+0x44
+    int32_t                 mSubclass;                      //+0x48
+    int32_t                 mDisappearCountdown;            //+0x4C
+    int32_t                 mDoSpecialCountdown;            //+0x50
+    int32_t                 mStateCountdown;                //+0x54
+    int32_t                 mLaunchCounter;                 //+0x58
+    int32_t                 mLaunchRate;                    //+0x5C
     Rect                    mPlantRect;                     //+0x60
     Rect                    mPlantAttackRect;               //+0x70
-    int                     mTargetX;                       //+0x80
-    int                     mTargetY;                       //+0x84
-    int                     mStartRow;                      //+0x88
+    int32_t                 mTargetX;                       //+0x80
+    int32_t                 mTargetY;                       //+0x84
+    int32_t                 mStartRow;                      //+0x88
     ParticleSystemID        mParticleID;                    //+0x8C
-    int                     mShootingCounter;               //+0x90
+    int32_t                 mShootingCounter;               //+0x90
     ReanimationID           mBodyReanimID;                  //+0x94
     ReanimationID           mHeadReanimID;                  //+0x98
     ReanimationID           mHeadReanimID2;                 //+0x9C
@@ -171,18 +172,18 @@ public:
     ReanimationID           mBlinkReanimID;                 //+0xA4
     ReanimationID           mLightReanimID;                 //+0xA8
     ReanimationID           mSleepingReanimID;              //+0xAC
-    int                     mBlinkCountdown;                //+0xB0
-    int                     mRecentlyEatenCountdown;        //+0xB4
-    int                     mEatenFlashCountdown;           //+0xB8
-    int                     mBeghouledFlashCountdown;       //+0xBC
+    int32_t                 mBlinkCountdown;                //+0xB0
+    int32_t                 mRecentlyEatenCountdown;        //+0xB4
+    int32_t                 mEatenFlashCountdown;           //+0xB8
+    int32_t                 mBeghouledFlashCountdown;       //+0xBC
     float                   mShakeOffsetX;                  //+0xC0
     float                   mShakeOffsetY;                  //+0xC4
     MagnetItem              mMagnetItems[MAX_MAGNET_ITEMS]; //+0xC8
     ZombieID                mTargetZombieID;                //+0x12C
-    int                     mWakeUpCounter;                 //+0x130
+    int32_t                 mWakeUpCounter;                 //+0x130
     PlantOnBungeeState      mOnBungeeState;                 //+0x134
     SeedType                mImitaterType;                  //+0x138
-    int                     mPottedPlantIndex;              //+0x13C
+    int32_t                 mPottedPlantIndex;              //+0x13C
     bool                    mAnimPing;                      //+0x140
     bool                    mDead;                          //+0x141
     bool                    mSquished;                      //+0x142

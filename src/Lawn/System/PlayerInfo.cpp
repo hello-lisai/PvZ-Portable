@@ -113,7 +113,7 @@ void PlayerInfo::SyncDetails(DataSync& theSync)
 	// Known that achievements are stored as 20 x 16-bit values (0/1) in the original format.
 	for (int i = 0; i < 20; i++)
 	{
-		unsigned short aAchievementValue = mEarnedAchievements[i] ? 1 : 0;
+		uint16_t aAchievementValue = mEarnedAchievements[i] ? 1 : 0;
 		theSync.SyncUInt16(aAchievementValue);
 		if (theSync.GetReader())
 		{

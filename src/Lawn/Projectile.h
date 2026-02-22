@@ -1,6 +1,7 @@
 #ifndef __PROJECTILE_H__
 #define __PROJECTILE_H__
 
+#include <cstdint>
 #include "../ConstEnums.h"
 #include "GameObject.h"
 
@@ -16,17 +17,17 @@ class ProjectileDefinition
 {
 public:
     ProjectileType          mProjectileType;
-    int                     mImageRow;
-    int                     mDamage;
+    int32_t                 mImageRow;
+    int32_t                 mDamage;
 };
 extern ProjectileDefinition gProjectileDefinition[NUM_PROJECTILES];  //0x69F1C0
 
 class Projectile : public GameObject
 {
 public:
-    int                     mFrame;                 //+0x24
-    int                     mNumFrames;             //+0x28
-    int                     mAnimCounter;           //+0x2C
+    int32_t                 mFrame;                 //+0x24
+    int32_t                 mNumFrames;             //+0x28
+    int32_t                 mAnimCounter;           //+0x2C
     float                   mPosX;                  //+0x30
     float                   mPosY;                  //+0x34
     float                   mPosZ;                  //+0x38
@@ -36,21 +37,21 @@ public:
     float                   mAccZ;                  //+0x48
     float                   mShadowY;               //+0x4C
     bool                    mDead;                  //+0x50
-    int                     mAnimTicksPerFrame;     //+0x54
+    int32_t                 mAnimTicksPerFrame;     //+0x54
     ProjectileMotion        mMotionType;            //+0x58
     ProjectileType          mProjectileType;        //+0x5C
-    int                     mProjectileAge;         //+0x60
-    int                     mClickBackoffCounter;   //+0x64
+    int32_t                 mProjectileAge;         //+0x60
+    int32_t                 mClickBackoffCounter;   //+0x64
     float                   mRotation;              //+0x68
     float                   mRotationSpeed;         //+0x6C
     bool                    mOnHighGround;          //+0x70
-    int                     mDamageRangeFlags;      //+0x74
-    int                     mHitTorchwoodGridX;     //+0x78
+    int32_t                 mDamageRangeFlags;      //+0x74
+    int32_t                 mHitTorchwoodGridX;     //+0x78
     AttachmentID            mAttachmentID;          //+0x7C
     float                   mCobTargetX;            //+0x80
-    int                     mCobTargetRow;          //+0x84
+    int32_t                 mCobTargetRow;          //+0x84
     ZombieID                mTargetZombieID;        //+0x88
-    int                     mLastPortalX;           //+0x8C
+    int32_t                 mLastPortalX;           //+0x8C
 
 public:
     Projectile();

@@ -35,8 +35,6 @@ namespace Sexy
 	class ButtonWidget;
 };
 
-enum FoleyType;
-
 using namespace Sexy;
 
 typedef std::list<ButtonWidget*> ButtonList;

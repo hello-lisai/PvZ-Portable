@@ -1,6 +1,7 @@
 #ifndef __FILTEREFFECT_H__
 #define __FILTEREFFECT_H__
 
+#include <cstdint>
 #include <map>
 
 namespace Sexy
@@ -10,7 +11,7 @@ namespace Sexy
 }
 using namespace Sexy;
 
-enum FilterEffect
+enum FilterEffect : int32_t
 {
     FILTER_EFFECT_NONE = -1,
     FILTER_EFFECT_WASHED_OUT,
