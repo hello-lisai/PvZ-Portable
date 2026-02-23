@@ -2297,7 +2297,7 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
 		}
 
 		// 将植物写入 thePlantOnLawn 的记录
-		if (Plant::IsFlying(aPlant->mSeedType))
+		if (Plant::IsFlying(aSeedType))
 		{
 			TOD_ASSERT(!thePlantOnLawn->mFlyingPlant);
 			thePlantOnLawn->mFlyingPlant = aPlant;
