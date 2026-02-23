@@ -451,6 +451,8 @@ void Music::UpdateMusicBurst()
 {
 	if (mApp->mBoard == nullptr)
 		return;
+	if (mApp->mGameMode == GameMode::GAMEMODE_INTRO)
+		return;
 
 	int aBurstScheme;
 	if (mCurMusicTune == MusicTune::MUSIC_TUNE_DAY_GRASSWALK || mCurMusicTune == MusicTune::MUSIC_TUNE_POOL_WATERYGRAVES ||
@@ -473,7 +475,7 @@ void Music::UpdateMusicBurst()
 	switch (mMusicBurstState)
 	{
 		case MusicBurstState::MUSIC_BURST_OFF:
-			if ((mApp->mBoard->CountZombiesOnScreen() >= 10 || mBurstOverride == 1) && mApp->mGameMode != GameMode::GAMEMODE_INTRO)
+			if (mApp->mBoard->CountZombiesOnScreen() >= 10 || mBurstOverride == 1)
 				StartBurst();
 			break;
 		case MusicBurstState::MUSIC_BURST_STARTING:
