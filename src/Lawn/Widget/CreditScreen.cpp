@@ -318,6 +318,7 @@ CreditScreen::CreditScreen(LawnApp* theApp)
 
 	mApp->mEffectSystem->EffectSystemFreeAll();
 	mApp->mMusic->StopAllMusic();
+	mLoadedResourceNames.push_back("DelayLoad_Credits");
 	TodLoadResources("DelayLoad_Credits");
 
     mBrainPosX = 0.0f;
