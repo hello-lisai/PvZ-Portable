@@ -1880,11 +1880,7 @@ void ZenGarden::GotoNextGarden()
         return;
     }
 
-#ifdef LOW_MEMORY
-	for (std::string& resource : mLoadedResourceNames)
-		mApp->mResourceManager->DeleteResources(resource.c_str());
-#endif
-	mLoadedResourceNames.clear();
+	mApp->mResourceManager->ReleaseTrackedResources(mLoadedResourceNames);
 
     if (mBoard->mBackground == BackgroundType::BACKGROUND_MUSHROOM_GARDEN)
     {
