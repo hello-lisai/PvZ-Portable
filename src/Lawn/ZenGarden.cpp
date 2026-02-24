@@ -1880,6 +1880,7 @@ void ZenGarden::GotoNextGarden()
     }
     if (aGoToTree)
     {
+        mApp->mResourceManager->ReleaseTrackedResources(mLoadedResourceNames);
         mApp->KillBoard();
         mApp->PreNewGame(GameMode::GAMEMODE_TREE_OF_WISDOM, false);
         return;
