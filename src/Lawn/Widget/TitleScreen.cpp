@@ -55,15 +55,11 @@ TitleScreen::~TitleScreen()
 	}
 
 #ifdef LOW_MEMORY
-	// free memory used by title screen since we won't see it again
-	mApp->mResourceManager->DeleteResources("LoaderBar");
-	FONT_BRIANNETOD16 = mApp->mResourceManager->LoadFont("FONT_BRIANNETOD16");
-	IMAGE_PVZ_LOGO = mApp->mResourceManager->LoadImage("IMAGE_PVZ_LOGO");
-	IMAGE_REANIM_SODROLLCAP = mApp->mResourceManager->LoadImage("IMAGE_REANIM_SODROLLCAP");
-	SOUND_LOADINGBAR_FLOWER = mApp->mSoundManager->GetFreeSoundId();
-	mApp->mSoundManager->LoadSound(SOUND_LOADINGBAR_FLOWER, "sounds/loadingbar_flower");
-	SOUND_BUTTONCLICK = mApp->mSoundManager->GetFreeSoundId();
-	mApp->mSoundManager->LoadSound(SOUND_BUTTONCLICK, "sounds/buttonclick");
+	// Selectively delete only title-screen-specific resources from LoaderBar group.
+	mApp->mResourceManager->DeleteImage("IMAGE_LOADBAR_DIRT");
+	mApp->mResourceManager->DeleteImage("IMAGE_LOADBAR_GRASS");
+	mApp->mResourceManager->DeleteImage("IMAGE_TITLESCREEN");
+	mApp->mResourceManager->DeleteSound("SOUND_LOADINGBAR_ZOMBIE");
 #endif
 }
 

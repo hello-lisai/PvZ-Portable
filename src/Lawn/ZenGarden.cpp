@@ -85,6 +85,11 @@ ZenGarden::ZenGarden()
     mGardenType = GardenType::GARDEN_MAIN;
 }
 
+ZenGarden::~ZenGarden()
+{
+    mApp->mResourceManager->ReleaseTrackedResources(mLoadedResourceNames);
+}
+
 //0x51D0E0
 void ZenGarden::DrawPottedPlantIcon(Graphics* g, float x, float y, PottedPlant* thePottedPlant)
 {
@@ -1875,16 +1880,13 @@ void ZenGarden::GotoNextGarden()
     }
     if (aGoToTree)
     {
+        mApp->mResourceManager->ReleaseTrackedResources(mLoadedResourceNames);
         mApp->KillBoard();
         mApp->PreNewGame(GameMode::GAMEMODE_TREE_OF_WISDOM, false);
         return;
     }
 
-#ifdef LOW_MEMORY
-	for (std::string& resource : mLoadedResourceNames)
-		mApp->mResourceManager->DeleteResources(resource.c_str());
-#endif
-	mLoadedResourceNames.clear();
+	mApp->mResourceManager->ReleaseTrackedResources(mLoadedResourceNames);
 
     if (mBoard->mBackground == BackgroundType::BACKGROUND_MUSHROOM_GARDEN)
     {

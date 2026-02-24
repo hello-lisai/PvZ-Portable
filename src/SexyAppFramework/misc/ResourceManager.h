@@ -179,6 +179,8 @@ public:
 	void					DeleteImage(const std::string &theName);
 	SharedImageRef			LoadImage(const std::string &theName);
 
+	void					DeleteSound(const std::string &theName);
+
 	void					DeleteFont(const std::string &theName);
 	_Font*					LoadFont(const std::string &theName);
 
@@ -197,6 +199,7 @@ public:
 	void					SetAllowMissingProgramImages(bool allow);
 
 	virtual void			DeleteResources(const std::string &theGroup);
+	void					ReleaseTrackedResources(std::vector<std::string>& theNames);
 	void					DeleteExtraImageBuffers(const std::string &theGroup);
 
 	const ResList*			GetCurResGroupList()	{return mCurResGroupList;}

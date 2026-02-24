@@ -3128,6 +3128,10 @@ void LawnApp::DrawCrazyDave(Graphics* g)
 //0x455670
 int LawnApp::GetNumPreloadingTasks()
 {
+#ifdef LOW_MEMORY
+	return 0;
+#endif
+
 	int aTaskCount = 10;
 	if (mPlayerInfo)
 	{
