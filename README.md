@@ -98,7 +98,7 @@ This project is designed and tested against Plants vs. Zombies **GOTY Edition 1.
 
 Before building on PC, ensure you have the necessary dependencies installed:
 
-- **Build Tools**: `CMake`, `Ninja`, A C/C++ compiler (e.g., `gcc`, `clang`, `MSVC`)
+- **Build Tools**: `CMake`, `Ninja`, A C/C++ compiler (e.g., `gcc`, `clang`, `MSVC`) supporting **C++20** (Also need a standard library implementation like `libstdc++`, `libc++` or MSVC STL that supports C++20)
 - **Graphics**: `OpenGL ES 2.0` or `OpenGL 2.1+` (auto-detected at runtime via SDL2)
 - **Audio**: `libopenmpt`, `libogg`, `libvorbis`, `mpg123`
 - **Image**: `libpng`, `libjpeg-turbo`
