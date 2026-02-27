@@ -2,6 +2,21 @@ cmake_minimum_required(VERSION 3.5...4.0)
 
 project(pvz-portable LANGUAGES C CXX ASM)
 
+option(BUILD_STATIC "Static link for a standalone exe (Windows, non-MSVC)" OFF)
+if(BUILD_STATIC)
+	if(WIN32 AND NOT MSVC)
+		set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+		set(BUILD_SHARED_LIBS OFF)
+		add_link_options(-static)
+	elseif(MSVC)
+		message(WARNING "BUILD_STATIC is not supported for MSVC. Use a vcpkg -static triplet instead.")
+		set(BUILD_STATIC OFF)
+	else()
+		message(WARNING "BUILD_STATIC is only supported on Windows with MinGW-based toolchains.")
+		set(BUILD_STATIC OFF)
+	endif()
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if (CMAKE_GENERATOR MATCHES "Ninja")
 	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
@@ -112,6 +127,31 @@ find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
 
+function(_pvz_patch_sdl2_iface_libs target)
+	get_target_property(_libs ${target} INTERFACE_LINK_LIBRARIES)
+	if(NOT _libs)
+		return()
+	endif()
+	set(_patched)
+	foreach(_lib IN LISTS _libs)
+		if(_lib STREQUAL "SDL2::SDL2")
+			list(APPEND _patched SDL2::SDL2-static)
+		else()
+			list(APPEND _patched "${_lib}")
+		endif()
+	endforeach()
+	set_target_properties(${target} PROPERTIES INTERFACE_LINK_LIBRARIES "${_patched}")
+endfunction()
+
+if(BUILD_STATIC AND TARGET SDL2::SDL2-static)
+	if(TARGET SDL2::SDL2main)
+		_pvz_patch_sdl2_iface_libs(SDL2::SDL2main)
+	endif()
+	set(SDL2_LINK_TARGET SDL2::SDL2-static)
+else()
+	set(SDL2_LINK_TARGET SDL2::SDL2)
+endif()
+
 set(SDL_MIXER_X_STATIC ON CACHE BOOL "Build static library of SDL Mixer X")
 set(SDL_MIXER_X_SHARED OFF CACHE BOOL "Build shared library of SDL Mixer X")
 set(USE_MIDI OFF CACHE BOOL "SDL Mixer X midi")
@@ -121,6 +161,11 @@ set(USE_OPUS OFF CACHE BOOL "SDL Mixer X opus")
 set(USE_DRFLAC OFF CACHE BOOL "SDL Mixer X flac")
 set(USE_PXTONE OFF CACHE BOOL "SDL Mixer X pxtone")
 add_subdirectory(src/SexyAppFramework/sound/SDL-Mixer-X)
+
+# Patch SDL-Mixer-X's transitive SDL2 dep without touching vendored CMake files
+if(BUILD_STATIC AND TARGET SDL2::SDL2-static)
+	_pvz_patch_sdl2_iface_libs(SDL2_mixer_ext_Static)
+endif()
 
 add_executable(pvz-portable ${SOURCES})
 target_include_directories(pvz-portable PRIVATE
@@ -152,7 +197,7 @@ target_link_libraries(pvz-portable PRIVATE
 	JPEG::JPEG
 	ZLIB::ZLIB
 	SDL2::SDL2main
-	SDL2::SDL2
+	${SDL2_LINK_TARGET}
 	Threads::Threads
 )
 
