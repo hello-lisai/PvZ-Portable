@@ -174,7 +174,7 @@ jobs:
   #         name: pvz-portable-switch
   #         path: |
   #           ./build/pvz-portable.nro
-  #           ./build/pvz-portable.elf
+  #           ./build/pvz-portable.elf999
 
   build-macos:
     name: Build for macOS (aarch64)
