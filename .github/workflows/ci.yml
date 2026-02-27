@@ -88,33 +88,18 @@ jobs:
           mingw-w64-ucrt-x86_64-libvorbis
           mingw-w64-ucrt-x86_64-mpg123
           mingw-w64-ucrt-x86_64-ninja
-          mingw-w64-ucrt-x86_64-ntldd
           mingw-w64-ucrt-x86_64-SDL2
 
     - name: Compile PvZ-Portable for Windows
       shell: msys2 {0}
       run: |
         mkdir build
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCONSOLE=OFF -DCMAKE_COLOR_DIAGNOSTICS=ON
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCONSOLE=OFF -DBUILD_STATIC=ON -DCMAKE_COLOR_DIAGNOSTICS=ON
         cmake --build build
         
         mkdir -p dist
-        
         cp build/pvz-portable.exe dist/
         strip dist/pvz-portable.exe
-        
-        echo "Collecting dependencies..."
-        ntldd -R dist/pvz-portable.exe \
-          | grep "=>" \
-          | awk '{print $3}' \
-          | grep -vE '^not$' \
-          | grep -ivE '[\\/]windows[\\/]' \
-          | sed 's/\\/\//g' \
-          | sort -u \
-          | xargs -I {} cp "{}" dist/
-
-        echo "Packed files:"
-        ls -lh dist/
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
@@ -257,12 +242,10 @@ jobs:
         mv artifacts/pvz-portable-archlinux/pvz-portable release_files/pvz-portable-linux-x86_64
 
         echo "Preparing Windows MSVC file..."
-        mv artifacts/pvz-portable-windows-msvc-x64/pvz-portable.exe release_files/pvz-portable-windows-x64-static.exe
+        mv artifacts/pvz-portable-windows-msvc-x64/pvz-portable.exe release_files/pvz-portable-windows-msvc-x64-static.exe
 
         echo "Preparing Windows MSYS2 file..."
-        cd artifacts/pvz-portable-windows-msys2-ucrt64
-        zip -r ../../release_files/pvz-portable-windows-ucrt64.zip .
-        cd ../..
+        mv artifacts/pvz-portable-windows-msys2-ucrt64/pvz-portable.exe release_files/pvz-portable-windows-ucrt64-static.exe
 
         echo "Preparing macOS file..."
         cd artifacts/pvz-portable-macos
