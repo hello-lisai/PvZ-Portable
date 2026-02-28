@@ -255,9 +255,21 @@ jobs:
         ls -lh release_files/
 
     - name: Create Release
-      uses: softprops/action-gh-release@v2
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        files: release_files/*
-        generate_release_notes: true
+        tag_name: build-${{ github.run_number }}-${{ github.run_id }}
+        release_name: Build #${{ github.run_number }}
         draft: false
-        prerelease: false
+        prerelease: true
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release_files/*
+        asset_name: pvz-portable-${{ matrix.os }}
+        asset_content_type: application/octet-stream
