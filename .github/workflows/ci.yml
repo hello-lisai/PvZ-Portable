@@ -223,7 +223,6 @@ jobs:
   release:
     name: Release
     needs: ['build-archlinux', 'build-windows-msys2-ucrt64', 'build-windows-msvc-x64', 'build-macos']
-    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       contents: write
