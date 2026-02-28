@@ -233,17 +233,17 @@ jobs:
 
     - name: Prepare Release Files
       run: |
-        mkdir release_files
+        mkdir -p release_files
 
         echo "Preparing Arch Linux file..."
         chmod +x artifacts/pvz-portable-archlinux/pvz-portable
-        mv artifacts/pvz-portable-archlinux/pvz-portable release_files/pvz-portable-linux-x86_64
+        cp artifacts/pvz-portable-archlinux/pvz-portable release_files/pvz-portable-linux-x86_64
 
         echo "Preparing Windows MSVC file..."
-        mv artifacts/pvz-portable-windows-msvc-x64/pvz-portable.exe release_files/pvz-portable-windows-msvc-x64-static.exe
+        cp artifacts/pvz-portable-windows-msvc-x64/pvz-portable.exe release_files/pvz-portable-windows-msvc-x64-static.exe
 
         echo "Preparing Windows MSYS2 file..."
-        mv artifacts/pvz-portable-windows-msys2-ucrt64/pvz-portable.exe release_files/pvz-portable-windows-ucrt64-static.exe
+        cp artifacts/pvz-portable-windows-msys2-ucrt64/pvz-portable.exe release_files/pvz-portable-windows-ucrt64-static.exe
 
         echo "Preparing macOS file..."
         cd artifacts/pvz-portable-macos
@@ -253,6 +253,16 @@ jobs:
 
         echo "Final files:"
         ls -lh release_files/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: build-${{ github.run_number }}-${{ github.run_id }}
+        name: Build #${{ github.run_number }}
+        files: release_files/*
+        draft: false
+        prerelease: true
+
 
     - name: Create Release
       id: create_release
