@@ -369,7 +369,7 @@ void ChallengeScreen::UpdateButtons()
 	{
 		ButtonWidget* aPageButton = mPageButton[aPage];
 
-#ifdef _PVZ_LIMBO_PAGE
+#ifdef PVZ_LIMBO_PAGE
 		aPageButton->mVisible = true;
 #endif
 

@@ -305,7 +305,7 @@ LawnApp::~LawnApp()
 
 	mResourceManager->DeleteResources("");
 	/*
-#ifdef _PVZ_DEBUG
+#ifdef PVZ_DEBUG
 	BetaSubmit(true);
 #endif
 	*/
@@ -346,7 +346,7 @@ void LawnApp::KillBoard()
 		}
 
 /*
-#ifdef _PVZ_DEBUG
+#ifdef PVZ_DEBUG
 		BetaRecordLevelStats();
 #endif
 */
@@ -1267,7 +1267,7 @@ void LawnApp::Init()
 		return;
 
 	// @Patoke: horrible debug checks, breaks the whole exe in release mode
-//#ifdef _PVZ_DEBUG
+//#ifdef PVZ_DEBUG
 	TodAssertInitForApp();
 	TodLog("session id: %u", mSessionID);
 //#endif
@@ -1307,7 +1307,7 @@ void LawnApp::Init()
 	mWidgetManager->AddWidget(mTitleScreen);
 	mWidgetManager->SetFocus(mTitleScreen);
 
-#ifdef _PVZ_DEBUG
+#ifdef PVZ_DEBUG
 	int aDuration = mTimer.GetDuration();
 	TodTrace("loading: 'profiles' %d ms", aDuration);
 #endif
@@ -1339,7 +1339,7 @@ void LawnApp::Init()
 	mDaisyCheck = new TypingCheck("daisies");
 	mSukhbirCheck = new TypingCheck("sukhbir");
 
-#ifdef _PVZ_DEBUG
+#ifdef PVZ_DEBUG
 	aDuration = mTimer.GetDuration();
 	TodTrace("loading: 'system' %d ms", aDuration);
 #endif
@@ -1349,7 +1349,7 @@ void LawnApp::Init()
 	ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_LOADBAR_SPROUT, true);
 	ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_LOADBAR_ZOMBIEHEAD, true);
 
-#ifdef _PVZ_DEBUG
+#ifdef PVZ_DEBUG
 	aDuration = mTimer.GetDuration();
 	TodTrace("loading: 'loaderbar' %d ms", aDuration);
 #endif
@@ -1378,7 +1378,7 @@ void LawnApp::HandleCmdLineParam(const std::string& theParamName, const std::str
 {
 	if (theParamName == "-tod")
 	{
-#ifdef _PVZ_DEBUG
+#ifdef PVZ_DEBUG
 		mTodCheatKeys = true;
 		mDebugKeysEnabled = true;
 #endif
@@ -1655,7 +1655,7 @@ void LawnApp::UpdateFrames()
 		mBoard->ResetFPSStats();
 	}
 
-#ifdef _PVZ_DEBUG
+#ifdef PVZ_DEBUG
 	UpdatePlayTimeStats();
 #endif
 
