@@ -23,8 +23,8 @@
 #include <cstdarg>
 
 // ============================================================
-//  Debug logging system – writes to both console and a file
-//  so we can diagnose crashes after they happen.
+//  Minimal debug logging – only errors and warnings.
+//  No per-frame or per-slot logging to avoid I/O overhead.
 // ============================================================
 static FILE* gLogFile = nullptr;
 
@@ -62,8 +62,8 @@ static void spineLog(const char* fmt, ...)
     va_end(args);
 }
 
-#define SPINE_LOG(...) do { spineLogOpen(); spineLog(__VA_ARGS__); } while(0)
-#define SPINE_LOG_FN() SPINE_LOG("[SPINE] %s", __FUNCTION__)
+#define SPINE_ERR(...) do { spineLogOpen(); spineLog("[SPINE ERROR] " __VA_ARGS__); } while(0)
+#define SPINE_WARN(...) do { spineLogOpen(); spineLog("[SPINE WARN] " __VA_ARGS__); } while(0)
 
 // ============================================================
 //  Static variables
@@ -81,7 +81,7 @@ static std::vector<char> readSpineFile(const std::string& path)
     std::vector<char> result;
     PFILE* f = p_fopen(path.c_str(), "rb");
     if (f == nullptr) {
-        SPINE_LOG("[readSpineFile] FAILED to open: %s", path.c_str());
+        SPINE_ERR("Cannot open file: %s", path.c_str());
         return result;
     }
 
@@ -96,7 +96,6 @@ static std::vector<char> readSpineFile(const std::string& path)
     result[size] = '\0';
     p_fclose(f);
 
-    SPINE_LOG("[readSpineFile] OK: %s (size=%ld)", path.c_str(), size);
     return result;
 }
 
@@ -105,13 +104,11 @@ static std::vector<char> readSpineFile(const std::string& path)
 // ============================================================
 static void _pvz_spine_createTexture(spAtlasPage* self, const char* path)
 {
-    SPINE_LOG("[_pvz_spine_createTexture] path=%s", path ? path : "(null)");
-
     if (path == nullptr) {
         self->rendererObject = nullptr;
         self->width = 1;
         self->height = 1;
-        SPINE_LOG("[_pvz_spine_createTexture] ERROR: null path");
+        SPINE_ERR("createTexture: null path");
         return;
     }
 
@@ -120,11 +117,9 @@ static void _pvz_spine_createTexture(spAtlasPage* self, const char* path)
         self->rendererObject = nullptr;
         self->width = 1;
         self->height = 1;
-        SPINE_LOG("[_pvz_spine_createTexture] ERROR: ImageLib::GetImage failed for %s", path);
+        SPINE_ERR("createTexture: ImageLib::GetImage failed for %s", path);
         return;
     }
-
-    SPINE_LOG("[_pvz_spine_createTexture] Image loaded: %dx%d", loaded->GetWidth(), loaded->GetHeight());
 
     Sexy::MemoryImage* img = new Sexy::MemoryImage();
     img->mFilePath = path;
@@ -133,19 +128,14 @@ static void _pvz_spine_createTexture(spAtlasPage* self, const char* path)
     self->rendererObject = img;
     self->width = img->mWidth;
     self->height = img->mHeight;
-
-    SPINE_LOG("[_pvz_spine_createTexture] SUCCESS: %s -> %dx%d", path, img->mWidth, img->mHeight);
 }
 
 static void _pvz_spine_disposeTexture(spAtlasPage* self)
 {
-    SPINE_LOG("[_pvz_spine_disposeTexture] page=%p rendererObject=%p", (void*)self, self ? self->rendererObject : nullptr);
     if (self == nullptr) return;
     Sexy::MemoryImage* img = (Sexy::MemoryImage*)self->rendererObject;
-    if (img) {
-        SPINE_LOG("[_pvz_spine_disposeTexture] deleting MemoryImage %p", (void*)img);
+    if (img)
         delete img;
-    }
     self->rendererObject = nullptr;
 }
 
@@ -187,7 +177,6 @@ char* _spUtil_readFile(const char* path, int* length)
 
 static spAtlas* pvzCreateAtlas(const char* data, int length, const char* dir)
 {
-    SPINE_LOG("[pvzCreateAtlas] data=%p length=%d dir=%s", (const void*)data, length, dir ? dir : "(null)");
     return spAtlas_create(data, length, dir, nullptr);
 }
 
@@ -206,20 +195,16 @@ SpineSkeletonDataCache::CachedData SpineSkeletonDataCache::LoadData(
     const std::string& jsonPath,
     const std::string& atlasPath)
 {
-    SPINE_LOG("[LoadData] json=%s atlas=%s", jsonPath.c_str(), atlasPath.c_str());
-
     std::string key = jsonPath + "|" + atlasPath;
     auto it = gCache.find(key);
-    if (it != gCache.end()) {
-        SPINE_LOG("[LoadData] CACHE HIT");
+    if (it != gCache.end())
         return it->second;
-    }
 
     CachedData data = { nullptr, nullptr };
 
     std::vector<char> atlasData = readSpineFile(atlasPath);
     if (atlasData.empty()) {
-        SPINE_LOG("[LoadData] FAILED: atlas file empty or missing");
+        SPINE_ERR("LoadData: atlas file empty: %s", atlasPath.c_str());
         gCache[key] = data;
         return data;
     }
@@ -228,16 +213,14 @@ SpineSkeletonDataCache::CachedData SpineSkeletonDataCache::LoadData(
     spAtlas* atlas = pvzCreateAtlas(atlasData.data(), (int)atlasData.size() - 1,
                                      atlasDir.empty() ? nullptr : atlasDir.c_str());
     if (atlas == nullptr) {
-        SPINE_LOG("[LoadData] FAILED: spAtlas_create returned null");
+        SPINE_ERR("LoadData: spAtlas_create failed for %s", atlasPath.c_str());
         gCache[key] = data;
         return data;
     }
 
-    SPINE_LOG("[LoadData] Atlas created OK, pages=%p regions=%p", (void*)atlas->pages, (void*)atlas->regions);
-
     std::vector<char> jsonData = readSpineFile(jsonPath);
     if (jsonData.empty()) {
-        SPINE_LOG("[LoadData] FAILED: json file empty or missing");
+        SPINE_ERR("LoadData: json file empty: %s", jsonPath.c_str());
         spAtlas_dispose(atlas);
         gCache[key] = data;
         return data;
@@ -245,7 +228,6 @@ SpineSkeletonDataCache::CachedData SpineSkeletonDataCache::LoadData(
 
     spSkeletonJson* json = spSkeletonJson_create(atlas);
     if (json == nullptr) {
-        SPINE_LOG("[LoadData] FAILED: spSkeletonJson_create returned null");
         spAtlas_dispose(atlas);
         gCache[key] = data;
         return data;
@@ -257,14 +239,11 @@ SpineSkeletonDataCache::CachedData SpineSkeletonDataCache::LoadData(
     spSkeletonJson_dispose(json);
 
     if (skeletonData == nullptr) {
-        SPINE_LOG("[LoadData] FAILED: spSkeletonJson_readSkeletonData error=%s", error ? error : "(null)");
+        SPINE_ERR("LoadData: readSkeletonData error: %s", error ? error : "(null)");
         spAtlas_dispose(atlas);
         gCache[key] = data;
         return data;
     }
-
-    SPINE_LOG("[LoadData] SUCCESS: skeletonData=%p bones=%d slots=%d animations=%d",
-              (void*)skeletonData, skeletonData->bonesCount, skeletonData->slotsCount, skeletonData->animationsCount);
 
     data.atlas = atlas;
     data.skeletonData = skeletonData;
@@ -274,7 +253,6 @@ SpineSkeletonDataCache::CachedData SpineSkeletonDataCache::LoadData(
 
 void SpineSkeletonDataCache::ClearAll()
 {
-    SPINE_LOG("[ClearAll] clearing %zu entries", gCache.size());
     for (auto& kv : gCache) {
         if (kv.second.skeletonData)
             spSkeletonData_dispose(kv.second.skeletonData);
@@ -289,12 +267,10 @@ void SpineSkeletonDataCache::ClearAll()
 // ============================================================
 void SpineAnimation::InitializeSpineAnimArray()
 {
-    SPINE_LOG("[InitializeSpineAnimArray]");
     if (gSpineAnimArray.empty()) {
         gSpineAnimArray.push_back(
             SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
                 "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f));
-        SPINE_LOG("[InitializeSpineAnimArray] Registered SPINE_PEASHOOTER");
     }
 }
 
@@ -303,7 +279,6 @@ void SpineAnimation::InitializeSpineAnimArray()
 // ============================================================
 SpineAnimation::~SpineAnimation()
 {
-    SPINE_LOG("[~SpineAnimation] this=%p", (void*)this);
     if (mAnimState) {
         spAnimationState_dispose(mAnimState);
         mAnimState = nullptr;
@@ -323,8 +298,6 @@ SpineAnimation::~SpineAnimation()
 // ============================================================
 void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnimationType theSpineType)
 {
-    SPINE_LOG("[SpineAnimationInitialize] this=%p x=%f y=%f type=%d", (void*)this, theX, theY, (int)theSpineType);
-
     mPosX = theX;
     mPosY = theY;
     mAnimTime = 0.0f;
@@ -353,23 +326,16 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
     if (theSpineType >= SpineAnimationType(0) &&
         (size_t)theSpineType < gSpineAnimArray.size()) {
         mSpineParams = &gSpineAnimArray[(size_t)theSpineType];
-        SPINE_LOG("[SpineAnimationInitialize] Loading: json=%s atlas=%s",
-                  mSpineParams->mJSONPath.c_str(), mSpineParams->mAtlasPath.c_str());
 
         SpineSkeletonDataCache::CachedData cached =
             SpineSkeletonDataCache::LoadData(mSpineParams->mJSONPath, mSpineParams->mAtlasPath);
         mAtlas = cached.atlas;
         mSkeletonData = cached.skeletonData;
 
-        SPINE_LOG("[SpineAnimationInitialize] cached: atlas=%p skeletonData=%p", (void*)mAtlas, (void*)mSkeletonData);
-
         if (mSkeletonData != nullptr) {
             mSkeleton = spSkeleton_create(mSkeletonData);
             mAnimStateData = spAnimationStateData_create(mSkeletonData);
             mAnimState = spAnimationState_create(mAnimStateData);
-
-            SPINE_LOG("[SpineAnimationInitialize] skeleton=%p animStateData=%p animState=%p",
-                      (void*)mSkeleton, (void*)mAnimStateData, (void*)mAnimState);
 
             if (mSkeleton != nullptr) {
                 mSkeleton->x = theX;
@@ -378,15 +344,10 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
                 mSkeleton->scaleY = mSpineParams->mDefaultScale;
                 spSkeleton_setToSetupPose(mSkeleton);
                 spSkeleton_updateWorldTransform(mSkeleton, (spPhysics)0);
-                SPINE_LOG("[SpineAnimationInitialize] Skeleton initialized at (%f, %f) scale=%f",
-                          theX, theY, mSpineParams->mDefaultScale);
             }
         } else {
-            SPINE_LOG("[SpineAnimationInitialize] FAILED: skeletonData is null");
+            SPINE_ERR("SpineAnimationInitialize: skeletonData is null for type %d", (int)theSpineType);
         }
-    } else {
-        SPINE_LOG("[SpineAnimationInitialize] FAILED: invalid spine type %d (array size=%zu)",
-                  (int)theSpineType, gSpineAnimArray.size());
     }
 }
 
@@ -395,21 +356,14 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
 // ============================================================
 void SpineAnimation::SetAnimation(const char* theAnimName, bool theLoop)
 {
-    SPINE_LOG("[SetAnimation] name=%s loop=%d", theAnimName ? theAnimName : "(null)", theLoop);
-    if (mAnimState == nullptr || mSkeletonData == nullptr) {
-        SPINE_LOG("[SetAnimation] FAILED: animState=%p skeletonData=%p", (void*)mAnimState, (void*)mSkeletonData);
+    if (mAnimState == nullptr || mSkeletonData == nullptr)
         return;
-    }
 
     if (spSkeletonData_findAnimation(mSkeletonData, theAnimName) != nullptr) {
         spAnimationState_setAnimationByName(mAnimState, 0, theAnimName, theLoop ? 1 : 0);
-        SPINE_LOG("[SetAnimation] Set animation: %s", theAnimName);
     } else if (mSkeletonData->animationsCount > 0) {
         spAnimation* first = mSkeletonData->animations[0];
         spAnimationState_setAnimation(mAnimState, 0, first, theLoop ? 1 : 0);
-        SPINE_LOG("[SetAnimation] Fallback to first animation: %s", first->name);
-    } else {
-        SPINE_LOG("[SetAnimation] FAILED: no animations found");
     }
 
     if (mSkeleton != nullptr)
@@ -418,17 +372,13 @@ void SpineAnimation::SetAnimation(const char* theAnimName, bool theLoop)
 
 void SpineAnimation::AddAnimation(const char* theAnimName, bool theLoop, float theDelay)
 {
-    SPINE_LOG("[AddAnimation] name=%s loop=%d delay=%f", theAnimName ? theAnimName : "(null)", theLoop, theDelay);
-    if (mAnimState == nullptr) {
-        SPINE_LOG("[AddAnimation] FAILED: animState is null");
+    if (mAnimState == nullptr)
         return;
-    }
     spAnimationState_addAnimationByName(mAnimState, 0, theAnimName, theLoop ? 1 : 0, theDelay);
 }
 
 void SpineAnimation::SetTimeScale(float theScale)
 {
-    SPINE_LOG("[SetTimeScale] %f", theScale);
     if (mAnimState == nullptr) return;
     mAnimState->timeScale = theScale;
 }
@@ -438,17 +388,11 @@ void SpineAnimation::SetTimeScale(float theScale)
 // ============================================================
 void SpineAnimation::Update()
 {
-    if (mAnimState == nullptr || mSkeleton == nullptr) {
-        if (mAnimFrame % 60 == 0) {  // log sparingly
-            SPINE_LOG("[Update] SKIPPED: animState=%p skeleton=%p", (void*)mAnimState, (void*)mSkeleton);
-        }
+    if (mAnimState == nullptr || mSkeleton == nullptr)
         return;
-    }
 
     float dt = mFrameDelay;
     if (dt <= 0.0f) dt = 1.0f / 60.0f;
-
-    SPINE_LOG("[Update] dt=%f frame=%d", dt, mAnimFrame);
 
     spAnimationState_update(mAnimState, dt);
     spAnimationState_apply(mAnimState, mSkeleton);
@@ -473,7 +417,6 @@ void SpineAnimation::SetFlipX(bool theFlip)
     float magnitude = mSkeleton->scaleX < 0 ? -mSkeleton->scaleX : mSkeleton->scaleX;
     if (magnitude == 0.0f) magnitude = 1.0f;
     mSkeleton->scaleX = theFlip ? -magnitude : magnitude;
-    SPINE_LOG("[SetFlipX] flip=%d scaleX=%f", theFlip, mSkeleton->scaleX);
 }
 
 void SpineAnimation::SetFlipY(bool theFlip)
@@ -482,12 +425,10 @@ void SpineAnimation::SetFlipY(bool theFlip)
     float magnitude = mSkeleton->scaleY < 0 ? -mSkeleton->scaleY : mSkeleton->scaleY;
     if (magnitude == 0.0f) magnitude = 1.0f;
     mSkeleton->scaleY = theFlip ? -magnitude : magnitude;
-    SPINE_LOG("[SetFlipY] flip=%d scaleY=%f", theFlip, mSkeleton->scaleY);
 }
 
 void SpineAnimation::SetScale(float theScale)
 {
-    SPINE_LOG("[SetScale] %f", theScale);
     if (mSkeleton == nullptr) return;
     mSkeleton->scaleX = theScale;
     mSkeleton->scaleY = theScale;
@@ -495,7 +436,6 @@ void SpineAnimation::SetScale(float theScale)
 
 void SpineAnimation::SetPosition(float theX, float theY)
 {
-    SPINE_LOG("[SetPosition] (%f, %f)", theX, theY);
     if (mSkeleton == nullptr) return;
     mSkeleton->x = theX;
     mSkeleton->y = theY;
@@ -546,35 +486,34 @@ bool SpineAnimation::IsAnimComplete()
 
 // ============================================================
 //  Draw – the core rendering function.
+//
+//  Passes world vertices and UV coordinates from Spine directly
+//  to the engine's DrawTrianglesTex. No coordinate transformation
+//  is applied here – the skeleton position (x, y) is set via
+//  SetPosition() in game coordinates, and Spine's bone transforms
+//  produce vertices in that same space.
 // ============================================================
-static Sexy::TriVertex makeVert(float x, float y, float u, float v, uint32_t color)
+static inline uint32_t colorToUInt(float r, float g, float b, float a)
 {
-    return Sexy::TriVertex(x, y, u, v, color);
-}
-
-static uint32_t colorToUInt(float r, float g, float b, float a)
-{
-    uint8_t A = (uint8_t)(a * 255.0f);
-    uint8_t R = (uint8_t)(r * 255.0f);
-    uint8_t G = (uint8_t)(g * 255.0f);
-    uint8_t B = (uint8_t)(b * 255.0f);
-    return ((uint32_t)A << 24) | ((uint32_t)R << 16) | ((uint32_t)G << 8) | (uint32_t)B;
+    return ((uint32_t)(a * 255.0f) << 24) |
+           ((uint32_t)(r * 255.0f) << 16) |
+           ((uint32_t)(g * 255.0f) << 8)  |
+           (uint32_t)(b * 255.0f);
 }
 
 void SpineAnimation::Draw(Sexy::Graphics* g)
 {
-    if (g == nullptr || mSkeleton == nullptr) {
-        SPINE_LOG("[Draw] EARLY EXIT: g=%p skeleton=%p", (void*)g, (void*)mSkeleton);
+    if (g == nullptr || mSkeleton == nullptr)
         return;
-    }
 
-    if (mSkeleton->drawOrder == nullptr || mSkeleton->slotsCount <= 0) {
-        SPINE_LOG("[Draw] EARLY EXIT: drawOrder=%p slotsCount=%d",
-                  (void*)mSkeleton->drawOrder, mSkeleton->slotsCount);
+    if (mSkeleton->drawOrder == nullptr || mSkeleton->slotsCount <= 0)
         return;
-    }
 
-    SPINE_LOG("[Draw] BEGIN skeleton=%p slots=%d", (void*)mSkeleton, mSkeleton->slotsCount);
+    // Pre-compute skeleton color once
+    float skelR = mSkeleton->color.r;
+    float skelG = mSkeleton->color.g;
+    float skelB = mSkeleton->color.b;
+    float skelA = mSkeleton->color.a;
 
     uint32_t baseColor = 0;
     if (mColorOverride.mRed != 255 || mColorOverride.mGreen != 255 ||
@@ -585,159 +524,106 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                     (uint32_t)mColorOverride.mBlue;
     }
 
-    float skelR = mSkeleton->color.r;
-    float skelG = mSkeleton->color.g;
-    float skelB = mSkeleton->color.b;
-    float skelA = mSkeleton->color.a;
-
-    // Y-down coordinate conversion: flip Y and adjust V
-    const float yFlip = -1.0f;
-    const float yAdd  = 2.0f * mSkeleton->y;
-
-    int drawnSlots = 0;
-    int skippedSlots = 0;
-
     const int slotCount = mSkeleton->slotsCount;
     for (int i = 0; i < slotCount; i++) {
         spSlot* slot = mSkeleton->drawOrder[i];
-        if (slot == nullptr) {
-            skippedSlots++;
-            continue;
-        }
+        if (slot == nullptr) continue;
 
         spAttachment* attachment = slot->attachment;
-        if (attachment == nullptr) {
-            skippedSlots++;
-            continue;
-        }
+        if (attachment == nullptr) continue;
 
         // --- Region attachment ---
         if (attachment->type == SP_ATTACHMENT_REGION) {
             spRegionAttachment* region = (spRegionAttachment*)attachment;
-            if (region == nullptr) {
-                skippedSlots++;
-                continue;
-            }
+            if (region == nullptr) continue;
 
             spAtlasRegion* regionData = (spAtlasRegion*)region->region;
             Sexy::Image* tex = nullptr;
             if (regionData != nullptr && regionData->page != nullptr)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
-            if (tex == nullptr) {
-                SPINE_LOG("[Draw] slot=%d region: NO TEXTURE", i);
-                skippedSlots++;
-                continue;
-            }
+            if (tex == nullptr) continue;
 
             float r = region->color.r * slot->color.r * skelR;
-            float gC = region->color.g * slot->color.g * skelG;
+            float gr = region->color.g * slot->color.g * skelG;
             float b = region->color.b * slot->color.b * skelB;
             float a = region->color.a * slot->color.a * skelA;
-            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gC, b, a);
+            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gr, b, a);
 
             float worldVerts[8];
             spRegionAttachment_computeWorldVertices(region, slot, worldVerts, 0, 2);
 
-            Sexy::TriVertex tri[2][3];
-
-            tri[0][0] = makeVert(worldVerts[0], worldVerts[1] * yFlip + yAdd, region->uvs[0], 1.0f - region->uvs[1], vertColor);
-            tri[0][1] = makeVert(worldVerts[2], worldVerts[3] * yFlip + yAdd, region->uvs[2], 1.0f - region->uvs[3], vertColor);
-            tri[0][2] = makeVert(worldVerts[4], worldVerts[5] * yFlip + yAdd, region->uvs[4], 1.0f - region->uvs[5], vertColor);
-
-            tri[1][0] = makeVert(worldVerts[0], worldVerts[1] * yFlip + yAdd, region->uvs[0], 1.0f - region->uvs[1], vertColor);
-            tri[1][1] = makeVert(worldVerts[4], worldVerts[5] * yFlip + yAdd, region->uvs[4], 1.0f - region->uvs[5], vertColor);
-            tri[1][2] = makeVert(worldVerts[6], worldVerts[7] * yFlip + yAdd, region->uvs[6], 1.0f - region->uvs[7], vertColor);
-
-            SPINE_LOG("[Draw] slot=%d region: verts=(%.1f,%.1f)-(%.1f,%.1f)-(%.1f,%.1f)-(%.1f,%.1f)",
-                      i, worldVerts[0], worldVerts[1], worldVerts[2], worldVerts[3],
-                      worldVerts[4], worldVerts[5], worldVerts[6], worldVerts[7]);
+            // Two triangles forming a quad: (0,1,2) and (0,2,3)
+            // Vertex order from Spine: top-left, top-right, bottom-right, bottom-left
+            Sexy::TriVertex tri[2][3] = {{
+                { worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[2], worldVerts[3], region->uvs[2], region->uvs[3], vertColor },
+                { worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
+            }, {
+                { worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
+                { worldVerts[6], worldVerts[7], region->uvs[6], region->uvs[7], vertColor },
+            }};
 
             g->DrawTrianglesTex(tex, tri, 2);
-            drawnSlots++;
         }
         // --- Mesh attachment ---
         else if (attachment->type == SP_ATTACHMENT_MESH ||
                  attachment->type == SP_ATTACHMENT_LINKED_MESH) {
             spMeshAttachment* mesh = (spMeshAttachment*)attachment;
-            if (mesh == nullptr) {
-                skippedSlots++;
-                continue;
-            }
+            if (mesh == nullptr) continue;
 
             spAtlasRegion* regionData = (spAtlasRegion*)mesh->region;
             Sexy::Image* tex = nullptr;
             if (regionData != nullptr && regionData->page != nullptr)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
-            if (tex == nullptr) {
-                SPINE_LOG("[Draw] slot=%d mesh: NO TEXTURE", i);
-                skippedSlots++;
-                continue;
-            }
+            if (tex == nullptr) continue;
 
             const int worldVertsLen = mesh->super.worldVerticesLength;
-            if (worldVertsLen <= 0) {
-                skippedSlots++;
-                continue;
-            }
+            if (worldVertsLen <= 0) continue;
 
             float r = mesh->color.r * slot->color.r * skelR;
-            float gC = mesh->color.g * slot->color.g * skelG;
+            float gr = mesh->color.g * slot->color.g * skelG;
             float b = mesh->color.b * slot->color.b * skelB;
             float a = mesh->color.a * slot->color.a * skelA;
-            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gC, b, a);
+            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gr, b, a);
 
             std::vector<float> worldVerts((size_t)worldVertsLen);
             spVertexAttachment_computeWorldVertices(
                 &mesh->super, slot, 0, worldVertsLen, worldVerts.data(), 0, 2);
 
             const int trianglesCount = mesh->trianglesCount;
-            if (trianglesCount <= 0 || (trianglesCount % 3) != 0) {
-                skippedSlots++;
-                continue;
-            }
+            if (trianglesCount <= 0 || (trianglesCount % 3) != 0) continue;
             const int numTris = trianglesCount / 3;
 
-            if (mesh->uvs == nullptr || mesh->triangles == nullptr) {
-                skippedSlots++;
-                continue;
-            }
+            if (mesh->uvs == nullptr || mesh->triangles == nullptr) continue;
 
             const int maxIdx = worldVertsLen / 2;
 
+            // Allocate for worst case; track how many are actually valid
             std::vector<Sexy::TriVertex> triBatch((size_t)numTris * 3);
             int validTris = 0;
             for (int t = 0; t < numTris; t++) {
                 const int i0 = mesh->triangles[t * 3];
                 const int i1 = mesh->triangles[t * 3 + 1];
                 const int i2 = mesh->triangles[t * 3 + 2];
-                if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx) {
+                if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx)
                     continue;
-                }
 
-                const float u0 = mesh->uvs[i0 * 2], v0 = mesh->uvs[i0 * 2 + 1];
-                const float u1 = mesh->uvs[i1 * 2], v1 = mesh->uvs[i1 * 2 + 1];
-                const float u2 = mesh->uvs[i2 * 2], v2 = mesh->uvs[i2 * 2 + 1];
-
-                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2], worldVerts[i0 * 2 + 1] * yFlip + yAdd, u0, 1.0f - v0, vertColor);
-                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2], worldVerts[i1 * 2 + 1] * yFlip + yAdd, u1, 1.0f - v1, vertColor);
-                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2], worldVerts[i2 * 2 + 1] * yFlip + yAdd, u2, 1.0f - v2, vertColor);
+                triBatch[validTris * 3]     = { worldVerts[i0 * 2], worldVerts[i0 * 2 + 1],
+                                                  mesh->uvs[i0 * 2], mesh->uvs[i0 * 2 + 1], vertColor };
+                triBatch[validTris * 3 + 1] = { worldVerts[i1 * 2], worldVerts[i1 * 2 + 1],
+                                                  mesh->uvs[i1 * 2], mesh->uvs[i1 * 2 + 1], vertColor };
+                triBatch[validTris * 3 + 2] = { worldVerts[i2 * 2], worldVerts[i2 * 2 + 1],
+                                                  mesh->uvs[i2 * 2], mesh->uvs[i2 * 2 + 1], vertColor };
                 validTris++;
             }
 
+            // FIX: use validTris, not numTris!
             if (validTris > 0) {
-                SPINE_LOG("[Draw] slot=%d mesh: tris=%d/%d", i, validTris, numTris);
-                g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
-                drawnSlots++;
-            } else {
-                skippedSlots++;
+                g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), validTris);
             }
         }
-        else {
-            skippedSlots++;
-        }
     }
-
-    SPINE_LOG("[Draw] END drawn=%d skipped=%d", drawnSlots, skippedSlots);
 }
 
 void SpineAnimation::DrawRenderGroup(Sexy::Graphics* g, int theRenderGroup)
