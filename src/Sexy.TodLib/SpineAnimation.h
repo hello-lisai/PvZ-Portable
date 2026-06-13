@@ -100,8 +100,7 @@ public:
     void    SetColorOverride(const Sexy::Color& theColor) { mColorOverride = theColor; }
     void    SetAdditiveColor(const Sexy::Color& theColor) { mExtraAdditiveColor = theColor; }
     void    SetPosition(float theX, float theY);
-    void    OverrideScale(float theScaleX, float theScaleY)
-            { (void)theScaleX; (void)theScaleY; }
+    void    OverrideScale(float theScaleX, float theScaleY);
     void    UpdateSkeletonWorld();
     int     GetNumAnimations();
     const char* GetAnimationName(int theIndex);

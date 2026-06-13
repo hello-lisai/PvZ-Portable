@@ -434,6 +434,13 @@ void SpineAnimation::SetScale(float theScale)
     mSkeleton->scaleY = theScale;
 }
 
+void SpineAnimation::OverrideScale(float theScaleX, float theScaleY)
+{
+    if (mSkeleton == nullptr) return;
+    mSkeleton->scaleX = theScaleX;
+    mSkeleton->scaleY = theScaleY;
+}
+
 void SpineAnimation::SetPosition(float theX, float theY)
 {
     if (mSkeleton == nullptr) return;
