@@ -74,6 +74,10 @@ public:
     spAnimationState*                  mAnimState;
     SpineAnimationParams*              mSpineParams;
 
+    // Pre-allocated draw buffers (avoid per-frame heap alloc)
+    std::vector<float>                 mWorldVertsCache;
+    std::vector<Sexy::TriVertex>      mTriBatchCache;
+
     SpineAnimation()  : mSpineType((SpineAnimationType)0),
         mPosX(0), mPosY(0), mAnimTime(0), mLastAnimTime(0),
         mFrameDelay(0.05f), mAnimFrame(0), mFlip(false), mDead(false),

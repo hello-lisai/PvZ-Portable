@@ -420,8 +420,11 @@ void Reanimation::Update()
 
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		// Scale Spine's frame delay by the reanim rate
-		mSpineAnimation->mFrameDelay = 0.01f * mAnimRate;
+		// Use the standard frame time (SECONDS_PER_UPDATE = 0.01s).
+		// Do NOT multiply by mAnimRate here — spAnimationState_update()
+		// takes real seconds, not normalized 0-1 time like the legacy system.
+		// Speed control is handled via Spine's own timeScale instead.
+		mSpineAnimation->mFrameDelay = (float)SECONDS_PER_UPDATE;
 		mSpineAnimation->Update();
 		mAnimTime = mSpineAnimation->mAnimTime;
 		mLastFrameTime = mAnimTime;

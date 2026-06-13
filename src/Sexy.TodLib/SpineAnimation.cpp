@@ -594,9 +594,10 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             float a = mesh->color.a * slot->color.a * skelA;
             uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gr, b, a);
 
-            std::vector<float> worldVerts((size_t)worldVertsLen);
+            // Reuse pre-allocated buffer (avoid per-frame heap alloc)
+            mWorldVertsCache.resize((size_t)worldVertsLen);
             spVertexAttachment_computeWorldVertices(
-                &mesh->super, slot, 0, worldVertsLen, worldVerts.data(), 0, 2);
+                &mesh->super, slot, 0, worldVertsLen, mWorldVertsCache.data(), 0, 2);
 
             const int trianglesCount = mesh->trianglesCount;
             if (trianglesCount <= 0 || (trianglesCount % 3) != 0) continue;
@@ -606,8 +607,8 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
 
             const int maxIdx = worldVertsLen / 2;
 
-            // Allocate for worst case; track how many are actually valid
-            std::vector<Sexy::TriVertex> triBatch((size_t)numTris * 3);
+            // Reuse pre-allocated buffer
+            mTriBatchCache.resize((size_t)numTris * 3);
             int validTris = 0;
             for (int t = 0; t < numTris; t++) {
                 const int i0 = mesh->triangles[t * 3];
@@ -616,18 +617,17 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                 if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx)
                     continue;
 
-                triBatch[validTris * 3]     = { worldVerts[i0 * 2], worldVerts[i0 * 2 + 1],
-                                                  mesh->uvs[i0 * 2], mesh->uvs[i0 * 2 + 1], vertColor };
-                triBatch[validTris * 3 + 1] = { worldVerts[i1 * 2], worldVerts[i1 * 2 + 1],
-                                                  mesh->uvs[i1 * 2], mesh->uvs[i1 * 2 + 1], vertColor };
-                triBatch[validTris * 3 + 2] = { worldVerts[i2 * 2], worldVerts[i2 * 2 + 1],
-                                                  mesh->uvs[i2 * 2], mesh->uvs[i2 * 2 + 1], vertColor };
+                mTriBatchCache[validTris * 3]     = { mWorldVertsCache[i0 * 2], mWorldVertsCache[i0 * 2 + 1],
+                                                      mesh->uvs[i0 * 2], mesh->uvs[i0 * 2 + 1], vertColor };
+                mTriBatchCache[validTris * 3 + 1] = { mWorldVertsCache[i1 * 2], mWorldVertsCache[i1 * 2 + 1],
+                                                      mesh->uvs[i1 * 2], mesh->uvs[i1 * 2 + 1], vertColor };
+                mTriBatchCache[validTris * 3 + 2] = { mWorldVertsCache[i2 * 2], mWorldVertsCache[i2 * 2 + 1],
+                                                      mesh->uvs[i2 * 2], mesh->uvs[i2 * 2 + 1], vertColor };
                 validTris++;
             }
 
-            // FIX: use validTris, not numTris!
             if (validTris > 0) {
-                g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), validTris);
+                g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])mTriBatchCache.data(), validTris);
             }
         }
     }
