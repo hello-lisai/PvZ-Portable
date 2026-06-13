@@ -39,11 +39,20 @@ struct SpineAnimationParams
     std::string         mJSONPath;
     std::string         mAtlasPath;
     float               mDefaultScale;
+    // Visual offset to align Spine skeleton origin with game coordinate origin.
+    // Game expects (0,0) at bottom-center of plant (ground level).
+    // Spine editor typically puts root bone at center of character.
+    // These offsets are added to all vertex positions during Draw().
+    float               mRenderOffsetX;
+    float               mRenderOffsetY;
 
-    SpineAnimationParams() : mType((SpineAnimationType)0), mDefaultScale(1.0f) {}
+    SpineAnimationParams() : mType((SpineAnimationType)0), mDefaultScale(1.0f),
+        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f) {}
     SpineAnimationParams(SpineAnimationType t, const std::string& j,
-                         const std::string& a, float s)
-        : mType(t), mJSONPath(j), mAtlasPath(a), mDefaultScale(s) {}
+                         const std::string& a, float s,
+                         float offX = 0.0f, float offY = 0.0f)
+        : mType(t), mJSONPath(j), mAtlasPath(a), mDefaultScale(s),
+          mRenderOffsetX(offX), mRenderOffsetY(offY) {}
 };
 
 class SpineAnimation
@@ -67,6 +76,8 @@ public:
     Sexy::Color                        mExtraAdditiveColor;
     bool                               mExtraOverlayDraw;
     Sexy::Color                        mExtraOverlayColor;
+    float                              mRenderOffsetX;
+    float                              mRenderOffsetY;
 
     // spine-c runtime objects
     spAtlas*                           mAtlas;
@@ -87,6 +98,7 @@ public:
         mRenderOrder(0), mFrameTime(0), mFPS(30.0f),
         mExtraAdditiveDraw(false), mExtraAdditiveColor(Sexy::Color::White),
         mExtraOverlayDraw(false), mExtraOverlayColor(Sexy::Color::White),
+        mRenderOffsetX(0), mRenderOffsetY(0),
         mAtlas(nullptr), mSkeletonData(nullptr), mSkeleton(nullptr),
         mAnimStateData(nullptr), mAnimState(nullptr), mSpineParams(nullptr) {}
 
@@ -116,6 +128,10 @@ public:
     const char* GetAnimationName(int theIndex);
     const char* GetCurrentAnimationName();
     bool    IsAnimComplete();
+
+    // Query world position of a named bone after skeleton update.
+    // Returns true if bone found, false otherwise.
+    bool    GetBoneWorldPosition(const char* boneName, float* outX, float* outY);
 
     static void InitializeSpineAnimArray();
     static std::vector<SpineAnimationParams>  gSpineAnimArray;

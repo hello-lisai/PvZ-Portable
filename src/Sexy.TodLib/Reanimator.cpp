@@ -576,10 +576,31 @@ void BlendTransform(ReanimatorTransform* theResult, const ReanimatorTransform& t
 // GOTY @Patoke: 0x476580
 void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* theTransformCurrent)
 {
-	if (mIsSpine)
+	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		theTransformCurrent->mTransX = 0.0f;
-		theTransformCurrent->mTransY = 0.0f;
+		// For Spine reanimations, query actual skeleton bone positions.
+		// This makes GetPeaHeadOffset() / Fire() work correctly —
+		// bullets spawn from the real "head" bone instead of (0,0).
+		// Bone names vary by Spine data; try common patterns.
+		float boneX = 0.0f, boneY = 0.0f;
+		bool found = false;
+		// Try common naming conventions (head/stem/body for descriptive names)
+		const char* candidates[] = {
+			"head", "stem", "body", "gun", "muzzle",
+			// GatlingPea.json uses numbered bones; bone10 = head/gun area
+			"bone10", "bone11", "bone3", "bone6",
+			"root",  // always exists — safe fallback
+			nullptr
+		};
+		for (int i = 0; candidates[i] != nullptr && !found; i++)
+			found = mSpineAnimation->GetBoneWorldPosition(candidates[i], &boneX, &boneY);
+		if (!found) {
+			boneX = mSpineAnimation->mSkeleton->x;
+			boneY = mSpineAnimation->mSkeleton->y;
+		}
+
+		theTransformCurrent->mTransX = boneX;
+		theTransformCurrent->mTransY = boneY;
 		theTransformCurrent->mSkewX = 0.0f;
 		theTransformCurrent->mSkewY = 0.0f;
 		theTransformCurrent->mScaleX = 1.0f;

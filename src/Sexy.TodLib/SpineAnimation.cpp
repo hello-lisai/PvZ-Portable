@@ -271,7 +271,14 @@ void SpineAnimation::InitializeSpineAnimArray()
     if (gSpineAnimArray.empty()) {
         gSpineAnimArray.push_back(
             SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
-                "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f));
+                "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f,
+                // Render offset: aligns Spine skeleton origin with game coord origin.
+                // Game expects (0,0) at plant bottom (ground level).
+                // GatlingPea.json skeleton has root near lower-center;
+                // these values shift visual so bottom touches ground.
+                // Tune these if position looks off after testing.
+                0.0f,    // mRenderOffsetX — horizontal tweak if needed
+                -35.0f)); // mRenderOffsetY — push down so plant bottom = ground
     }
 }
 
@@ -350,6 +357,13 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
             SPINE_ERR("SpineAnimationInitialize: skeletonData is null for type %d", (int)theSpineType);
         }
     }
+
+    // Copy render offset from params (aligns skeleton origin with game coords)
+    if (mSpineParams != nullptr)
+    {
+        mRenderOffsetX = mSpineParams->mRenderOffsetX;
+        mRenderOffsetY = mSpineParams->mRenderOffsetY;
+    }
 }
 
 // ============================================================
@@ -407,6 +421,22 @@ void SpineAnimation::UpdateSkeletonWorld()
 {
     if (mSkeleton != nullptr)
         spSkeleton_updateWorldTransform(mSkeleton, (spPhysics)0);
+}
+
+bool SpineAnimation::GetBoneWorldPosition(const char* boneName, float* outX, float* outY)
+{
+    if (mSkeleton == nullptr || boneName == nullptr || outX == nullptr || outY == nullptr)
+        return false;
+
+    spBone* bone = spSkeleton_findBone(mSkeleton, boneName);
+    if (bone == nullptr)
+        return false;
+
+    // Bone world position is in Spine's Y-up coordinate system.
+    // The skeleton's own x/y is the root position in game coords.
+    *outX = mSkeleton->x + bone->worldX;
+    *outY = mSkeleton->y + bone->worldY;
+    return true;
 }
 
 // ============================================================
@@ -576,7 +606,10 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
 
     // Coordinate fix: Spine uses Y-up, game engine uses Y-down (screen coords).
     // Flip world-vertex Y around skeleton origin to convert between systems.
-    const float originY = mSkeleton->y;
+    // Also apply render offset to align skeleton origin with game coordinate origin
+    // (game expects 0,0 at plant bottom; Spine editor often puts root at center).
+    const float originX = mSkeleton->x + mRenderOffsetX;
+    const float originY = mSkeleton->y + mRenderOffsetY;
 
     uint32_t baseColor = 0;
     if (mColorOverride.mRed != 255 || mColorOverride.mGreen != 255 ||
@@ -619,15 +652,15 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
 
             // Two triangles forming a quad: (0,1,2) and (0,2,3)
             // Vertex order from Spine: top-left, top-right, bottom-right, bottom-left
-            // Apply Y-flip: newY = originY - (worldY - originY) = 2*originY - worldY
+            // Apply Y-flip around (adjusted) origin + render offset
             Sexy::TriVertex tri[2][3] = {{
-                { worldVerts[0], 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
-                { worldVerts[2], 2.0f * originY - worldVerts[3], region->uvs[2], region->uvs[3], vertColor },
-                { worldVerts[4], 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
+                { worldVerts[0] + mRenderOffsetX, 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[2] + mRenderOffsetX, 2.0f * originY - worldVerts[3], region->uvs[2], region->uvs[3], vertColor },
+                { worldVerts[4] + mRenderOffsetX, 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
             }, {
-                { worldVerts[0], 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
-                { worldVerts[4], 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
-                { worldVerts[6], 2.0f * originY - worldVerts[7], region->uvs[6], region->uvs[7], vertColor },
+                { worldVerts[0] + mRenderOffsetX, 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[4] + mRenderOffsetX, 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
+                { worldVerts[6] + mRenderOffsetX, 2.0f * originY - worldVerts[7], region->uvs[6], region->uvs[7], vertColor },
             }};
 
             g->DrawTrianglesTex(tex, tri, 2);
@@ -678,12 +711,12 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                 if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx)
                     continue;
 
-                // Apply Y-flip for mesh vertices too
-                mTriBatchCache[validTris * 3]     = { mWorldVertsCache[i0 * 2], 2.0f * originY - mWorldVertsCache[i0 * 2 + 1],
+                // Apply Y-flip and render offset for mesh vertices
+                mTriBatchCache[validTris * 3]     = { mWorldVertsCache[i0 * 2] + mRenderOffsetX, 2.0f * originY - mWorldVertsCache[i0 * 2 + 1],
                                                       mesh->uvs[i0 * 2], mesh->uvs[i0 * 2 + 1], vertColor };
-                mTriBatchCache[validTris * 3 + 1] = { mWorldVertsCache[i1 * 2], 2.0f * originY - mWorldVertsCache[i1 * 2 + 1],
+                mTriBatchCache[validTris * 3 + 1] = { mWorldVertsCache[i1 * 2] + mRenderOffsetX, 2.0f * originY - mWorldVertsCache[i1 * 2 + 1],
                                                       mesh->uvs[i1 * 2], mesh->uvs[i1 * 2 + 1], vertColor };
-                mTriBatchCache[validTris * 3 + 2] = { mWorldVertsCache[i2 * 2], 2.0f * originY - mWorldVertsCache[i2 * 2 + 1],
+                mTriBatchCache[validTris * 3 + 2] = { mWorldVertsCache[i2 * 2] + mRenderOffsetX, 2.0f * originY - mWorldVertsCache[i2 * 2 + 1],
                                                       mesh->uvs[i2 * 2], mesh->uvs[i2 * 2 + 1], vertColor };
                 validTris++;
             }
