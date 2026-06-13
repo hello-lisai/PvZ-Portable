@@ -13,6 +13,7 @@
 #include "../SexyAppFramework/graphics/MemoryImage.h"
 
 #include <spine/spine.h>
+#include <spine/extension.h>
 
 #include <cstdlib>
 #include <cstring>
@@ -81,6 +82,44 @@ static void _pvz_spine_disposeTexture(spAtlasPage* self)
     delete img;
     self->rendererObject = nullptr;
 }
+
+// ============================================================
+//  spine-c requires platform callbacks declared in <spine/extension.h>.
+//  These must have external (C) linkage and be provided by exactly one
+//  translation unit. They delegate to the project's ImageLib / PakInterface.
+// ============================================================
+extern "C" {
+
+void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
+{
+    _pvz_spine_createTexture(self, path);
+}
+
+void _spAtlasPage_disposeTexture(spAtlasPage* self)
+{
+    _pvz_spine_disposeTexture(self);
+}
+
+char* _spUtil_readFile(const char* path, int* length)
+{
+    std::vector<char> buf = readSpineFile(std::string(path));
+    if (buf.empty() || length == nullptr) {
+        if (length != nullptr) *length = 0;
+        return nullptr;
+    }
+    int len = (int)(buf.size() - 1);
+    *length = len;
+    char* out = (char*)malloc((size_t)len + 1);
+    if (out == nullptr) {
+        *length = 0;
+        return nullptr;
+    }
+    if (len > 0) memcpy(out, buf.data(), (size_t)len);
+    out[len] = '\0';
+    return out;
+}
+
+} // extern "C"
 
 static spAtlas* pvzCreateAtlas(const char* data, int length, const char* dir)
 {
@@ -339,13 +378,18 @@ void SpineAnimation::UpdateSkeletonWorld()
 void SpineAnimation::SetFlipX(bool theFlip)
 {
     if (mSkeleton == nullptr) return;
-    mSkeleton->flipX = theFlip ? 1 : 0;
+    // spine-c 4.x no longer has flipX/flipY on spSkeleton; emulate via sign of scaleX.
+    float magnitude = mSkeleton->scaleX < 0 ? -mSkeleton->scaleX : mSkeleton->scaleX;
+    if (magnitude == 0.0f) magnitude = 1.0f;
+    mSkeleton->scaleX = theFlip ? -magnitude : magnitude;
 }
 
 void SpineAnimation::SetFlipY(bool theFlip)
 {
     if (mSkeleton == nullptr) return;
-    mSkeleton->flipY = theFlip ? 1 : 0;
+    float magnitude = mSkeleton->scaleY < 0 ? -mSkeleton->scaleY : mSkeleton->scaleY;
+    if (magnitude == 0.0f) magnitude = 1.0f;
+    mSkeleton->scaleY = theFlip ? -magnitude : magnitude;
 }
 
 void SpineAnimation::SetScale(float theScale)
@@ -471,7 +515,7 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             if (tex == nullptr) continue;
 
             float worldVerts[8];
-            spRegionAttachment_computeWorldVertices(region, slot->bone, worldVerts, 0, 2);
+            spRegionAttachment_computeWorldVertices(region, slot, worldVerts, 0, 2);
 
             // spine-c stores UVs as (u,v) pairs in region->uvs[8].
             // Vertex order in spine-c is: TL, TR, BR, BL  (counter-clockwise)
@@ -529,13 +573,13 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
         }
         // Linked mesh – delegate to the linked source mesh.
+        // In spine-c 4.x, linked mesh attachments are represented as spMeshAttachment
+        // with parentMesh pointing to the source mesh (deform) data.
         else if (attachment->type == SP_ATTACHMENT_LINKED_MESH) {
-            spLinkedMesh* linked = (spLinkedMesh*)attachment;
-            spVertexAttachment* source = linked->parent;
-            if (source == nullptr || source->type != SP_ATTACHMENT_MESH) continue;
-
-            spMeshAttachment* mesh = (spMeshAttachment*)source;
-            spAtlasRegion* regionData = (spAtlasRegion*)linked->region;
+            spMeshAttachment* linked = (spMeshAttachment*)attachment;
+            spMeshAttachment* source = linked->parentMesh;
+            spMeshAttachment* mesh = (source != nullptr) ? source : linked;
+            spAtlasRegion* regionData = (spAtlasRegion*)mesh->region;
             Sexy::Image* tex = nullptr;
             if (regionData != nullptr && regionData->page != nullptr)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
