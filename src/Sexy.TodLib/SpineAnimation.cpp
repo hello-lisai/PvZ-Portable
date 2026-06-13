@@ -522,6 +522,10 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
     float skelB = mSkeleton->color.b;
     float skelA = mSkeleton->color.a;
 
+    // Coordinate fix: Spine uses Y-up, game engine uses Y-down (screen coords).
+    // Flip world-vertex Y around skeleton origin to convert between systems.
+    const float originY = mSkeleton->y;
+
     uint32_t baseColor = 0;
     if (mColorOverride.mRed != 255 || mColorOverride.mGreen != 255 ||
         mColorOverride.mBlue != 255 || mColorOverride.mAlpha != 255) {
@@ -561,14 +565,15 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
 
             // Two triangles forming a quad: (0,1,2) and (0,2,3)
             // Vertex order from Spine: top-left, top-right, bottom-right, bottom-left
+            // Apply Y-flip: newY = originY - (worldY - originY) = 2*originY - worldY
             Sexy::TriVertex tri[2][3] = {{
-                { worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
-                { worldVerts[2], worldVerts[3], region->uvs[2], region->uvs[3], vertColor },
-                { worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
+                { worldVerts[0], 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[2], 2.0f * originY - worldVerts[3], region->uvs[2], region->uvs[3], vertColor },
+                { worldVerts[4], 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
             }, {
-                { worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
-                { worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
-                { worldVerts[6], worldVerts[7], region->uvs[6], region->uvs[7], vertColor },
+                { worldVerts[0], 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[4], 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
+                { worldVerts[6], 2.0f * originY - worldVerts[7], region->uvs[6], region->uvs[7], vertColor },
             }};
 
             g->DrawTrianglesTex(tex, tri, 2);
@@ -617,11 +622,12 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                 if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx)
                     continue;
 
-                mTriBatchCache[validTris * 3]     = { mWorldVertsCache[i0 * 2], mWorldVertsCache[i0 * 2 + 1],
+                // Apply Y-flip for mesh vertices too
+                mTriBatchCache[validTris * 3]     = { mWorldVertsCache[i0 * 2], 2.0f * originY - mWorldVertsCache[i0 * 2 + 1],
                                                       mesh->uvs[i0 * 2], mesh->uvs[i0 * 2 + 1], vertColor };
-                mTriBatchCache[validTris * 3 + 1] = { mWorldVertsCache[i1 * 2], mWorldVertsCache[i1 * 2 + 1],
+                mTriBatchCache[validTris * 3 + 1] = { mWorldVertsCache[i1 * 2], 2.0f * originY - mWorldVertsCache[i1 * 2 + 1],
                                                       mesh->uvs[i1 * 2], mesh->uvs[i1 * 2 + 1], vertColor };
-                mTriBatchCache[validTris * 3 + 2] = { mWorldVertsCache[i2 * 2], mWorldVertsCache[i2 * 2 + 1],
+                mTriBatchCache[validTris * 3 + 2] = { mWorldVertsCache[i2 * 2], 2.0f * originY - mWorldVertsCache[i2 * 2 + 1],
                                                       mesh->uvs[i2 * 2], mesh->uvs[i2 * 2 + 1], vertColor };
                 validTris++;
             }

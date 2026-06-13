@@ -37,6 +37,15 @@ ReanimatorDefinition* gReanimatorDefArray;
 unsigned int gReanimationParamArraySize;
 ReanimationParams* gReanimationParamArray;
 
+// ============================================================
+//  Sentinel: empty ReanimatorDefinition for Spine reanimations.
+//  Spine reanimations don't use legacy track data, but many
+//  Reanimation methods access mDefinition unconditionally.
+//  Pointing mDefinition here (count=0) makes all count-gated
+//  loops and checks safe without per-function guards.
+// ============================================================
+static ReanimatorDefinition sSpineEmptyDef;  // {mTracks={nullptr,0}, mFPS=12, mAtlas=nullptr}
+
 ReanimationParams gLawnReanimationArray[ReanimationType::NUM_REANIMS] = {
 	{ ReanimationType::REANIM_LOADBAR_SPROUT,                       "reanim/LoadBar_sprout.reanim",                    1 },
 	{ ReanimationType::REANIM_LOADBAR_ZOMBIEHEAD,                   "reanim/LoadBar_Zombiehead.reanim",                1 },
@@ -1305,14 +1314,49 @@ Reanimation* ReanimationHolder::AllocSpineAsReanimation(float theX, float theY, 
 	Reanimation* aReanim = mReanimations.DataArrayAlloc();
 	aReanim->mRenderOrder = theRenderOrder;
 	aReanim->mReanimationHolder = this;
+
+	// --- Core identity ---
 	aReanim->mIsSpine = true;
 	aReanim->mSpineType = theSpineType;
 	aReanim->mReanimationType = ReanimationType::REANIM_NONE;
 	aReanim->mDead = false;
+
+	// --- Point mDefinition to empty sentinel so all legacy code
+	//     that accesses mDefinition->mTracks sees count=0 and
+	//     safely skips / returns early.  This is the root fix:
+	//     instead of guarding every method individually, we make
+	//     the data structure itself valid.
+	aReanim->mDefinition = &sSpineEmptyDef;
+	aReanim->mTrackInstances = nullptr;  // 0 tracks → no instances
+
+	// --- Animation state (safe defaults matching ReanimationInitialize) ---
+	aReanim->mAnimTime = 0.0f;
+	aReanim->mAnimRate = sSpineEmptyDef.mFPS;  // 12.0f
+	aReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
+	aReanim->mFrameStart = 0;
+	aReanim->mFrameCount = 0;
+	aReanim->mFrameBasePose = NO_BASE_POSE;
+	aReanim->mLoopCount = 0;
+	aReanim->mLastFrameTime = -1.0f;
+
+	// --- Transform (identity) ---
+	aReanim->mOverlayMatrix.LoadIdentity();
+
+	// --- Color / effects (neutral defaults) ---
+	aReanim->mColorOverride = Sexy::Color(255, 255, 255, 255);
+	aReanim->mExtraAdditiveColor = Sexy::Color(255, 255, 255, 255);
+	aReanim->mEnableExtraAdditiveDraw = false;
+	aReanim->mExtraOverlayColor = Sexy::Color(255, 255, 255, 255);
+	aReanim->mEnableExtraOverlayDraw = false;
+	aReanim->mIsAttachment = false;
+	aReanim->mFilterEffect = FilterEffect::FILTER_NONE;
+
+	// --- Create Spine animation object ---
 	aReanim->mSpineAnimation = new SpineAnimation();
 	aReanim->mSpineAnimation->SpineAnimationInitialize(theX, theY, theSpineType);
 	aReanim->mSpineAnimation->mRenderOrder = theRenderOrder;
 	aReanim->SetPosition(theX, theY);
+
 	return aReanim;
 }
 
