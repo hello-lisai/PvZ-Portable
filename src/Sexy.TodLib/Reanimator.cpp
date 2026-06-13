@@ -580,22 +580,30 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 	{
 		// For Spine reanimations, query actual skeleton bone positions.
 		// This makes GetPeaHeadOffset() / Fire() work correctly —
-		// bullets spawn from the real "head" bone instead of (0,0).
-		// Bone names vary by Spine data; try common patterns.
+		// bullets spawn from the configured bullet track bone.
 		float boneX = 0.0f, boneY = 0.0f;
 		bool found = false;
-		// Try common naming conventions (head/stem/body for descriptive names)
-		const char* candidates[] = {
-			"head", "stem", "body", "gun", "muzzle",
-			// GatlingPea.json uses numbered bones; bone10 = head/gun area
-			"bone10", "bone11", "bone3", "bone6",
-			"root",  // always exists — safe fallback
-			nullptr
-		};
-		for (int i = 0; candidates[i] != nullptr && !found; i++)
-			found = mSpineAnimation->GetBoneWorldPosition(candidates[i], &boneX, &boneY);
+
+		// 1st: Try bulletTrack from config (explicit gun muzzle bone)
+		if (mSpineAnimation->mSpineParams != nullptr &&
+		    !mSpineAnimation->mSpineParams->mBulletTrack.empty())
+		{
+			found = mSpineAnimation->GetBoneWorldPosition(
+				mSpineAnimation->mSpineParams->mBulletTrack.c_str(), &boneX, &boneY);
+		}
+
+		// 2nd: Fall back to candidate search (common naming patterns)
 		if (!found) {
-			// Fallback: root bone always exists in Spine skeletons
+			const char* candidates[] = {
+				"head", "stem", "body", "gun", "muzzle",
+				"bone10", "bone11", "bone3", "bone6",
+				"root",
+				nullptr
+			};
+			for (int i = 0; candidates[i] != nullptr && !found; i++)
+				found = mSpineAnimation->GetBoneWorldPosition(candidates[i], &boneX, &boneY);
+		}
+		if (!found) {
 			mSpineAnimation->GetBoneWorldPosition("root", &boneX, &boneY);
 		}
 

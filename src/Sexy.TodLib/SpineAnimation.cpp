@@ -22,6 +22,215 @@
 #include <ctime>
 #include <cstdarg>
 #include <algorithm>
+#include <string>
+#include <map>
+#include <sstream>
+#include <cmath>
+
+// ============================================================
+//  Minimal JSON config parser – only handles the flat structure
+//  used by SpineAnimationConfig.json (objects, string/number values).
+//  NOT a general-purpose JSON parser; keep it tiny and fast.
+// ============================================================
+
+// Skip whitespace in a string
+static const char* skipWS(const char* p)
+{
+    while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
+    return p;
+}
+
+// Parse a JSON string value (between quotes), unescaping basics
+static std::string parseJsonString(const char** pp)
+{
+    const char* p = *pp;
+    if (*p != '"') return "";
+    p++;
+    std::string result;
+    while (*p && *p != '"')
+    {
+        if (*p == '\\' && *(p + 1))
+        {
+            p++;
+            switch (*p)
+            {
+                case 'n': result += '\n'; break;
+                case 't': result += '\t'; break;
+                case 'r': result += '\r'; break;
+                default:  result += *p; break;
+            }
+        }
+        else
+            result += *p;
+        p++;
+    }
+    if (*p == '"') p++;
+    *pp = p;
+    return result;
+}
+
+// Parse a JSON number value
+static double parseJsonNumber(const char** pp)
+{
+    const char* p = *pp;
+    char* end = nullptr;
+    double val = strtod(p, &end);
+    *pp = end ? end : p;
+    return val;
+}
+
+// Recursively parse JSON into a simple key→value map.
+// Only handles: { "key": "string" | number | object | array }.
+// Nested objects/arrays are stored as empty placeholders (we don't need their contents).
+static void parseJsonObject(const char** pp, std::map<std::string, std::string>& out)
+{
+    const char* p = skipWS(*pp);
+    if (*p != '{') return;
+    p++; // skip {
+
+    while (*p)
+    {
+        p = skipWS(p);
+
+        // End of object
+        if (*p == '}') { p++; break; }
+
+        // Expect key string
+        if (*p != '"') { p++; continue; }
+        std::string key = parseJsonString(&p);
+
+        p = skipWS(p);
+        if (*p != ':') { p++; continue; }
+        p++; // skip :
+
+        p = skipWS(p);
+
+        std::string value;
+        if (*p == '"')
+        {
+            value = parseJsonString(&p);
+        }
+        else if (*p == '{' || *p == '[')
+        {
+            // Skip nested object/array — store marker
+            char depthChar = *p;
+            int depth = 1;
+            p++;
+            while (*p && depth > 0)
+            {
+                if (*p == depthChar) depth++;
+                else if (*p == (depthChar == '{' ? '}' : ']')) depth--;
+                p++;
+            }
+            value = (depthChar == '{') ? "{...}" : "[...]";
+        }
+        else if (*p == '-' || *p == '.' || (*p >= '0' && *p <= '9'))
+        {
+            double num = parseJsonNumber(&p);
+            // Preserve decimal point for floats
+            char buf[64];
+            if (num == floor(num) && fabs(num) < 1e15)
+                snprintf(buf, sizeof(buf), "%.0f", num);
+            else
+                snprintf(buf, sizeof(buf), "%g", num);
+            value = buf;
+        }
+        else
+        {
+            // true / false / null
+            const char* start = p;
+            while (*p && *p != ',' && *p != '}' && *p != ']' && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n')
+                p++;
+            value = std::string(start, (size_t)(p - start));
+        }
+
+        out[key] = value;
+
+        p = skipWS(p);
+        if (*p == ',') p++; // skip comma
+    }
+
+    *pp = p;
+}
+
+// Load SpineAnimationConfig.json and parse each animation entry
+static bool loadConfigFromFile(const std::string& configPath,
+                                std::vector<SpineAnimationParams>& outParams)
+{
+    std::vector<char> data = readSpineFile(configPath);
+    if (data.empty())
+        return false;
+
+    const char* p = data.data();
+    std::map<std::string, std::string> root;
+
+    try { parseJsonObject(&p, root); }
+    catch (...) { return false; }
+
+    // Find "animations" array — we need to find it as raw text and parse entries
+    auto it = root.find("animations");
+    if (it == root.end() || it->second != "[...]")
+    {
+        SPINE_ERR("Config: missing or invalid 'animations' array");
+        return false;
+    }
+
+    // Re-scan to find the animations array content
+    p = data.data();
+    std::string animKey;
+    // Find "animations":
+    const char* animPos = strstr(p, "\"animations\"");
+    if (!animPos) return false;
+    animPos = strchr(animPos, '[');
+    if (!animPos) return false;
+    animPos++; // skip [
+
+    // Parse each animation object in the array
+    while (*animPos)
+    {
+        animPos = skipWS(animPos);
+        if (*animPos == ']') break;
+        if (*animPos != '{') { animPos++; continue; }
+
+        std::map<std::string, std::string> entry;
+        const char* before = animPos;
+        parseJsonObject(&animPos, entry);
+        if (animPos == before) { animPos++; continue; }
+
+        // Read fields
+        std::string typeStr     = entry.count("type")     ? entry["type"]     : "";
+        std::string jsonPath    = entry.count("json")     ? entry["json"]     : "";
+        std::string atlasPath   = entry.count("atlas")    ? entry["atlas"]    : "";
+        std::string scaleStr    = entry.count("scale")    ? entry["scale"]    : "1.0";
+        std::string offsetXStr  = entry.count("offsetX")  ? entry["offsetX"]  : "0.0";
+        std::string offsetYStr  = entry.count("offsetY")  ? entry["offsetY"]  : "0.0";
+        std::string anchorStr   = entry.count("anchorBone") ? entry["anchorBone"] : "root";
+        std::string bulletStr   = entry.count("bulletTrack")? entry["bulletTrack"]: "";
+
+        if (typeStr.empty() || jsonPath.empty() || atlasPath.empty())
+        {
+            SPINE_WARN("Config: skipping incomplete animation entry");
+            continue;
+        }
+
+        // Map type string to enum
+        SpineAnimationType animType = SpineAnimationType::SPINE_NONE;
+        if (typeStr == "PEASHOOTER")
+            animType = SpineAnimationType::SPINE_PEASHOOTER;
+
+        float scale   = (float)strtod(scaleStr.c_str(), nullptr);
+        float offX    = (float)strtod(offsetXStr.c_str(), nullptr);
+        float offY    = (float)strtod(offsetYStr.c_str(), nullptr);
+
+        outParams.push_back(SpineAnimationParams(animType, jsonPath, atlasPath,
+            scale, offX, offY, anchorStr, bulletStr));
+
+        animPos = skipWS(animPos);
+        if (*animPos == ',') animPos++;
+    }
+
+    return !outParams.empty();
+}
 
 // ============================================================
 //  Minimal debug logging – only errors and warnings.
@@ -65,6 +274,7 @@ static void spineLog(const char* fmt, ...)
 
 #define SPINE_ERR(...) do { spineLogOpen(); spineLog("[SPINE ERROR] " __VA_ARGS__); } while(0)
 #define SPINE_WARN(...) do { spineLogOpen(); spineLog("[SPINE WARN] " __VA_ARGS__); } while(0)
+#define SPINE_LOG(...)  do { spineLogOpen(); spineLog("[SPINE] " __VA_ARGS__); } while(0)
 
 // ============================================================
 //  Static variables
@@ -268,22 +478,26 @@ void SpineSkeletonDataCache::ClearAll()
 // ============================================================
 void SpineAnimation::InitializeSpineAnimArray()
 {
-    if (gSpineAnimArray.empty()) {
-        gSpineAnimArray.push_back(
-            SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
-                "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f,
-                // Render offset: fine-tuning after anchor transform.
-                // Positive Y pushes the entire animation DOWN on screen.
-                0.0f,    // mRenderOffsetX
-                40.0f,   // mRenderOffsetY — push body downward to align with game grid
-                // Anchor bone: "bone2" = body/frontleaf of the peashooter.
-                // This bone sits at the main body area (~y=+44 in Spine space).
-                // Using it as anchor means SetPosition() places the BODY at the
-                // given coordinates — matching where legacy Reanimator puts plants.
-                // Both Draw() and GetBoneWorldPosition() use this as origin,
-                // ensuring visual position and bullet spawn points are consistent.
-                "bone2"));
+    if (!gSpineAnimArray.empty())
+        return; // already initialized
+
+    // Try loading from external config file first
+    const std::string configPath = "spinedemo/SpineAnimationConfig.json";
+    if (loadConfigFromFile(configPath, gSpineAnimArray))
+    {
+        spineLog("[SPINE] Loaded %d spine animation(s) from config: %s",
+            (int)gSpineAnimArray.size(), configPath.c_str());
+        return;
     }
+
+    // Fallback: built-in defaults (used when config file is missing)
+    SPINE_WARN("No config file at '%s', using built-in defaults", configPath.c_str());
+    gSpineAnimArray.push_back(
+        SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
+            "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f,
+            0.0f, 40.0f,   // offsetX, offsetY
+            "bone2",       // anchor bone = body
+            "bone10"));    // bullet track = head/gun area
 }
 
 // ============================================================
@@ -452,15 +666,15 @@ bool SpineAnimation::GetBoneWorldPosition(const char* boneName, float* outX, flo
     if (bone == nullptr)
         return false;
 
-    // Return position as OFFSET from ANCHOR BONE, in GAME coordinates (Y-down).
-    // The anchor bone (e.g., "bone2" = body) sits at SetPosition() location.
-    // This matches legacy Reanimator behavior where GetCurrentTransform() returns
-    // mTransX/mTransY as offsets from the reanim position.
+    // Return position as OFFSET from ANCHOR BONE (in GAME Y-down coords),
+    // PLUS render offset — so bullets track with visual position changes.
     //
-    // Spine bone worldX/worldY are in Spine Y-up space relative to skeleton root.
-    // Convert: subtract anchor position, then flip Y sign for game coords.
-    *outX = bone->worldX - mAnchorX;
-    *outY = -(bone->worldY - mAnchorY);
+    // When user edits config's offsetY to push animation DOWN,
+    // BOTH rendering AND bullet spawn move together.
+    //
+    // Formula:  out = (bone - anchor)_flipped + renderOffset
+    *outX = (bone->worldX - mAnchorX) + mRenderOffsetX;
+    *outY = -(bone->worldY - mAnchorY) + mRenderOffsetY;
     return true;
 }
 

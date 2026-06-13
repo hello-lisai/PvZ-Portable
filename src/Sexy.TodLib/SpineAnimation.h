@@ -40,22 +40,27 @@ struct SpineAnimationParams
     std::string         mAtlasPath;
     float               mDefaultScale;
     // Visual offset applied after coordinate transform (fine-tuning).
+    // Positive Y pushes animation DOWN on screen.
     float               mRenderOffsetX;
     float               mRenderOffsetY;
-    // Anchor bone name: the bone that should sit at SetPosition() location.
-    // Both rendering (Draw) and logic (GetBoneWorldPosition) use this as
-    // the effective origin, so visual position and bullet spawn points agree.
-    // Default "root" means skeleton root is the origin (no adjustment).
+    // Anchor bone name: the bone that sits at SetPosition() location.
     std::string         mAnchorBone;
+    // Bullet track bone: the bone used as gun muzzle for bullet spawn position.
+    // Used by GetCurrentTransform() → Fire() to determine where bullets emit.
+    // If empty, falls back to the candidate search (head/stem/bone10/etc).
+    std::string         mBulletTrack;
 
     SpineAnimationParams() : mType((SpineAnimationType)0), mDefaultScale(1.0f),
-        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f), mAnchorBone("root") {}
+        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f),
+        mAnchorBone("root"), mBulletTrack("") {}
     SpineAnimationParams(SpineAnimationType t, const std::string& j,
                          const std::string& a, float s,
                          float offX = 0.0f, float offY = 0.0f,
-                         const std::string& anchor = "root")
+                         const std::string& anchor = "root",
+                         const std::string& bulletTrack = "")
         : mType(t), mJSONPath(j), mAtlasPath(a), mDefaultScale(s),
-          mRenderOffsetX(offX), mRenderOffsetY(offY), mAnchorBone(anchor) {}
+          mRenderOffsetX(offX), mRenderOffsetY(offY),
+          mAnchorBone(anchor), mBulletTrack(bulletTrack) {}
 };
 
 class SpineAnimation
