@@ -38,6 +38,7 @@
 #include "../Sexy.TodLib/TodDebug.h"
 #include "../Sexy.TodLib/Attachment.h"
 #include "../Sexy.TodLib/Reanimator.h"
+#include "../Sexy.TodLib/SpineAnimation.h"
 #include "../Sexy.TodLib/TodParticle.h"
 #include "../Sexy.TodLib/EffectSystem.h"
 #include "../Sexy.TodLib/TodStringFile.h"
@@ -161,14 +162,27 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
     if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)
     {
         float aOffsetY = PlantDrawHeightOffset(mBoard, this, mSeedType, mPlantCol, mRow);
-        aBodyReanim = mApp->AddReanimation(0.0f, aOffsetY, mRenderOrder + 1, aPlantDef.mReanimationType);
-        aBodyReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
-        aBodyReanim->mAnimRate = RandRangeFloat(10.0f, 15.0f);
+        if (mSeedType == SeedType::SEED_PEASHOOTER)
+        {
+            aBodyReanim = mApp->AddSpineReanimation(0.0f, aOffsetY, mRenderOrder + 1, SpineAnimationType::SPINE_PEASHOOTER);
+            aBodyReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
+            aBodyReanim->mAnimRate = RandRangeFloat(10.0f, 15.0f);
+            if (aBodyReanim->mSpineAnimation != nullptr)
+            {
+                aBodyReanim->mSpineAnimation->SetAnimation("idle", true);
+            }
+        }
+        else
+        {
+            aBodyReanim = mApp->AddReanimation(0.0f, aOffsetY, mRenderOrder + 1, aPlantDef.mReanimationType);
+            aBodyReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
+            aBodyReanim->mAnimRate = RandRangeFloat(10.0f, 15.0f);
 
-        if (aBodyReanim->TrackExists("anim_idle"))
-            aBodyReanim->SetFramesForLayer("anim_idle");
+            if (aBodyReanim->TrackExists("anim_idle"))
+                aBodyReanim->SetFramesForLayer("anim_idle");
+        }
 
-        if (mApp->IsWallnutBowlingLevel() && aBodyReanim->TrackExists("_ground"))
+        if (mApp->IsWallnutBowlingLevel() && aBodyReanim && !aBodyReanim->mIsSpine && aBodyReanim->TrackExists("_ground"))
         {
             aBodyReanim->SetFramesForLayer("_ground");
             if (mSeedType == SeedType::SEED_WALLNUT || mSeedType == SeedType::SEED_EXPLODE_O_NUT)
@@ -216,6 +230,11 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
         break;
     }
     case SeedType::SEED_PEASHOOTER:
+        if (aBodyReanim)
+        {
+            aBodyReanim->mAnimRate = RandRangeFloat(15.0f, 20.0f);
+        }
+        break;
     case SeedType::SEED_SNOWPEA:
     case SeedType::SEED_REPEATER:
     case SeedType::SEED_LEFTPEATER:

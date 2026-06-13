@@ -325,6 +325,9 @@ Reanimation::Reanimation()
 	mTrackInstances = nullptr;
 	mFilterEffect = FilterEffect::FILTER_EFFECT_NONE;
 	mReanimationType = ReanimationType::REANIM_NONE;
+	mIsSpine = false;
+	mSpineAnimation = nullptr;
+	mSpineType = SpineAnimationType::SPINE_NONE;
 }
 
 Reanimation::~Reanimation()
@@ -412,7 +415,24 @@ void Reanimation::ReanimationInitialize(float theX, float theY, ReanimatorDefini
 // GOTY @Patoke: 0x4761C0
 void Reanimation::Update()
 {
-	if (mFrameCount == 0 || mDead)
+	if (mDead)
+		return;
+
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		// Scale Spine's frame delay by the reanim rate
+		mSpineAnimation->mFrameDelay = 0.01f * mAnimRate;
+		mSpineAnimation->Update();
+		mAnimTime = mSpineAnimation->mAnimTime;
+		mLastFrameTime = mAnimTime;
+		if (mSpineAnimation->mDead)
+		{
+			mDead = true;
+		}
+		return;
+	}
+
+	if (mFrameCount == 0)
 		return;
 
 	TOD_ASSERT(std::isfinite(mAnimRate));
@@ -920,6 +940,12 @@ void Reanimation::DrawRenderGroup(Graphics* g, int theRenderGroup)
 	if (mDead)
 		return;
 
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		mSpineAnimation->DrawRenderGroup(g, theRenderGroup);
+		return;
+	}
+
 	TodTriangleGroup aTriangleGroup;
 	for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
 	{
@@ -939,6 +965,11 @@ void Reanimation::DrawRenderGroup(Graphics* g, int theRenderGroup)
 
 void Reanimation::Draw(Graphics* g)
 { 
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		mSpineAnimation->Draw(g);
+		return;
+	}
 	DrawRenderGroup(g, RENDER_GROUP_NORMAL);
 }
 
@@ -1084,6 +1115,13 @@ void Reanimation::ReanimationDie()
 	if (!mDead)
 	{
 		mDead = true;
+		if (mIsSpine && mSpineAnimation != nullptr)
+		{
+			mSpineAnimation->SpineAnimationDie();
+			delete mSpineAnimation;
+			mSpineAnimation = nullptr;
+			return;
+		}
 		for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
 		{
 			TOD_ASSERT(mTrackInstances);
@@ -1101,12 +1139,20 @@ void Reanimation::SetPosition(float theX, float theY)
 { 
 	mOverlayMatrix.m02 = theX;
 	mOverlayMatrix.m12 = theY;
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		mSpineAnimation->SetPosition(theX, theY);
+	}
 }
 
 void Reanimation::OverrideScale(float theScaleX, float theScaleY)
 {
 	mOverlayMatrix.m00 = theScaleX;
 	mOverlayMatrix.m11 = theScaleY;
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		mSpineAnimation->OverrideScale(theScaleX, theScaleY);
+	}
 }
 
 Image* Reanimation::GetImageOverride(const char* theTrackName)
@@ -1153,6 +1199,23 @@ Reanimation* ReanimationHolder::AllocReanimation(float theX, float theY, int the
 	aReanim->mRenderOrder = theRenderOrder;
 	aReanim->mReanimationHolder = this;
 	aReanim->ReanimationInitializeType(theX, theY, theReanimationType);
+	return aReanim;
+}
+
+Reanimation* ReanimationHolder::AllocSpineAsReanimation(float theX, float theY, int theRenderOrder, SpineAnimationType theSpineType)
+{
+	TOD_ASSERT(mReanimations.mSize != mReanimations.mMaxSize);
+	Reanimation* aReanim = mReanimations.DataArrayAlloc();
+	aReanim->mRenderOrder = theRenderOrder;
+	aReanim->mReanimationHolder = this;
+	aReanim->mIsSpine = true;
+	aReanim->mSpineType = theSpineType;
+	aReanim->mReanimationType = ReanimationType::REANIM_NONE;
+	aReanim->mDead = false;
+	aReanim->mSpineAnimation = new SpineAnimation();
+	aReanim->mSpineAnimation->SpineAnimationInitialize(theX, theY, theSpineType);
+	aReanim->mSpineAnimation->mRenderOrder = theRenderOrder;
+	aReanim->SetPosition(theX, theY);
 	return aReanim;
 }
 
@@ -1279,6 +1342,13 @@ void Reanimation::AssignRenderGroupToPrefix(const char* theTrackName, int theRen
 
 void Reanimation::PropogateColorToAttachments()
 {
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		mSpineAnimation->SetColorOverride(mColorOverride);
+		if (mEnableExtraAdditiveDraw)
+			mSpineAnimation->SetAdditiveColor(mExtraAdditiveColor);
+		return;
+	}
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
 		AttachmentPropogateColor(
 			mTrackInstances[i].mAttachmentID, mColorOverride, mEnableExtraAdditiveDraw, mExtraAdditiveColor, mEnableExtraOverlayDraw, mExtraOverlayColor
@@ -1299,6 +1369,16 @@ bool Reanimation::ShouldTriggerTimedEvent(float theEventTime)
 // GOTY @Patoke: 0x478310
 void Reanimation::PlayReanim(const char* theTrackName, ReanimLoopType theLoopType, int theBlendTime, float theAnimRate)
 {
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		bool aShouldLoop = (theLoopType == ReanimLoopType::REANIM_LOOP || 
+			theLoopType == ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME);
+		if (theAnimRate != 0.0f)
+			mSpineAnimation->SetTimeScale(theAnimRate / 12.0f);
+		mSpineAnimation->SetAnimation(theTrackName, aShouldLoop);
+		return;
+	}
+
 	if (theBlendTime > 0)  // 当需要补间过渡时，开始混合
 		StartBlend(theBlendTime);
 	if (theAnimRate != 0.0f)  // 当指定的速率为 0 时，表示不改变原有动画速率
@@ -1476,6 +1556,10 @@ void Reanimation::UpdateAttacherTrack(int theTrackIndex)
 
 bool Reanimation::IsAnimPlaying(const char* theTrackName)
 {
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		return strcasecmp(mSpineAnimation->GetCurrentAnimationName(), theTrackName) == 0;
+	}
 	int aFrameStart, aFrameCount;
 	GetFramesForLayer(theTrackName, aFrameStart, aFrameCount);
 	return mFrameStart == aFrameStart && mFrameCount == aFrameCount;

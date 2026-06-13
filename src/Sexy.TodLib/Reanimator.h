@@ -26,6 +26,7 @@
 #include "DataArray.h"
 #include "FilterEffect.h"
 #include "misc/SexyMatrix.h"
+#include "SpineAnimation.h"
 //using namespace std;
 using namespace Sexy;
 
@@ -145,6 +146,7 @@ public:
     void                            InitializeHolder();
     void                            DisposeHolder();
     Reanimation*                    AllocReanimation(float theX, float theY, int theRenderOrder, ReanimationType theReanimationType);
+    Reanimation*                    AllocSpineAsReanimation(float theX, float theY, int theRenderOrder, SpineAnimationType theSpineType);
 };
 
 // ====================================================================================================
@@ -226,6 +228,10 @@ public:
     bool                            mEnableExtraOverlayDraw;
     float                           mLastFrameTime;
     FilterEffect                    mFilterEffect;
+
+    bool                            mIsSpine;
+    class SpineAnimation*           mSpineAnimation;
+    SpineAnimationType              mSpineType;
 
 public:
     Reanimation();

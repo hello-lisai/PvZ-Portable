@@ -2,6 +2,81 @@ cmake_minimum_required(VERSION 3.5...4.0)
 
 project(pvz-portable LANGUAGES C CXX ASM)
 
+# ============================================================
+#  spine-c: download official Spine runtime (Esoteric Software)
+#  Falls back to GitHub raw file download if pre-fetched dir is missing.
+# ============================================================
+include(FetchContent)
+set(SPINE_C_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spine-c")
+set(SPINE_C_GIT_URL "https://github.com/EsotericSoftware/spine-runtimes.git")
+set(SPINE_C_GIT_TAG "4.2")
+
+# Collect the list of spine-c source files we need
+set(SPINE_C_HEADERS
+    spine.h Animation.h AnimationState.h AnimationStateData.h
+    Atlas.h Attachment.h Bone.h BoneData.h Event.h Extension.h
+    Json.h Skeleton.h SkeletonData.h SkeletonJson.h Skin.h
+    Slot.h SlotData.h SpaceTransforms.h TrackEntry.h VertexAttachment.h
+)
+set(SPINE_C_SOURCES
+    Animation.c AnimationState.c AnimationStateData.c
+    Atlas.c AtlasAttachmentLoader.c Attachment.c Bone.c BoneData.c
+    Event.c Extension.c Json.c Skeleton.c SkeletonData.c
+    SkeletonJson.c Skin.c Slot.c SlotData.c
+    SpaceTransforms.c TrackEntry.c VertexAttachment.c
+)
+
+set(_spine_c_complete TRUE)
+foreach(_f ${SPINE_C_HEADERS})
+    if(NOT EXISTS "${SPINE_C_DIR}/include/spine/${_f}")
+        set(_spine_c_complete FALSE)
+        break()
+    endif()
+endforeach()
+if(_spine_c_complete)
+    foreach(_f ${SPINE_C_SOURCES})
+        if(NOT EXISTS "${SPINE_C_DIR}/src/spine/${_f}")
+            set(_spine_c_complete FALSE)
+            break()
+        endif()
+    endforeach()
+endif()
+
+if(NOT _spine_c_complete)
+    message(STATUS "spine-c sources not found locally, fetching from GitHub (${SPINE_C_GIT_TAG}) ...")
+    FetchContent_Declare(
+        spine-runtimes-fetch
+        GIT_REPOSITORY  ${SPINE_C_GIT_URL}
+        GIT_TAG         ${SPINE_C_GIT_TAG}
+        GIT_SHALLOW     TRUE
+        GIT_SUBMODULES  ""
+        SOURCE_DIR      "${CMAKE_CURRENT_BINARY_DIR}/spine-runtimes-src"
+    )
+    FetchContent_MakeAvailable(spine-runtimes-fetch)
+    set(SPINE_C_RUNTIME_SRC "${CMAKE_CURRENT_BINARY_DIR}/spine-runtimes-src/spine-c/spine-c")
+    if(NOT EXISTS "${SPINE_C_RUNTIME_SRC}/include/spine/spine.h")
+        message(FATAL_ERROR "Failed to locate spine-c headers at ${SPINE_C_RUNTIME_SRC}")
+    endif()
+else()
+    message(STATUS "Using local spine-c sources at ${SPINE_C_DIR}")
+    set(SPINE_C_RUNTIME_SRC "${SPINE_C_DIR}")
+endif()
+
+# Build spine-c as a static library
+set(SPINE_C_ABS_SOURCES)
+foreach(_f ${SPINE_C_SOURCES})
+    list(APPEND SPINE_C_ABS_SOURCES "${SPINE_C_RUNTIME_SRC}/src/spine/${_f}")
+endforeach()
+
+add_library(spine-c STATIC ${SPINE_C_ABS_SOURCES})
+target_include_directories(spine-c PUBLIC "${SPINE_C_RUNTIME_SRC}/include")
+set_target_properties(spine-c PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON)
+if(MSVC)
+    target_compile_options(spine-c PRIVATE /W0)
+else()
+    target_compile_options(spine-c PRIVATE -w)
+endif()
+
 option(BUILD_STATIC "Static link for a standalone exe (Windows, non-MSVC)" OFF)
 if(BUILD_STATIC)
 	if(WIN32 AND NOT MSVC)
@@ -251,6 +326,7 @@ else()
 		SDL2::SDL2main
 		${SDL2_LINK_TARGET}
 		Threads::Threads
+		spine-c
 	)
 endif()
 

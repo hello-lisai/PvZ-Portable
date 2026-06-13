@@ -25,6 +25,7 @@
 #include "ConstEnums.h"
 #include "SexyAppFramework/SexyApp.h"
 #include "Sexy.TodLib/TodFoley.h"
+#include "Sexy.TodLib/SpineAnimation.h"
 
 class Board;
 class GameSelector;
@@ -247,6 +248,7 @@ public:
 	bool							KillAlmanacDialog();
 	int								GetSeedsAvailable();
 	Reanimation*					AddReanimation(float theX, float theY, int theRenderOrder, ReanimationType theReanimationType);
+	Reanimation*					AddSpineReanimation(float theX, float theY, int theRenderOrder, SpineAnimationType theSpineType);
 	TodParticleSystem*				AddTodParticle(float theX, float theY, int theRenderOrder, ParticleEffect theEffect);
 	/*inline*/ ParticleSystemID		ParticleGetID(TodParticleSystem* theParticle);
 	/*inline*/ TodParticleSystem*	ParticleGet(ParticleSystemID theParticleID);

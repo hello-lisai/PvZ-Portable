@@ -175,6 +175,7 @@ LawnApp::LawnApp()
 	mCrazyDaveBlinkCounter = 0;
 	mCrazyDaveBlinkReanimID = ReanimationID::REANIMATIONID_NULL;
 	mCrazyDaveMessageIndex = -1;
+	SpineAnimation::InitializeSpineAnimArray();
 	//mBigArrowCursor = LoadCursor(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDC_CURSOR1));
 }
 
@@ -2421,6 +2422,11 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 Reanimation* LawnApp::AddReanimation(float theX, float theY, int theRenderOrder, ReanimationType theReanimationType)
 {
 	return mEffectSystem->mReanimationHolder->AllocReanimation(theX, theY, theRenderOrder, theReanimationType);
+}
+
+Reanimation* LawnApp::AddSpineReanimation(float theX, float theY, int theRenderOrder, SpineAnimationType theSpineType)
+{
+	return mEffectSystem->mReanimationHolder->AllocSpineAsReanimation(theX, theY, theRenderOrder, theSpineType);
 }
 
 TodParticleSystem* LawnApp::AddTodParticle(float theX, float theY, int theRenderOrder, ParticleEffect theEffect)
