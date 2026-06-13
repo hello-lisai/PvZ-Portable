@@ -567,6 +567,22 @@ void BlendTransform(ReanimatorTransform* theResult, const ReanimatorTransform& t
 // GOTY @Patoke: 0x476580
 void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* theTransformCurrent)
 {
+	if (mIsSpine)
+	{
+		theTransformCurrent->mTransX = 0.0f;
+		theTransformCurrent->mTransY = 0.0f;
+		theTransformCurrent->mSkewX = 0.0f;
+		theTransformCurrent->mSkewY = 0.0f;
+		theTransformCurrent->mScaleX = 1.0f;
+		theTransformCurrent->mScaleY = 1.0f;
+		theTransformCurrent->mAlpha = 1.0f;
+		theTransformCurrent->mFrame = 0.0f;
+		theTransformCurrent->mImage = nullptr;
+		theTransformCurrent->mFont = nullptr;
+		theTransformCurrent->mText = "";
+		return;
+	}
+
 	ReanimatorFrameTime aFrameTime;
 	GetFrameTime(&aFrameTime);
 	GetTransformAtTime(theTrackIndex, theTransformCurrent, &aFrameTime);  // 结合两帧之间的自然补间取得基础变换
@@ -581,6 +597,12 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 
 void Reanimation::GetTransformAtTime(int theTrackIndex, ReanimatorTransform* theTransform, ReanimatorFrameTime* theFrameTime)
 {
+	if (mIsSpine)
+	{
+		memset(theTransform, 0, sizeof(ReanimatorTransform));
+		return;
+	}
+
 	TOD_ASSERT(theTrackIndex >= 0 && theTrackIndex < mDefinition->mTracks.count);
 	ReanimatorTrack* aTrack = &mDefinition->mTracks.tracks[theTrackIndex];
 	TOD_ASSERT(aTrack->mTransforms.count == mDefinition->mTracks.tracks[0].mTransforms.count);
@@ -841,6 +863,8 @@ bool Reanimation::DrawTrack(Graphics* g, int theTrackIndex, int theRenderGroup, 
 
 Image* Reanimation::GetCurrentTrackImage(const char* theTrackName)
 {
+	if (mIsSpine)
+		return nullptr;
 	int aTrackIndex = FindTrackIndex(theTrackName);
 	ReanimatorTrackInstance* aTrackInstance = &mTrackInstances[aTrackIndex];
 	if (aTrackInstance->mImageOverride != nullptr)
@@ -860,6 +884,12 @@ Image* Reanimation::GetCurrentTrackImage(const char* theTrackName)
 
 void Reanimation::GetTrackMatrix(int theTrackIndex, SexyTransform2D& theMatrix)
 {
+	if (mIsSpine)
+	{
+		theMatrix.LoadIdentity();
+		return;
+	}
+
 	ReanimatorTrackInstance* aTrackInstance = &mTrackInstances[theTrackIndex];
 	ReanimatorTransform aTransform;
 	GetCurrentTransform(theTrackIndex, &aTransform);
@@ -917,6 +947,14 @@ void Reanimation::GetTrackMatrix(int theTrackIndex, SexyTransform2D& theMatrix)
 
 void Reanimation::GetFrameTime(ReanimatorFrameTime* theFrameTime)
 {
+	if (mIsSpine)
+	{
+		theFrameTime->mFraction = 0.0f;
+		theFrameTime->mAnimFrameBeforeInt = 0;
+		theFrameTime->mAnimFrameAfterInt = 0;
+		return;
+	}
+
 	TOD_ASSERT(mFrameStart + mFrameCount <= mDefinition->mTracks.tracks[0].mTransforms.count);
 	int aFrameCount;
 	if (mLoopType == ReanimLoopType::REANIM_PLAY_ONCE_FULL_LAST_FRAME || mLoopType == ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME ||
@@ -1014,6 +1052,12 @@ void Reanimation::SetBasePoseFromAnim(const char* theTrackName)
 
 void Reanimation::GetTrackBasePoseMatrix(int theTrackIndex, SexyTransform2D& theBasePosMatrix)
 {
+	if (mIsSpine)
+	{
+		theBasePosMatrix.LoadIdentity();
+		return;
+	}
+
 	if (mFrameBasePose == NO_BASE_POSE)
 	{
 		theBasePosMatrix.LoadIdentity();
@@ -1203,17 +1247,24 @@ void Reanimation::OverrideScale(float theScaleX, float theScaleY)
 
 Image* Reanimation::GetImageOverride(const char* theTrackName)
 {
+	if (mIsSpine)
+		return nullptr;
 	return GetTrackInstanceByName(theTrackName)->mImageOverride;
 }
 
 // GOTY @Patoke: 0x477BB0
 void Reanimation::SetImageOverride(const char* theTrackName, Image* theImage)
 {
+	if (mIsSpine)
+		return;
 	GetTrackInstanceByName(theTrackName)->mImageOverride = theImage;
 }
 
 void Reanimation::SetTruncateDisappearingFrames(const char* theTrackName, bool theTruncateDisappearingFrames)
 {
+	if (mIsSpine)
+		return;
+
 	if (theTrackName == nullptr)  // 若给出的轨道名称为空指针
 	{
 		for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)  // 依次设置每一轨道
@@ -1349,6 +1400,8 @@ float Reanimation::GetTrackVelocity(const char* theTrackName)
 
 bool Reanimation::IsTrackShowing(const char* theTrackName)
 {
+	if (mIsSpine)
+		return false;
 	ReanimatorFrameTime aFrameTime;
 	GetFrameTime(&aFrameTime);
 	int aTrackIndex = FindTrackIndex(theTrackName);
