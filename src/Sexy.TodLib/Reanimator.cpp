@@ -1349,7 +1349,7 @@ Reanimation* ReanimationHolder::AllocSpineAsReanimation(float theX, float theY, 
 	aReanim->mExtraOverlayColor = Sexy::Color(255, 255, 255, 255);
 	aReanim->mEnableExtraOverlayDraw = false;
 	aReanim->mIsAttachment = false;
-	aReanim->mFilterEffect = FilterEffect::FILTER_NONE;
+	aReanim->mFilterEffect = FilterEffect::FILTER_EFFECT_NONE;
 
 	// --- Create Spine animation object ---
 	aReanim->mSpineAnimation = new SpineAnimation();
