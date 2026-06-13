@@ -979,6 +979,8 @@ void Reanimation::Draw(Graphics* g)
 // GOTY @Patoke: 0x477640
 int Reanimation::FindTrackIndex(const char* theTrackName)
 {
+	if (mIsSpine)
+		return -1;
 	for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
 		if (strcasecmp(mDefinition->mTracks.tracks[aTrackIndex].mName, theTrackName) == 0)
 			return aTrackIndex;
@@ -995,7 +997,7 @@ ReanimatorTrackInstance* Reanimation::GetTrackInstanceByName(const char* theTrac
 
 void Reanimation::AttachToAnotherReanimation(Reanimation* theAttachReanim, const char* theTrackName)
 {
-	if (theAttachReanim->mDefinition->mTracks.count <= 0)
+	if (theAttachReanim->mIsSpine || theAttachReanim->mDefinition->mTracks.count <= 0)
 		return;
 
 	if (theAttachReanim->mFrameBasePose == -1)
@@ -1027,6 +1029,9 @@ void Reanimation::GetTrackBasePoseMatrix(int theTrackIndex, SexyTransform2D& the
 
 AttachEffect* Reanimation::AttachParticleToTrack(const char* theTrackName, TodParticleSystem* theParticleSystem, float thePosX, float thePosY)
 {
+	if (mIsSpine)
+		return nullptr;
+
 	int aTrackIndex = FindTrackIndex(theTrackName);
 	ReanimatorTrackInstance* aTrackInstance = &mTrackInstances[aTrackIndex];
 	SexyTransform2D aBasePoseMatrix;
@@ -1038,6 +1043,12 @@ AttachEffect* Reanimation::AttachParticleToTrack(const char* theTrackName, TodPa
 // GOTY @Patoke: 0x477810
 void Reanimation::GetAttachmentOverlayMatrix(int theTrackIndex, SexyTransform2D& theOverlayMatrix)
 {
+	if (mIsSpine)
+	{
+		theOverlayMatrix.LoadIdentity();
+		return;
+	}
+
 	ReanimatorTransform aTransform;
 	GetCurrentTransform(theTrackIndex, &aTransform);  // 取得含混合、不含覆写的自然变换
 	SexyTransform2D aTransformMatrix;
@@ -1164,7 +1175,9 @@ void Reanimation::ReanimationDie()
 }
 
 void Reanimation::SetShakeOverride(const char* theTrackName, float theShakeAmount)
-{ 
+{
+	if (mIsSpine)
+		return;
 	GetTrackInstanceByName(theTrackName)->mShakeOverride = theShakeAmount;
 }
 
@@ -1321,6 +1334,9 @@ void ReanimatorFreeDefinitions()
 
 float Reanimation::GetTrackVelocity(const char* theTrackName)
 {
+	if (mIsSpine)
+		return 0.0f;
+
 	ReanimatorFrameTime aFrameTime;
 	GetFrameTime(&aFrameTime);
 	int aTrackIndex = FindTrackIndex(theTrackName);
@@ -1343,6 +1359,8 @@ bool Reanimation::IsTrackShowing(const char* theTrackName)
 
 void Reanimation::ShowOnlyTrack(const char* theTrackName)
 {
+	if (mIsSpine)
+		return;
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
 	{
 		// 轨道名与指定名称相同时，设置轨道渲染分组为正常显示，否则设置轨道渲染分组为隐藏
@@ -1353,6 +1371,8 @@ void Reanimation::ShowOnlyTrack(const char* theTrackName)
 // GOTY @Patoke: 0x478120
 void Reanimation::AssignRenderGroupToTrack(const char* theTrackName, int theRenderGroup)
 {
+	if (mIsSpine)
+		return;
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
 		if (strcasecmp(mDefinition->mTracks.tracks[i].mName, theTrackName) == 0)
 		{
@@ -1364,6 +1384,8 @@ void Reanimation::AssignRenderGroupToTrack(const char* theTrackName, int theRend
 // GOTY @Patoke: 0x478170
 void Reanimation::AssignRenderGroupToPrefix(const char* theTrackName, int theRenderGroup)
 {
+	if (mIsSpine)
+		return;
 	size_t aPrifixLength = strlen(theTrackName);
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
 	{
@@ -1600,6 +1622,8 @@ bool Reanimation::IsAnimPlaying(const char* theTrackName)
 
 Reanimation* Reanimation::FindSubReanim(ReanimationType theReanimType)
 {
+	if (mIsSpine)
+		return nullptr;
 	if (mReanimationType == theReanimType)
 		return this;
 
