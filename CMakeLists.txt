@@ -11,35 +11,10 @@ set(SPINE_C_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spine-c")
 set(SPINE_C_GIT_URL "https://github.com/EsotericSoftware/spine-runtimes.git")
 set(SPINE_C_GIT_TAG "4.2")
 
-# Collect the list of spine-c source files we need
-set(SPINE_C_HEADERS
-    spine.h Animation.h AnimationState.h AnimationStateData.h
-    Atlas.h Attachment.h Bone.h BoneData.h Event.h Extension.h
-    Json.h Skeleton.h SkeletonData.h SkeletonJson.h Skin.h
-    Slot.h SlotData.h SpaceTransforms.h TrackEntry.h VertexAttachment.h
-)
-set(SPINE_C_SOURCES
-    Animation.c AnimationState.c AnimationStateData.c
-    Atlas.c AtlasAttachmentLoader.c Attachment.c Bone.c BoneData.c
-    Event.c Extension.c Json.c Skeleton.c SkeletonData.c
-    SkeletonJson.c Skin.c Slot.c SlotData.c
-    SpaceTransforms.c TrackEntry.c VertexAttachment.c
-)
-
 set(_spine_c_complete TRUE)
-foreach(_f ${SPINE_C_HEADERS})
-    if(NOT EXISTS "${SPINE_C_DIR}/include/spine/${_f}")
-        set(_spine_c_complete FALSE)
-        break()
-    endif()
-endforeach()
-if(_spine_c_complete)
-    foreach(_f ${SPINE_C_SOURCES})
-        if(NOT EXISTS "${SPINE_C_DIR}/src/spine/${_f}")
-            set(_spine_c_complete FALSE)
-            break()
-        endif()
-    endforeach()
+if(NOT EXISTS "${SPINE_C_DIR}/include/spine/spine.h" OR
+   NOT EXISTS "${SPINE_C_DIR}/src/spine")
+    set(_spine_c_complete FALSE)
 endif()
 
 if(NOT _spine_c_complete)
@@ -62,13 +37,19 @@ else()
     set(SPINE_C_RUNTIME_SRC "${SPINE_C_DIR}")
 endif()
 
-# Build spine-c as a static library
-set(SPINE_C_ABS_SOURCES)
-foreach(_f ${SPINE_C_SOURCES})
-    list(APPEND SPINE_C_ABS_SOURCES "${SPINE_C_RUNTIME_SRC}/src/spine/${_f}")
-endforeach()
+# Auto-detect spine-c sources and headers instead of hard-coding a list.
+# The file set differs between Spine runtime versions (e.g. SpaceTransforms
+# only exists in newer versions), so we glob whatever is actually available.
+file(GLOB SPINE_C_SOURCES_ABS
+    "${SPINE_C_RUNTIME_SRC}/src/spine/*.c"
+    "${SPINE_C_RUNTIME_SRC}/src/spine/*.cpp"
+)
+file(GLOB SPINE_C_HEADERS_ABS
+    "${SPINE_C_RUNTIME_SRC}/include/spine/*.h"
+    "${SPINE_C_RUNTIME_SRC}/include/spine/*.hpp"
+)
 
-add_library(spine-c STATIC ${SPINE_C_ABS_SOURCES})
+add_library(spine-c STATIC ${SPINE_C_SOURCES_ABS} ${SPINE_C_HEADERS_ABS})
 target_include_directories(spine-c PUBLIC "${SPINE_C_RUNTIME_SRC}/include")
 set_target_properties(spine-c PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON)
 if(MSVC)
