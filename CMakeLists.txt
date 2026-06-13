@@ -49,11 +49,37 @@ file(GLOB SPINE_C_HEADERS_ABS
     "${SPINE_C_RUNTIME_SRC}/include/spine/*.hpp"
 )
 
+# Configure MSVC runtime library BEFORE creating any targets so all
+# targets (including spine-c static library below) pick up the same CRT.
+# Otherwise spine-c would default to /MD while the main exe uses /MT,
+# causing LNK2019 (e.g. unresolved __imp_strncat) and LNK4098 warnings.
+if(MSVC)
+	if(DEFINED VCPKG_TARGET_TRIPLET AND VCPKG_TARGET_TRIPLET MATCHES "-static")
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	elseif(DEFINED VCPKG_TARGET_TRIPLET)
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>")
+	endif()
+endif()
+
 add_library(spine-c STATIC ${SPINE_C_SOURCES_ABS} ${SPINE_C_HEADERS_ABS})
 target_include_directories(spine-c PUBLIC "${SPINE_C_RUNTIME_SRC}/include")
-set_target_properties(spine-c PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON)
+set_target_properties(spine-c PROPERTIES
+    C_STANDARD 99
+    C_STANDARD_REQUIRED ON
+    POSITION_INDEPENDENT_CODE ON)
 if(MSVC)
+    # Explicitly match the runtime library selection for the spine-c
+    # static library so it links cleanly against the main executable
+    # regardless of whether a vcpkg static/dynamic triplet is in use.
+    if(DEFINED VCPKG_TARGET_TRIPLET AND VCPKG_TARGET_TRIPLET MATCHES "-static")
+        set_target_properties(spine-c PROPERTIES
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    elseif(DEFINED VCPKG_TARGET_TRIPLET)
+        set_target_properties(spine-c PROPERTIES
+            MSVC_RUNTIME_LIBRARY "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>")
+    endif()
     target_compile_options(spine-c PRIVATE /W0)
+    target_compile_definitions(spine-c PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
     target_compile_options(spine-c PRIVATE -w)
 endif()
