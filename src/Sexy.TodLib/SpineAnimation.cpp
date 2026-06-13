@@ -464,7 +464,10 @@ static uint32_t colorToUInt(float r, float g, float b, float a)
 
 void SpineAnimation::Draw(Sexy::Graphics* g)
 {
-    if (mSkeleton == nullptr)
+    if (g == nullptr || mSkeleton == nullptr)
+        return;
+
+    if (mSkeleton->drawOrder == nullptr || mSkeleton->slotsCount <= 0)
         return;
 
     // Determine the base color (slot color is multiplied with skeleton color).
@@ -482,9 +485,23 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
     float skelB = mSkeleton->color.b;
     float skelA = mSkeleton->color.a;
 
+    // Convert from spine's Y-up coordinates (positive Y goes up, mathematical
+    // convention) to the game's Y-down screen coordinates (positive Y goes down,
+    // typical for screen rendering). We flip each position's Y component and
+    // vertically flip each texture's V (or keep UV unchanged when the texture
+    // loader already flipped the image during loading).
+    //
+    // Here we apply the Y-flip at draw time so SetPosition/SetFlip remain
+    // simple. The V coordinate is also flipped to keep the texture upright
+    // after the Y position flip.
+    const float yFlip = -1.0f;
+    const float yAdd  = 2.0f * mSkeleton->y;  // Keep image centered around the set position
+    const float vFlip = 1.0f;
+
     // Render each slot in draw order. Draw order uses the same slot objects
     // as mSkeleton->slots[] but arranged for correct visual stacking.
-    for (int i = 0; i < mSkeleton->slotsCount; i++) {
+    const int slotCount = mSkeleton->slotsCount;
+    for (int i = 0; i < slotCount; i++) {
         spSlot* slot = mSkeleton->drawOrder[i];
         if (slot == nullptr) continue;
 
@@ -494,6 +511,7 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
         // --- Region attachment (simple 4-corner quad). ---
         if (attachment->type == SP_ATTACHMENT_REGION) {
             spRegionAttachment* region = (spRegionAttachment*)attachment;
+            if (region == nullptr) continue;
 
             spAtlasRegion* regionData = (spAtlasRegion*)region->region;
             Sexy::Image* tex = nullptr;
@@ -512,28 +530,26 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             spRegionAttachment_computeWorldVertices(region, slot, worldVerts, 0, 2);
 
             // spine-c stores UVs as (u,v) pairs in region->uvs[8].
-            // Vertex order in spine-c is: TL, TR, BR, BL
+            // Vertex order in spine-c is: TL, TR, BR, BL (in spine Y-up space).
+            // Apply the Y-axis flip for Y-down screen coordinates and flip V to
+            // keep texture sampling upright after the geometry flip.
             Sexy::TriVertex tri[2][3];
 
-            tri[0][0] = makeVert(worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor);
-            tri[0][1] = makeVert(worldVerts[2], worldVerts[3], region->uvs[2], region->uvs[3], vertColor);
-            tri[0][2] = makeVert(worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor);
+            tri[0][0] = makeVert(worldVerts[0], worldVerts[1] * yFlip + yAdd, region->uvs[0], vFlip - region->uvs[1], vertColor);
+            tri[0][1] = makeVert(worldVerts[2], worldVerts[3] * yFlip + yAdd, region->uvs[2], vFlip - region->uvs[3], vertColor);
+            tri[0][2] = makeVert(worldVerts[4], worldVerts[5] * yFlip + yAdd, region->uvs[4], vFlip - region->uvs[5], vertColor);
 
-            tri[1][0] = makeVert(worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor);
-            tri[1][1] = makeVert(worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor);
-            tri[1][2] = makeVert(worldVerts[6], worldVerts[7], region->uvs[6], region->uvs[7], vertColor);
+            tri[1][0] = makeVert(worldVerts[0], worldVerts[1] * yFlip + yAdd, region->uvs[0], vFlip - region->uvs[1], vertColor);
+            tri[1][1] = makeVert(worldVerts[4], worldVerts[5] * yFlip + yAdd, region->uvs[4], vFlip - region->uvs[5], vertColor);
+            tri[1][2] = makeVert(worldVerts[6], worldVerts[7] * yFlip + yAdd, region->uvs[6], vFlip - region->uvs[7], vertColor);
 
             g->DrawTrianglesTex(tex, tri, 2);
         }
         // --- Mesh / linked mesh attachment (arbitrary polygon, possibly with deform). ---
-        // In spine-c 4.x, linked mesh attachments are represented as spMeshAttachment
-        // with parentMesh pointing to the source mesh for shared geometry. After
-        // spMeshAttachment_setParentMesh + spMeshAttachment_updateRegion, the linked
-        // mesh has its own valid uvs, region, and references to the parent's
-        // triangles/vertices/bones — so we can render it identically to a normal mesh.
         else if (attachment->type == SP_ATTACHMENT_MESH ||
                  attachment->type == SP_ATTACHMENT_LINKED_MESH) {
             spMeshAttachment* mesh = (spMeshAttachment*)attachment;
+            if (mesh == nullptr) continue;
 
             spAtlasRegion* regionData = (spAtlasRegion*)mesh->region;
             Sexy::Image* tex = nullptr;
@@ -541,7 +557,7 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
             if (tex == nullptr) continue;
 
-            int worldVertsLen = mesh->super.worldVerticesLength;
+            const int worldVertsLen = mesh->super.worldVerticesLength;
             if (worldVertsLen <= 0) continue;
 
             float r = mesh->color.r * slot->color.r * skelR;
@@ -554,26 +570,29 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             spVertexAttachment_computeWorldVertices(
                 &mesh->super, slot, 0, worldVertsLen, worldVerts.data(), 0, 2);
 
-            int numTris = mesh->trianglesCount / 3;
-            if (numTris <= 0) continue;
+            const int trianglesCount = mesh->trianglesCount;
+            if (trianglesCount <= 0 || (trianglesCount % 3) != 0) continue;
+            const int numTris = trianglesCount / 3;
 
-            // bounds-check the triangle indices against the UV / world-vertex arrays.
-            int maxIdx = worldVertsLen / 2;
+            if (mesh->uvs == nullptr || mesh->triangles == nullptr) continue;
+
+            // Bounds-check the triangle indices against the UV / world-vertex arrays.
+            const int maxIdx = worldVertsLen / 2;
 
             std::vector<Sexy::TriVertex> triBatch((size_t)numTris * 3);
             for (int t = 0; t < numTris; t++) {
-                int i0 = mesh->triangles[t * 3];
-                int i1 = mesh->triangles[t * 3 + 1];
-                int i2 = mesh->triangles[t * 3 + 2];
+                const int i0 = mesh->triangles[t * 3];
+                const int i1 = mesh->triangles[t * 3 + 1];
+                const int i2 = mesh->triangles[t * 3 + 2];
                 if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx) continue;
 
-                float u0 = mesh->uvs[i0 * 2], v0 = mesh->uvs[i0 * 2 + 1];
-                float u1 = mesh->uvs[i1 * 2], v1 = mesh->uvs[i1 * 2 + 1];
-                float u2 = mesh->uvs[i2 * 2], v2 = mesh->uvs[i2 * 2 + 1];
+                const float u0 = mesh->uvs[i0 * 2], v0 = mesh->uvs[i0 * 2 + 1];
+                const float u1 = mesh->uvs[i1 * 2], v1 = mesh->uvs[i1 * 2 + 1];
+                const float u2 = mesh->uvs[i2 * 2], v2 = mesh->uvs[i2 * 2 + 1];
 
-                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2], worldVerts[i0 * 2 + 1], u0, v0, vertColor);
-                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2], worldVerts[i1 * 2 + 1], u1, v1, vertColor);
-                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2], worldVerts[i2 * 2 + 1], u2, v2, vertColor);
+                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2], worldVerts[i0 * 2 + 1] * yFlip + yAdd, u0, vFlip - v0, vertColor);
+                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2], worldVerts[i1 * 2 + 1] * yFlip + yAdd, u1, vFlip - v1, vertColor);
+                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2], worldVerts[i2 * 2 + 1] * yFlip + yAdd, u2, vFlip - v2, vertColor);
             }
 
             g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
