@@ -123,19 +123,11 @@ char* _spUtil_readFile(const char* path, int* length)
 
 static spAtlas* pvzCreateAtlas(const char* data, int length, const char* dir)
 {
-    spAtlas* atlas = spAtlas_create(data, length, dir, nullptr);
-    if (atlas == nullptr) return nullptr;
-
-    for (spAtlasPage* page = atlas->pages; page != nullptr; page = page->next) {
-        std::string texPath;
-        if (dir != nullptr && dir[0] != '\0') {
-            texPath = std::string(dir) + "/" + page->name;
-        } else {
-            texPath = page->name;
-        }
-        _pvz_spine_createTexture(page, texPath.c_str());
-    }
-    return atlas;
+    // spAtlas_create internally calls _spAtlasPage_createTexture for each page,
+    // passing the full path (dir + "/" + pageName). Our callback loads the
+    // texture via ImageLib. We do NOT re-load textures here — doing so would
+    // leak the first image and leave dangling pointers.
+    return spAtlas_create(data, length, dir, nullptr);
 }
 
 static std::string extractDirectory(const std::string& path)
@@ -490,125 +482,98 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
     float skelB = mSkeleton->color.b;
     float skelA = mSkeleton->color.a;
 
-    // Render each slot in order (draw order is determined by slot order in skeleton data).
+    // Render each slot in draw order. Draw order uses the same slot objects
+    // as mSkeleton->slots[] but arranged for correct visual stacking.
     for (int i = 0; i < mSkeleton->slotsCount; i++) {
-        spSlot* slot = mSkeleton->slots[i];
+        spSlot* slot = mSkeleton->drawOrder[i];
         if (slot == nullptr) continue;
 
         spAttachment* attachment = slot->attachment;
         if (attachment == nullptr) continue;
 
-        // Compute slot color (multiplied with skeleton color).
-        float sr = slot->color.r * skelR;
-        float sg = slot->color.g * skelG;
-        float sb = slot->color.b * skelB;
-        float sa = slot->color.a * skelA;
-        uint32_t slotColor = baseColor != 0 ? baseColor : colorToUInt(sr, sg, sb, sa);
-
         // --- Region attachment (simple 4-corner quad). ---
         if (attachment->type == SP_ATTACHMENT_REGION) {
             spRegionAttachment* region = (spRegionAttachment*)attachment;
-            spAtlasRegion* regionData = (spAtlasRegion*)region->rendererObject;
+
+            spAtlasRegion* regionData = (spAtlasRegion*)region->region;
             Sexy::Image* tex = nullptr;
             if (regionData != nullptr && regionData->page != nullptr)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
             if (tex == nullptr) continue;
+
+            // Final vertex color = attachment * slot * skeleton
+            float r = region->color.r * slot->color.r * skelR;
+            float gC = region->color.g * slot->color.g * skelG;
+            float b = region->color.b * slot->color.b * skelB;
+            float a = region->color.a * slot->color.a * skelA;
+            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gC, b, a);
 
             float worldVerts[8];
             spRegionAttachment_computeWorldVertices(region, slot, worldVerts, 0, 2);
 
             // spine-c stores UVs as (u,v) pairs in region->uvs[8].
-            // Vertex order in spine-c is: TL, TR, BR, BL  (counter-clockwise)
-            // Build two triangles from the quad.
+            // Vertex order in spine-c is: TL, TR, BR, BL
             Sexy::TriVertex tri[2][3];
 
-            // Triangle 1: TL, TR, BR
-            tri[0][0] = makeVert(worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], slotColor);
-            tri[0][1] = makeVert(worldVerts[2], worldVerts[3], region->uvs[2], region->uvs[3], slotColor);
-            tri[0][2] = makeVert(worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], slotColor);
+            tri[0][0] = makeVert(worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor);
+            tri[0][1] = makeVert(worldVerts[2], worldVerts[3], region->uvs[2], region->uvs[3], vertColor);
+            tri[0][2] = makeVert(worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor);
 
-            // Triangle 2: TL, BR, BL
-            tri[1][0] = makeVert(worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], slotColor);
-            tri[1][1] = makeVert(worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], slotColor);
-            tri[1][2] = makeVert(worldVerts[6], worldVerts[7], region->uvs[6], region->uvs[7], slotColor);
+            tri[1][0] = makeVert(worldVerts[0], worldVerts[1], region->uvs[0], region->uvs[1], vertColor);
+            tri[1][1] = makeVert(worldVerts[4], worldVerts[5], region->uvs[4], region->uvs[5], vertColor);
+            tri[1][2] = makeVert(worldVerts[6], worldVerts[7], region->uvs[6], region->uvs[7], vertColor);
 
             g->DrawTrianglesTex(tex, tri, 2);
         }
-        // --- Mesh attachment (arbitrary polygon, possibly with deform). ---
-        else if (attachment->type == SP_ATTACHMENT_MESH) {
-            spMeshAttachment* mesh = (spMeshAttachment*)attachment;
-            spAtlasRegion* regionData = (spAtlasRegion*)mesh->rendererObject;
-            Sexy::Image* tex = nullptr;
-            if (regionData != nullptr && regionData->page != nullptr)
-                tex = (Sexy::Image*)regionData->page->rendererObject;
-            if (tex == nullptr) continue;
-
-            int numVerts = mesh->super.worldVerticesLength / 2;
-            if (numVerts <= 0) continue;
-
-            std::vector<float> worldVerts((size_t)mesh->super.worldVerticesLength);
-            spVertexAttachment_computeWorldVertices(
-                &mesh->super, slot, 0, mesh->super.worldVerticesLength,
-                worldVerts.data(), 0, 2);
-
-            int numTris = mesh->trianglesCount / 3;
-            if (numTris <= 0) continue;
-
-            // Emit triangles using DrawTrianglesTex.
-            std::vector<Sexy::TriVertex> triBatch((size_t)numTris * 3);
-            for (int t = 0; t < numTris; t++) {
-                int i0 = mesh->triangles[t * 3];
-                int i1 = mesh->triangles[t * 3 + 1];
-                int i2 = mesh->triangles[t * 3 + 2];
-
-                float u0 = mesh->uvs[i0 * 2], v0 = mesh->uvs[i0 * 2 + 1];
-                float u1 = mesh->uvs[i1 * 2], v1 = mesh->uvs[i1 * 2 + 1];
-                float u2 = mesh->uvs[i2 * 2], v2 = mesh->uvs[i2 * 2 + 1];
-
-                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2], worldVerts[i0 * 2 + 1], u0, v0, slotColor);
-                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2], worldVerts[i1 * 2 + 1], u1, v1, slotColor);
-                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2], worldVerts[i2 * 2 + 1], u2, v2, slotColor);
-            }
-
-            g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
-        }
-        // Linked mesh – delegate to the linked source mesh.
+        // --- Mesh / linked mesh attachment (arbitrary polygon, possibly with deform). ---
         // In spine-c 4.x, linked mesh attachments are represented as spMeshAttachment
-        // with parentMesh pointing to the source mesh (deform) data.
-        else if (attachment->type == SP_ATTACHMENT_LINKED_MESH) {
-            spMeshAttachment* linked = (spMeshAttachment*)attachment;
-            spMeshAttachment* source = linked->parentMesh;
-            spMeshAttachment* mesh = (source != nullptr) ? source : linked;
+        // with parentMesh pointing to the source mesh for shared geometry. After
+        // spMeshAttachment_setParentMesh + spMeshAttachment_updateRegion, the linked
+        // mesh has its own valid uvs, region, and references to the parent's
+        // triangles/vertices/bones — so we can render it identically to a normal mesh.
+        else if (attachment->type == SP_ATTACHMENT_MESH ||
+                 attachment->type == SP_ATTACHMENT_LINKED_MESH) {
+            spMeshAttachment* mesh = (spMeshAttachment*)attachment;
+
             spAtlasRegion* regionData = (spAtlasRegion*)mesh->region;
             Sexy::Image* tex = nullptr;
             if (regionData != nullptr && regionData->page != nullptr)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
             if (tex == nullptr) continue;
 
-            int numVerts = mesh->super.worldVerticesLength / 2;
-            if (numVerts <= 0) continue;
+            int worldVertsLen = mesh->super.worldVerticesLength;
+            if (worldVertsLen <= 0) continue;
 
-            std::vector<float> worldVerts((size_t)mesh->super.worldVerticesLength);
+            float r = mesh->color.r * slot->color.r * skelR;
+            float gC = mesh->color.g * slot->color.g * skelG;
+            float b = mesh->color.b * slot->color.b * skelB;
+            float a = mesh->color.a * slot->color.a * skelA;
+            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gC, b, a);
+
+            std::vector<float> worldVerts((size_t)worldVertsLen);
             spVertexAttachment_computeWorldVertices(
-                &mesh->super, slot, 0, mesh->super.worldVerticesLength,
-                worldVerts.data(), 0, 2);
+                &mesh->super, slot, 0, worldVertsLen, worldVerts.data(), 0, 2);
 
             int numTris = mesh->trianglesCount / 3;
             if (numTris <= 0) continue;
+
+            // bounds-check the triangle indices against the UV / world-vertex arrays.
+            int maxIdx = worldVertsLen / 2;
 
             std::vector<Sexy::TriVertex> triBatch((size_t)numTris * 3);
             for (int t = 0; t < numTris; t++) {
                 int i0 = mesh->triangles[t * 3];
                 int i1 = mesh->triangles[t * 3 + 1];
                 int i2 = mesh->triangles[t * 3 + 2];
+                if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx) continue;
 
                 float u0 = mesh->uvs[i0 * 2], v0 = mesh->uvs[i0 * 2 + 1];
                 float u1 = mesh->uvs[i1 * 2], v1 = mesh->uvs[i1 * 2 + 1];
                 float u2 = mesh->uvs[i2 * 2], v2 = mesh->uvs[i2 * 2 + 1];
 
-                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2], worldVerts[i0 * 2 + 1], u0, v0, slotColor);
-                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2], worldVerts[i1 * 2 + 1], u1, v1, slotColor);
-                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2], worldVerts[i2 * 2 + 1], u2, v2, slotColor);
+                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2], worldVerts[i0 * 2 + 1], u0, v0, vertColor);
+                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2], worldVerts[i1 * 2 + 1], u1, v1, vertColor);
+                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2], worldVerts[i2 * 2 + 1], u2, v2, vertColor);
             }
 
             g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
