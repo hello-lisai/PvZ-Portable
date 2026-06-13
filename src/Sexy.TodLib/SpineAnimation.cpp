@@ -683,8 +683,13 @@ void SpineAnimation::SetScale(float theScale)
 void SpineAnimation::OverrideScale(float theScaleX, float theScaleY)
 {
     if (mSkeleton == nullptr) return;
-    mSkeleton->scaleX = theScaleX;
-    mSkeleton->scaleY = theScaleY;
+    // Apply config's defaultScale as a multiplier on top of the game's scale.
+    // This lets the config file control overall animation size relative to
+    // legacy plants, while the game still handles per-plant scaling (wake-up,
+    // potted plant sizing, etc.).
+    float mult = (mSpineParams != nullptr) ? mSpineParams->mDefaultScale : 1.0f;
+    mSkeleton->scaleX = theScaleX * mult;
+    mSkeleton->scaleY = theScaleY * mult;
 }
 
 void SpineAnimation::SetPosition(float theX, float theY)
