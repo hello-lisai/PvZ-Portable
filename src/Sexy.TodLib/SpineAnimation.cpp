@@ -272,13 +272,12 @@ void SpineAnimation::InitializeSpineAnimArray()
         gSpineAnimArray.push_back(
             SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
                 "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f,
-                // Render offset: aligns Spine skeleton origin with game coord origin.
-                // Game expects (0,0) at plant bottom (ground level).
-                // GatlingPea.json skeleton has root near lower-center;
-                // these values shift visual so bottom touches ground.
-                // Tune these if position looks off after testing.
-                0.0f,    // mRenderOffsetX — horizontal tweak if needed
-                -35.0f)); // mRenderOffsetY — push down so plant bottom = ground
+                // Render offset: uniform shift applied after coordinate transform.
+                // With the unified Y-flip system, (0,0) means skeleton root bone
+                // renders exactly where SetPosition() places it.
+                // Tune these if the character needs nudging after testing.
+                0.0f,    // mRenderOffsetX
+                0.0f));  // mRenderOffsetY
     }
 }
 
@@ -432,10 +431,15 @@ bool SpineAnimation::GetBoneWorldPosition(const char* boneName, float* outX, flo
     if (bone == nullptr)
         return false;
 
-    // Bone world position is in Spine's Y-up coordinate system.
-    // The skeleton's own x/y is the root position in game coords.
-    *outX = mSkeleton->x + bone->worldX;
-    *outY = mSkeleton->y + bone->worldY;
+    // Return position as OFFSET from skeleton origin, in GAME coordinates (Y-down).
+    // This matches legacy Reanimator behavior where GetCurrentTransform() returns
+    // mTransX/mTransY as offsets from the reanim position — used by Fire(),
+    // GetPeaHeadOffset(), and other logic code to compute bullet spawn points etc.
+    //
+    // Spine bone worldX/worldY are relative to skeleton origin in Y-up space.
+    // Convert: X stays same, Y flips sign (Spine +up → screen +up = smaller Y).
+    *outX = bone->worldX;
+    *outY = -(bone->worldY);
     return true;
 }
 
@@ -604,12 +608,27 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
     float skelB = mSkeleton->color.b;
     float skelA = mSkeleton->color.a;
 
-    // Coordinate fix: Spine uses Y-up, game engine uses Y-down (screen coords).
-    // Flip world-vertex Y around skeleton origin to convert between systems.
-    // Also apply render offset to align skeleton origin with game coordinate origin
-    // (game expects 0,0 at plant bottom; Spine editor often puts root at center).
-    const float originX = mSkeleton->x + mRenderOffsetX;
-    const float originY = mSkeleton->y + mRenderOffsetY;
+    // ============================================================
+    //  Unified coordinate transform: Spine Y-up → Game Y-down
+    //  ============================================================
+    // Spine computes world vertices in Y-up space (positive Y = up).
+    // The game engine uses Y-down screen coordinates (positive Y = down).
+    // sp*_*computeWorldVertices() outputs vertices that INCLUDE mSkeleton->x/y.
+    //
+    // Conversion formula (flip Y around skeleton position):
+    //   screenX = worldVertX                          (X unchanged)
+    //   screenY = 2 * mSkeleton->y - worldVertY       (Y flipped around skelY)
+    //
+    // This is the SAME transform logic that GetBoneWorldPosition() uses
+    // for logical coordinates (bullet spawn points, etc.), ensuring visual
+    // and logical positions are always consistent.
+    //
+    // mRenderOffsetX/Y are added as a final uniform shift to align the
+    // skeleton origin with the expected game position (e.g., root bone
+    // may not be at the plant's bottom-center where the game expects).
+    // ============================================================
+    const float skelX = mSkeleton->x;
+    const float skelY = mSkeleton->y;
 
     uint32_t baseColor = 0;
     if (mColorOverride.mRed != 255 || mColorOverride.mGreen != 255 ||
@@ -652,15 +671,15 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
 
             // Two triangles forming a quad: (0,1,2) and (0,2,3)
             // Vertex order from Spine: top-left, top-right, bottom-right, bottom-left
-            // Apply Y-flip around (adjusted) origin + render offset
+            // Apply unified Y-flip around skeleton position + render offset
             Sexy::TriVertex tri[2][3] = {{
-                { worldVerts[0] + mRenderOffsetX, 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
-                { worldVerts[2] + mRenderOffsetX, 2.0f * originY - worldVerts[3], region->uvs[2], region->uvs[3], vertColor },
-                { worldVerts[4] + mRenderOffsetX, 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
+                { worldVerts[0] + mRenderOffsetX, 2.0f * skelY - worldVerts[1] + mRenderOffsetY, region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[2] + mRenderOffsetX, 2.0f * skelY - worldVerts[3] + mRenderOffsetY, region->uvs[2], region->uvs[3], vertColor },
+                { worldVerts[4] + mRenderOffsetX, 2.0f * skelY - worldVerts[5] + mRenderOffsetY, region->uvs[4], region->uvs[5], vertColor },
             }, {
-                { worldVerts[0] + mRenderOffsetX, 2.0f * originY - worldVerts[1], region->uvs[0], region->uvs[1], vertColor },
-                { worldVerts[4] + mRenderOffsetX, 2.0f * originY - worldVerts[5], region->uvs[4], region->uvs[5], vertColor },
-                { worldVerts[6] + mRenderOffsetX, 2.0f * originY - worldVerts[7], region->uvs[6], region->uvs[7], vertColor },
+                { worldVerts[0] + mRenderOffsetX, 2.0f * skelY - worldVerts[1] + mRenderOffsetY, region->uvs[0], region->uvs[1], vertColor },
+                { worldVerts[4] + mRenderOffsetX, 2.0f * skelY - worldVerts[5] + mRenderOffsetY, region->uvs[4], region->uvs[5], vertColor },
+                { worldVerts[6] + mRenderOffsetX, 2.0f * skelY - worldVerts[7] + mRenderOffsetY, region->uvs[6], region->uvs[7], vertColor },
             }};
 
             g->DrawTrianglesTex(tex, tri, 2);
@@ -711,12 +730,12 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                 if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx)
                     continue;
 
-                // Apply Y-flip and render offset for mesh vertices
-                mTriBatchCache[validTris * 3]     = { mWorldVertsCache[i0 * 2] + mRenderOffsetX, 2.0f * originY - mWorldVertsCache[i0 * 2 + 1],
+                // Apply unified Y-flip around skeleton position + render offset for mesh vertices
+                mTriBatchCache[validTris * 3]     = { mWorldVertsCache[i0 * 2] + mRenderOffsetX, 2.0f * skelY - mWorldVertsCache[i0 * 2 + 1] + mRenderOffsetY,
                                                       mesh->uvs[i0 * 2], mesh->uvs[i0 * 2 + 1], vertColor };
-                mTriBatchCache[validTris * 3 + 1] = { mWorldVertsCache[i1 * 2] + mRenderOffsetX, 2.0f * originY - mWorldVertsCache[i1 * 2 + 1],
+                mTriBatchCache[validTris * 3 + 1] = { mWorldVertsCache[i1 * 2] + mRenderOffsetX, 2.0f * skelY - mWorldVertsCache[i1 * 2 + 1] + mRenderOffsetY,
                                                       mesh->uvs[i1 * 2], mesh->uvs[i1 * 2 + 1], vertColor };
-                mTriBatchCache[validTris * 3 + 2] = { mWorldVertsCache[i2 * 2] + mRenderOffsetX, 2.0f * originY - mWorldVertsCache[i2 * 2 + 1],
+                mTriBatchCache[validTris * 3 + 2] = { mWorldVertsCache[i2 * 2] + mRenderOffsetX, 2.0f * skelY - mWorldVertsCache[i2 * 2 + 1] + mRenderOffsetY,
                                                       mesh->uvs[i2 * 2], mesh->uvs[i2 * 2 + 1], vertColor };
                 validTris++;
             }
