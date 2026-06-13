@@ -595,8 +595,8 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 		for (int i = 0; candidates[i] != nullptr && !found; i++)
 			found = mSpineAnimation->GetBoneWorldPosition(candidates[i], &boneX, &boneY);
 		if (!found) {
-			boneX = mSpineAnimation->mSkeleton->x;
-			boneY = mSpineAnimation->mSkeleton->y;
+			// Fallback: root bone always exists in Spine skeletons
+			mSpineAnimation->GetBoneWorldPosition("root", &boneX, &boneY);
 		}
 
 		theTransformCurrent->mTransX = boneX;
