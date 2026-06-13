@@ -272,9 +272,10 @@ void SpineAnimation::InitializeSpineAnimArray()
         gSpineAnimArray.push_back(
             SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
                 "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f,
-                // Render offset: fine-tuning after anchor transform (usually 0,0).
+                // Render offset: fine-tuning after anchor transform.
+                // Positive Y pushes the entire animation DOWN on screen.
                 0.0f,    // mRenderOffsetX
-                0.0f,    // mRenderOffsetY
+                40.0f,   // mRenderOffsetY — push body downward to align with game grid
                 // Anchor bone: "bone2" = body/frontleaf of the peashooter.
                 // This bone sits at the main body area (~y=+44 in Spine space).
                 // Using it as anchor means SetPosition() places the BODY at the
