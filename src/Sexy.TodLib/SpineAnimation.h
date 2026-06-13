@@ -39,20 +39,23 @@ struct SpineAnimationParams
     std::string         mJSONPath;
     std::string         mAtlasPath;
     float               mDefaultScale;
-    // Visual offset to align Spine skeleton origin with game coordinate origin.
-    // Game expects (0,0) at bottom-center of plant (ground level).
-    // Spine editor typically puts root bone at center of character.
-    // These offsets are added to all vertex positions during Draw().
+    // Visual offset applied after coordinate transform (fine-tuning).
     float               mRenderOffsetX;
     float               mRenderOffsetY;
+    // Anchor bone name: the bone that should sit at SetPosition() location.
+    // Both rendering (Draw) and logic (GetBoneWorldPosition) use this as
+    // the effective origin, so visual position and bullet spawn points agree.
+    // Default "root" means skeleton root is the origin (no adjustment).
+    std::string         mAnchorBone;
 
     SpineAnimationParams() : mType((SpineAnimationType)0), mDefaultScale(1.0f),
-        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f) {}
+        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f), mAnchorBone("root") {}
     SpineAnimationParams(SpineAnimationType t, const std::string& j,
                          const std::string& a, float s,
-                         float offX = 0.0f, float offY = 0.0f)
+                         float offX = 0.0f, float offY = 0.0f,
+                         const std::string& anchor = "root")
         : mType(t), mJSONPath(j), mAtlasPath(a), mDefaultScale(s),
-          mRenderOffsetX(offX), mRenderOffsetY(offY) {}
+          mRenderOffsetX(offX), mRenderOffsetY(offY), mAnchorBone(anchor) {}
 };
 
 class SpineAnimation
@@ -87,6 +90,12 @@ public:
     spAnimationState*                  mAnimState;
     SpineAnimationParams*              mSpineParams;
 
+    // Anchor bone offset (cached after skeleton init).
+    // World position of the anchor bone in Spine Y-up space.
+    // All coordinate transforms use this as the effective origin.
+    float                              mAnchorX;
+    float                              mAnchorY;
+
     // Pre-allocated draw buffers (avoid per-frame heap alloc)
     std::vector<float>                 mWorldVertsCache;
     std::vector<Sexy::TriVertex>      mTriBatchCache;
@@ -100,7 +109,8 @@ public:
         mExtraOverlayDraw(false), mExtraOverlayColor(Sexy::Color::White),
         mRenderOffsetX(0), mRenderOffsetY(0),
         mAtlas(nullptr), mSkeletonData(nullptr), mSkeleton(nullptr),
-        mAnimStateData(nullptr), mAnimState(nullptr), mSpineParams(nullptr) {}
+        mAnimStateData(nullptr), mAnimState(nullptr), mSpineParams(nullptr),
+        mAnchorX(0), mAnchorY(0) {}
 
     ~SpineAnimation();
 
