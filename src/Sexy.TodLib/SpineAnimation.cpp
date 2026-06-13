@@ -10,6 +10,7 @@
 #include "../SexyAppFramework/imagelib/ImageLib.h"
 #include "../SexyAppFramework/paklib/PakInterface.h"
 #include "../SexyAppFramework/graphics/TriVertex.h"
+#include "../SexyAppFramework/graphics/MemoryImage.h"
 
 #include <spine/spine.h>
 
@@ -58,47 +59,44 @@ static std::vector<char> readSpineFile(const std::string& path)
 // ============================================================
 static void _pvz_spine_createTexture(spAtlasPage* self, const char* path)
 {
-    // ImageLib::GetImage tries various extensions (.png, .jpg, etc.)
-    Sexy::Image* img = ImageLib::GetImage(path, false);
-    self->rendererObject = img;
-    if (img != nullptr) {
-        self->width = img->mWidth;
-        self->height = img->mHeight;
-    } else {
+    ImageLib::Image* loaded = ImageLib::GetImage(path, false);
+    if (loaded == nullptr) {
+        self->rendererObject = nullptr;
         self->width = 1;
         self->height = 1;
+        return;
     }
+    Sexy::MemoryImage* img = new Sexy::MemoryImage();
+    img->mFilePath = path;
+    img->SetBits(loaded->GetBits(), loaded->GetWidth(), loaded->GetHeight(), true);
+    delete loaded;
+    self->rendererObject = img;
+    self->width = img->mWidth;
+    self->height = img->mHeight;
 }
 
 static void _pvz_spine_disposeTexture(spAtlasPage* self)
 {
-    // Images are owned by ImageLib / the resource system; do not delete them here.
-    (void)self;
+    Sexy::MemoryImage* img = (Sexy::MemoryImage*)self->rendererObject;
+    delete img;
+    self->rendererObject = nullptr;
 }
 
-// spine-c provides spAtlas_create signatures that accept explicit
-// createTexture/disposeTexture callbacks.  We wrap both variants
-// (the older 4.1 style and the newer 4.2 style) via a thin adapter
-// so the code compiles on either runtime version.
 static spAtlas* pvzCreateAtlas(const char* data, int length, const char* dir)
 {
-#if defined(SPINE_VERSION_MAJOR) && SPINE_VERSION_MAJOR >= 4 && SPINE_VERSION_MINOR >= 2
-    // spine-c 4.2+ – explicit createTexture / disposeTexture callbacks
-    return spAtlas_create(data, length, dir,
-                          _pvz_spine_createTexture,
-                          _pvz_spine_disposeTexture);
-#else
-    // spine-c 4.1 / 4.0 style: set the global extension callbacks
-    // before calling spAtlas_create().  The extension struct is a
-    // per-process singleton in <spine/extension.h>.
-    extern "C" {
-        extern void (*_spAtlasPage_createTexture_ext)(spAtlasPage*, const char*);
-        extern void (*_spAtlasPage_disposeTexture_ext)(spAtlasPage*);
+    spAtlas* atlas = spAtlas_create(data, length, dir, nullptr);
+    if (atlas == nullptr) return nullptr;
+
+    for (spAtlasPage* page = atlas->pages; page != nullptr; page = page->next) {
+        std::string texPath;
+        if (dir != nullptr && dir[0] != '\0') {
+            texPath = std::string(dir) + "/" + page->name;
+        } else {
+            texPath = page->name;
+        }
+        _pvz_spine_createTexture(page, texPath.c_str());
     }
-    _spAtlasPage_createTexture_ext = _pvz_spine_createTexture;
-    _spAtlasPage_disposeTexture_ext = _pvz_spine_disposeTexture;
-    return spAtlas_create(data, length, dir);
-#endif
+    return atlas;
 }
 
 static std::string extractDirectory(const std::string& path)
@@ -270,7 +268,7 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
                 mSkeleton->scaleX = mSpineParams->mDefaultScale;
                 mSkeleton->scaleY = mSpineParams->mDefaultScale;
                 spSkeleton_setToSetupPose(mSkeleton);
-                spSkeleton_updateWorldTransform(mSkeleton);
+                spSkeleton_updateWorldTransform(mSkeleton, (spPhysics)0);
             }
         }
     }
@@ -293,7 +291,7 @@ void SpineAnimation::SetAnimation(const char* theAnimName, bool theLoop)
         spAnimationState_setAnimation(mAnimState, 0, first, theLoop ? 1 : 0);
     }
     if (mSkeleton != nullptr)
-        spSkeleton_updateWorldTransform(mSkeleton);
+        spSkeleton_updateWorldTransform(mSkeleton, (spPhysics)0);
 }
 
 void SpineAnimation::AddAnimation(const char* theAnimName, bool theLoop, float theDelay)
@@ -323,7 +321,7 @@ void SpineAnimation::Update()
 
     spAnimationState_update(mAnimState, dt);
     spAnimationState_apply(mAnimState, mSkeleton);
-    spSkeleton_updateWorldTransform(mSkeleton);
+    spSkeleton_updateWorldTransform(mSkeleton, (spPhysics)0);
 
     mAnimTime += dt;
     mAnimFrame++;
@@ -332,7 +330,7 @@ void SpineAnimation::Update()
 void SpineAnimation::UpdateSkeletonWorld()
 {
     if (mSkeleton != nullptr)
-        spSkeleton_updateWorldTransform(mSkeleton);
+        spSkeleton_updateWorldTransform(mSkeleton, (spPhysics)0);
 }
 
 // ============================================================
