@@ -1050,6 +1050,13 @@ void Reanimation::GetAttachmentOverlayMatrix(int theTrackIndex, SexyTransform2D&
 
 void Reanimation::GetFramesForLayer(const char* theTrackName, int& theFrameStart, int& theFrameCount)
 {
+	if (mIsSpine)
+	{
+		theFrameStart = 0;
+		theFrameCount = 0;
+		return;
+	}
+
 	if (mDefinition->mTracks.count == 0)  // 如果动画没有轨道
 	{
 		theFrameStart = 0;
@@ -1075,6 +1082,14 @@ void Reanimation::GetFramesForLayer(const char* theTrackName, int& theFrameStart
 
 void Reanimation::SetFramesForLayer(const char* theTrackName)
 {
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		bool aShouldLoop = (mLoopType == ReanimLoopType::REANIM_LOOP ||
+			mLoopType == ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME);
+		mSpineAnimation->SetAnimation(theTrackName, aShouldLoop);
+		return;
+	}
+
 	if (mAnimRate >= 0)
 		mAnimTime = 0.0f;
 	else
@@ -1085,6 +1100,18 @@ void Reanimation::SetFramesForLayer(const char* theTrackName)
 
 bool Reanimation::TrackExists(const char* theTrackName)
 {
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		int aCount = mSpineAnimation->GetNumAnimations();
+		for (int i = 0; i < aCount; i++)
+		{
+			const char* aName = mSpineAnimation->GetAnimationName(i);
+			if (aName != nullptr && strcasecmp(aName, theTrackName) == 0)
+				return true;
+		}
+		return false;
+	}
+
 	for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
 		if (strcasecmp(mDefinition->mTracks.tracks[aTrackIndex].mName, theTrackName) == 0)
 			return true;
@@ -1093,6 +1120,9 @@ bool Reanimation::TrackExists(const char* theTrackName)
 
 void Reanimation::StartBlend(int theBlendTime)
 {
+	if (mIsSpine)
+		return;
+
 	for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
 	{
 		ReanimatorTransform aTransform;
