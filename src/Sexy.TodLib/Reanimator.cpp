@@ -1497,8 +1497,12 @@ void Reanimation::PropogateColorToAttachments()
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
 		mSpineAnimation->SetColorOverride(mColorOverride);
+		mSpineAnimation->SetEnableExtraAdditiveDraw(mEnableExtraAdditiveDraw);
 		if (mEnableExtraAdditiveDraw)
 			mSpineAnimation->SetAdditiveColor(mExtraAdditiveColor);
+		mSpineAnimation->SetEnableExtraOverlayDraw(mEnableExtraOverlayDraw);
+		if (mEnableExtraOverlayDraw)
+			mSpineAnimation->SetOverlayColor(mExtraOverlayColor);
 		return;
 	}
 	for (int i = 0; i < mDefinition->mTracks.count; i++)

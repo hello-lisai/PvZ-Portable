@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <ctime>
 #include <cstdarg>
+#include <algorithm>
 
 // ============================================================
 //  Minimal debug logging – only errors and warnings.
@@ -508,6 +509,57 @@ static inline uint32_t colorToUInt(float r, float g, float b, float a)
            (uint32_t)(b * 255.0f);
 }
 
+// Apply additive (eaten flash) and overlay (beghouled) visual effects
+// to a per-vertex color.  These are set by PropogateColorToAttachments()
+// which is called every frame from Plant::Animate() / Reanimation::Draw().
+// This is the single point where ALL Spine visual effects are applied —
+// no per-animation or per-plant special-casing needed.
+static inline uint32_t applyVisualEffects(
+    float r, float g, float b, float a,
+    uint32_t baseColor,
+    bool enableAdditive, const Sexy::Color& additiveCol,
+    bool enableOverlay, const Sexy::Color& overlayCol)
+{
+    // Start from base color if overridden, otherwise compute from spine colors
+    uint32_t finalColor;
+    if (baseColor != 0) {
+        finalColor = baseColor;
+    } else {
+        finalColor = colorToUInt(r, g, b, a);
+    }
+
+    // Additive blend: eaten flash (white flash when zombie bites plant)
+    // Adds color on top of existing — simulates DRAWMODE_ADDITIVE.
+    if (enableAdditive) {
+        int addR = (int)(finalColor >> 16 & 0xFF) + additiveCol.mRed;
+        int addG = (int)(finalColor >> 8  & 0xFF) + additiveCol.mGreen;
+        int addB = (int)(finalColor       & 0xFF) + additiveCol.mBlue;
+        finalColor = ((uint32_t)(std::min(addR, 255)) << 16) |
+                     ((uint32_t)(std::min(addG, 255)) << 8)  |
+                     ((uint32_t)(std::min(addB, 255)));
+        // Keep original alpha
+    }
+
+    // Overlay blend: beghouled flash (glowing outline effect)
+    // Blends overlay color into existing using overlay alpha as factor.
+    if (enableOverlay && overlayCol.mAlpha > 0) {
+        float ovAlpha = overlayCol.mAlpha / 255.0f;
+        float invA = 1.0f - ovAlpha;
+        int curR = (int)(finalColor >> 16 & 0xFF);
+        int curG = (int)(finalColor >> 8  & 0xFF);
+        int curB = (int)(finalColor       & 0xFF);
+        int ovR = (int)(curR * invA + overlayCol.mRed   * ovAlpha);
+        int ovG = (int)(curG * invA + overlayCol.mGreen * ovAlpha);
+        int ovB = (int)(curB * invA + overlayCol.mBlue  * ovAlpha);
+        finalColor = (finalColor & 0xFF000000) |  // preserve alpha
+                     ((uint32_t)(std::clamp(ovR, 0, 255)) << 16) |
+                     ((uint32_t)(std::clamp(ovG, 0, 255)) << 8)  |
+                     ((uint32_t)(std::clamp(ovB, 0, 255)));
+    }
+
+    return finalColor;
+}
+
 void SpineAnimation::Draw(Sexy::Graphics* g)
 {
     if (g == nullptr || mSkeleton == nullptr)
@@ -558,7 +610,9 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             float gr = region->color.g * slot->color.g * skelG;
             float b = region->color.b * slot->color.b * skelB;
             float a = region->color.a * slot->color.a * skelA;
-            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gr, b, a);
+            uint32_t vertColor = applyVisualEffects(r, gr, b, a, baseColor,
+                mExtraAdditiveDraw, mExtraAdditiveColor,
+                mExtraOverlayDraw, mExtraOverlayColor);
 
             float worldVerts[8];
             spRegionAttachment_computeWorldVertices(region, slot, worldVerts, 0, 2);
@@ -597,7 +651,9 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             float gr = mesh->color.g * slot->color.g * skelG;
             float b = mesh->color.b * slot->color.b * skelB;
             float a = mesh->color.a * slot->color.a * skelA;
-            uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gr, b, a);
+            uint32_t vertColor = applyVisualEffects(r, gr, b, a, baseColor,
+                mExtraAdditiveDraw, mExtraAdditiveColor,
+                mExtraOverlayDraw, mExtraOverlayColor);
 
             // Reuse pre-allocated buffer (avoid per-frame heap alloc)
             mWorldVertsCache.resize((size_t)worldVertsLen);

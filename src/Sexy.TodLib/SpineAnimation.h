@@ -65,6 +65,8 @@ public:
     float                              mFPS;
     bool                               mExtraAdditiveDraw;
     Sexy::Color                        mExtraAdditiveColor;
+    bool                               mExtraOverlayDraw;
+    Sexy::Color                        mExtraOverlayColor;
 
     // spine-c runtime objects
     spAtlas*                           mAtlas;
@@ -84,6 +86,7 @@ public:
         mColorOverride(Sexy::Color::White), mRenderGroup(0),
         mRenderOrder(0), mFrameTime(0), mFPS(30.0f),
         mExtraAdditiveDraw(false), mExtraAdditiveColor(Sexy::Color::White),
+        mExtraOverlayDraw(false), mExtraOverlayColor(Sexy::Color::White),
         mAtlas(nullptr), mSkeletonData(nullptr), mSkeleton(nullptr),
         mAnimStateData(nullptr), mAnimState(nullptr), mSpineParams(nullptr) {}
 
@@ -103,6 +106,9 @@ public:
     void    SetColor(const Sexy::Color& theColor);
     void    SetColorOverride(const Sexy::Color& theColor) { mColorOverride = theColor; }
     void    SetAdditiveColor(const Sexy::Color& theColor) { mExtraAdditiveColor = theColor; }
+    void    SetEnableExtraAdditiveDraw(bool theEnable) { mExtraAdditiveDraw = theEnable; }
+    void    SetOverlayColor(const Sexy::Color& theColor) { mExtraOverlayColor = theColor; }
+    void    SetEnableExtraOverlayDraw(bool theEnable) { mExtraOverlayDraw = theEnable; }
     void    SetPosition(float theX, float theY);
     void    OverrideScale(float theScaleX, float theScaleY);
     void    UpdateSkeletonWorld();
