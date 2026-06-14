@@ -558,10 +558,10 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
                     // Look up attachment from default skin
                     spAttachment* att = nullptr;
                     if (mSkeletonData->defaultSkin != nullptr) {
-                        att = spSkin_getAttachment(mSkeletonData->defaultSkin, slotData->name, slotData->attachmentName);
+                        att = spSkin_getAttachment(mSkeletonData->defaultSkin, s, slotData->attachmentName);
                     }
                     if (att == nullptr && mSkeletonData->skinsCount > 0 && mSkeletonData->skins[0] != nullptr) {
-                        att = spSkin_getAttachment(mSkeletonData->skins[0], slotData->name, slotData->attachmentName);
+                        att = spSkin_getAttachment(mSkeletonData->skins[0], s, slotData->attachmentName);
                     }
                     if (att == nullptr) continue;
                     if (att->type == SP_ATTACHMENT_REGION)
