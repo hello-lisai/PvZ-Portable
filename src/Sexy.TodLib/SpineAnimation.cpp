@@ -64,12 +64,131 @@ static void spineLog(const char* fmt, ...)
 
 #define SPINE_LOG(...) do { spineLogOpen(); spineLog(__VA_ARGS__); } while(0)
 #define SPINE_LOG_FN() SPINE_LOG("[SPINE] %s", __FUNCTION__)
+#define SPINE_ERR(...) do { spineLogOpen(); spineLog("[ERROR] " __VA_ARGS__); } while(0)
+#define SPINE_WARN(...) do { spineLogOpen(); spineLog("[WARN] " __VA_ARGS__); } while(0)
 
 // ============================================================
 //  Static variables
 // ============================================================
 std::vector<SpineAnimationParams> SpineAnimation::gSpineAnimArray;
 std::map<std::string, SpineSkeletonDataCache::CachedData> SpineSkeletonDataCache::gCache;
+
+// ============================================================
+//  Minimal JSON parser for SpineAnimationConfig.json
+//  No third-party library dependency.
+// ============================================================
+static const char* skipWS(const char* p)
+{
+    while (*p && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r'))
+        p++;
+    return p;
+}
+
+static std::string parseJsonString(const char** pp)
+{
+    const char* p = *pp;
+    p = skipWS(p);
+    if (*p != '"') return "";
+    p++; // skip opening quote
+    std::string result;
+    while (*p && *p != '"') {
+        if (*p == '\\' && *(p + 1)) {
+            p++;
+            switch (*p) {
+                case '"':  result += '"'; break;
+                case '\\': result += '\\'; break;
+                case '/':  result += '/'; break;
+                case 'b':  result += '\b'; break;
+                case 'f':  result += '\f'; break;
+                case 'n':  result += '\n'; break;
+                case 'r':  result += '\r'; break;
+                case 't':  result += '\t'; break;
+                default:   result += *p; break;
+            }
+        } else {
+            result += *p;
+        }
+        p++;
+    }
+    if (*p == '"') p++; // skip closing quote
+    *pp = p;
+    return result;
+}
+
+static float parseJsonNumber(const char** pp)
+{
+    const char* p = *pp;
+    p = skipWS(p);
+    char* end = nullptr;
+    float val = strtof(p, &end);
+    *pp = end ? end : p;
+    return val;
+}
+
+static bool parseJsonObject(const char* data, SpineAnimationParams& out)
+{
+    // Find the first '{'
+    const char* p = strchr(data, '{');
+    if (p == nullptr) return false;
+    p++;
+
+    while (*p && *p != '}') {
+        p = skipWS(p);
+        if (*p != '"') { p++; continue; }
+        std::string key = parseJsonString(&p);
+        p = skipWS(p);
+        if (*p != ':') { p++; continue; }
+        p++; // skip ':'
+        p = skipWS(p);
+
+        if (key == "type") {
+            int typeVal = (int)parseJsonNumber(&p);
+            out.mType = (SpineAnimationType)typeVal;
+        } else if (key == "json") {
+            out.mJSONPath = parseJsonString(&p);
+        } else if (key == "atlas") {
+            out.mAtlasPath = parseJsonString(&p);
+        } else if (key == "scale") {
+            out.mDefaultScale = parseJsonNumber(&p);
+        } else if (key == "offsetX") {
+            out.mRenderOffsetX = parseJsonNumber(&p);
+        } else if (key == "offsetY") {
+            out.mRenderOffsetY = parseJsonNumber(&p);
+        } else if (key == "anchorBone") {
+            out.mAnchorBone = parseJsonString(&p);
+        } else if (key == "bulletTrack") {
+            out.mBulletTrack = parseJsonString(&p);
+        } else if (key == "cardImage") {
+            out.mCardImage = parseJsonString(&p);
+        } else {
+            // Skip unknown value
+            if (*p == '"') parseJsonString(&p);
+            else if (*p == '{' || *p == '[') {
+                int depth = 1;
+                p++;
+                while (*p && depth > 0) {
+                    if (*p == '{' || *p == '[') depth++;
+                    else if (*p == '}' || *p == ']') depth--;
+                    p++;
+                }
+            } else {
+                while (*p && *p != ',' && *p != '}') p++;
+            }
+        }
+
+        p = skipWS(p);
+        if (*p == ',') p++; // skip comma
+    }
+    return true;
+}
+
+static bool loadConfigFromFile(const char* path, SpineAnimationParams& out)
+{
+    std::vector<char> data = readSpineFile(path);
+    if (data.empty()) return false;
+    SPINE_LOG("[loadConfigFromFile] Loaded config from: %s (size=%zu)", path, data.size());
+    return parseJsonObject(data.data(), out);
+}
 
 // ============================================================
 //  Helper: read a Spine file (atlas or JSON) through the project's
@@ -291,10 +410,34 @@ void SpineAnimation::InitializeSpineAnimArray()
 {
     SPINE_LOG("[InitializeSpineAnimArray]");
     if (gSpineAnimArray.empty()) {
-        gSpineAnimArray.push_back(
-            SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
-                "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas", 1.0f));
-        SPINE_LOG("[InitializeSpineAnimArray] Registered SPINE_PEASHOOTER");
+        SpineAnimationParams params;
+
+        // Try loading from external config file first
+        bool loaded = loadConfigFromFile("spinedemo/SpineAnimationConfig.json", params);
+
+        if (loaded && !params.mJSONPath.empty()) {
+            // Apply defaults for any missing fields
+            if (params.mAnchorBone.empty()) params.mAnchorBone = "bone2";
+            if (params.mRenderOffsetY == 0.0f) params.mRenderOffsetY = 50.0f;
+            if (params.mBulletTrack.empty()) params.mBulletTrack = "bone10";
+            if (params.mCardImage.empty()) params.mCardImage = "spinedemo/123.png";
+            if (params.mDefaultScale == 0.0f) params.mDefaultScale = 1.0f;
+
+            gSpineAnimArray.push_back(params);
+            SPINE_LOG("[InitializeSpineAnimArray] Loaded from config file: json=%s atlas=%s scale=%f anchor=%s card=%s",
+                      params.mJSONPath.c_str(), params.mAtlasPath.c_str(),
+                      params.mDefaultScale, params.mAnchorBone.c_str(),
+                      params.mCardImage.c_str());
+        } else {
+            // Fallback to built-in defaults
+            gSpineAnimArray.push_back(
+                SpineAnimationParams(SpineAnimationType::SPINE_PEASHOOTER,
+                    "spinedemo/GatlingPea.json", "spinedemo/GatlingPea.atlas",
+                    1.0f, 0.0f, 50.0f, "bone2", "bone10", "spinedemo/123.png"));
+            SPINE_WARN("[InitializeSpineAnimArray] Config file not found, using built-in defaults");
+        }
+
+        SPINE_LOG("[InitializeSpineAnimArray] Registered %zu animation(s)", gSpineAnimArray.size());
     }
 }
 
@@ -378,6 +521,47 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
                 mSkeleton->scaleY = mSpineParams->mDefaultScale;
                 spSkeleton_setToSetupPose(mSkeleton);
                 spSkeleton_updateWorldTransform(mSkeleton, (spPhysics)0);
+
+                // Copy render offsets from params
+                mRenderOffsetX = mSpineParams->mRenderOffsetX;
+                mRenderOffsetY = mSpineParams->mRenderOffsetY;
+
+                // Cache anchor bone world position
+                mAnchorX = 0.0f;
+                mAnchorY = 0.0f;
+                if (!mSpineParams->mAnchorBone.empty()) {
+                    spBone* anchorBone = spSkeleton_findBone(mSkeleton, mSpineParams->mAnchorBone.c_str());
+                    if (anchorBone != nullptr) {
+                        mAnchorX = anchorBone->worldX;
+                        mAnchorY = anchorBone->worldY;
+                        SPINE_LOG("[SpineAnimationInitialize] Anchor bone '%s' at (%f, %f)",
+                                  mSpineParams->mAnchorBone.c_str(), mAnchorX, mAnchorY);
+                    } else {
+                        SPINE_WARN("[SpineAnimationInitialize] Anchor bone '%s' not found",
+                                   mSpineParams->mAnchorBone.c_str());
+                    }
+                }
+
+                // Pre-allocate vertex buffers for Draw()
+                int maxWorldVerts = 0;
+                for (int s = 0; s < mSkeletonData->slotsCount; s++) {
+                    spSlot* slot = mSkeletonData->slots[s];
+                    if (slot == nullptr || slot->data == nullptr || slot->data->attachmentName == nullptr)
+                        continue;
+                    spAttachment* att = spSkeletonData_findAttachment(mSkeletonData, slot->data->attachmentName);
+                    if (att == nullptr) continue;
+                    if (att->type == SP_ATTACHMENT_REGION)
+                        maxWorldVerts = (maxWorldVerts > 8) ? maxWorldVerts : 8;
+                    else if (att->type == SP_ATTACHMENT_MESH || att->type == SP_ATTACHMENT_LINKED_MESH) {
+                        spMeshAttachment* meshAtt = SUB_CAST(spMeshAttachment, att);
+                        if (meshAtt && meshAtt->super.worldVerticesLength > maxWorldVerts)
+                            maxWorldVerts = meshAtt->super.worldVerticesLength;
+                    }
+                }
+                mWorldVertsCache.resize((size_t)(maxWorldVerts + 1));
+                // Reserve reasonable capacity for triangle batch (will grow if needed)
+                mTriBatchCache.reserve(256);
+
                 SPINE_LOG("[SpineAnimationInitialize] Skeleton initialized at (%f, %f) scale=%f",
                           theX, theY, mSpineParams->mDefaultScale);
             }
@@ -493,6 +677,38 @@ void SpineAnimation::SetScale(float theScale)
     mSkeleton->scaleY = theScale;
 }
 
+void SpineAnimation::OverrideScale(float theScaleX, float theScaleY)
+{
+    if (mSkeleton == nullptr) return;
+    float mult = (mSpineParams != nullptr) ? mSpineParams->mDefaultScale : 1.0f;
+    mSkeleton->scaleX = theScaleX * mult;
+    mSkeleton->scaleY = theScaleY * mult;
+    SPINE_LOG("[OverrideScale] (%f, %f) * %f -> (%f, %f)",
+              theScaleX, theScaleY, mult, mSkeleton->scaleX, mSkeleton->scaleY);
+}
+
+bool SpineAnimation::GetBoneWorldPosition(const char* boneName, float* outX, float* outY)
+{
+    if (mSkeleton == nullptr || boneName == nullptr || outX == nullptr || outY == nullptr) {
+        SPINE_ERR("[GetBoneWorldPosition] Invalid args: skeleton=%p name=%p outX=%p outY=%p",
+                  (void*)mSkeleton, (const void*)boneName, (void*)outX, (void*)outY);
+        return false;
+    }
+
+    spBone* bone = spSkeleton_findBone(mSkeleton, boneName);
+    if (bone == nullptr) {
+        SPINE_WARN("[GetBoneWorldPosition] Bone '%s' not found", boneName);
+        return false;
+    }
+
+    // Return offset relative to anchor in game coordinate system (Y-down) + renderOffset
+    *outX = (bone->worldX - mAnchorX) + mRenderOffsetX;
+    *outY = -(bone->worldY - mAnchorY) + mRenderOffsetY;
+
+    SPINE_LOG("[GetBoneWorldPosition] '%s' -> (%f, %f)", boneName, *outX, *outY);
+    return true;
+}
+
 void SpineAnimation::SetPosition(float theX, float theY)
 {
     SPINE_LOG("[SetPosition] (%f, %f)", theX, theY);
@@ -561,6 +777,36 @@ static uint32_t colorToUInt(float r, float g, float b, float a)
     return ((uint32_t)A << 24) | ((uint32_t)R << 16) | ((uint32_t)G << 8) | (uint32_t)B;
 }
 
+// Helper: apply additive/overlay visual effects after main draw pass
+static void applyVisualEffects(Sexy::Graphics* g,
+                                const SpineAnimation* anim,
+                                Sexy::Image* tex,
+                                const Sexy::TriVertex tri[][3],
+                                int triCount)
+{
+    // Additive draw for gnawing flash effect
+    if (anim->mExtraAdditiveDraw && tex != nullptr && triCount > 0) {
+        Sexy::Color prevColor = g->GetColor();
+        int prevMode = g->GetDrawMode();
+        g->SetColor(anim->mExtraAdditiveColor);
+        g->SetDrawMode(Sexy::Graphics::DRAWMODE_ADDITIVE);
+        g->DrawTrianglesTex(tex, tri, triCount);
+        g->SetDrawMode(prevMode);
+        g->SetColor(prevColor);
+    }
+
+    // Overlay draw for hypnosis glow effect
+    if (anim->mExtraOverlayDraw && tex != nullptr && triCount > 0) {
+        Sexy::Color prevColor = g->GetColor();
+        int prevMode = g->GetDrawMode();
+        g->SetColor(anim->mExtraOverlayColor);
+        g->SetDrawMode(Sexy::Graphics::DRAWMODE_NORMAL);
+        g->DrawTrianglesTex(tex, tri, triCount);
+        g->SetDrawMode(prevMode);
+        g->SetColor(prevColor);
+    }
+}
+
 void SpineAnimation::Draw(Sexy::Graphics* g)
 {
     if (g == nullptr || mSkeleton == nullptr) {
@@ -590,9 +836,10 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
     float skelB = mSkeleton->color.b;
     float skelA = mSkeleton->color.a;
 
-    // Y-down coordinate conversion: flip Y and adjust V
-    const float yFlip = -1.0f;
-    const float yAdd  = 2.0f * mSkeleton->y;
+    // Anchor-based coordinate transformation:
+    // screenX = worldVertX - anchorX + renderOffsetX
+    // screenY = 2*skelY - worldVertY + anchorY + renderOffsetY
+    const float skelY = mSkeleton->y;
 
     int drawnSlots = 0;
     int skippedSlots = 0;
@@ -640,19 +887,33 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
 
             Sexy::TriVertex tri[2][3];
 
-            tri[0][0] = makeVert(worldVerts[0], worldVerts[1] * yFlip + yAdd, region->uvs[0], 1.0f - region->uvs[1], vertColor);
-            tri[0][1] = makeVert(worldVerts[2], worldVerts[3] * yFlip + yAdd, region->uvs[2], 1.0f - region->uvs[3], vertColor);
-            tri[0][2] = makeVert(worldVerts[4], worldVerts[5] * yFlip + yAdd, region->uvs[4], 1.0f - region->uvs[5], vertColor);
+            // Anchor-based transform: screenX = worldVertX - anchorX + renderOffsetX
+            tri[0][0] = makeVert(worldVerts[0] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - worldVerts[1] + mAnchorY + mRenderOffsetY,
+                                  region->uvs[0], 1.0f - region->uvs[1], vertColor);
+            tri[0][1] = makeVert(worldVerts[2] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - worldVerts[3] + mAnchorY + mRenderOffsetY,
+                                  region->uvs[2], 1.0f - region->uvs[3], vertColor);
+            tri[0][2] = makeVert(worldVerts[4] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - worldVerts[5] + mAnchorY + mRenderOffsetY,
+                                  region->uvs[4], 1.0f - region->uvs[5], vertColor);
 
-            tri[1][0] = makeVert(worldVerts[0], worldVerts[1] * yFlip + yAdd, region->uvs[0], 1.0f - region->uvs[1], vertColor);
-            tri[1][1] = makeVert(worldVerts[4], worldVerts[5] * yFlip + yAdd, region->uvs[4], 1.0f - region->uvs[5], vertColor);
-            tri[1][2] = makeVert(worldVerts[6], worldVerts[7] * yFlip + yAdd, region->uvs[6], 1.0f - region->uvs[7], vertColor);
+            tri[1][0] = makeVert(worldVerts[0] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - worldVerts[1] + mAnchorY + mRenderOffsetY,
+                                  region->uvs[0], 1.0f - region->uvs[1], vertColor);
+            tri[1][1] = makeVert(worldVerts[4] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - worldVerts[5] + mAnchorY + mRenderOffsetY,
+                                  region->uvs[4], 1.0f - region->uvs[5], vertColor);
+            tri[1][2] = makeVert(worldVerts[6] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - worldVerts[7] + mAnchorY + mRenderOffsetY,
+                                  region->uvs[6], 1.0f - region->uvs[7], vertColor);
 
             SPINE_LOG("[Draw] slot=%d region: verts=(%.1f,%.1f)-(%.1f,%.1f)-(%.1f,%.1f)-(%.1f,%.1f)",
                       i, worldVerts[0], worldVerts[1], worldVerts[2], worldVerts[3],
                       worldVerts[4], worldVerts[5], worldVerts[6], worldVerts[7]);
 
             g->DrawTrianglesTex(tex, tri, 2);
+            applyVisualEffects(g, this, tex, tri, 2);
             drawnSlots++;
         }
         // --- Mesh attachment ---
@@ -718,15 +979,22 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                 const float u1 = mesh->uvs[i1 * 2], v1 = mesh->uvs[i1 * 2 + 1];
                 const float u2 = mesh->uvs[i2 * 2], v2 = mesh->uvs[i2 * 2 + 1];
 
-                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2], worldVerts[i0 * 2 + 1] * yFlip + yAdd, u0, 1.0f - v0, vertColor);
-                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2], worldVerts[i1 * 2 + 1] * yFlip + yAdd, u1, 1.0f - v1, vertColor);
-                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2], worldVerts[i2 * 2 + 1] * yFlip + yAdd, u2, 1.0f - v2, vertColor);
+                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2] - mAnchorX + mRenderOffsetX,
+                                                  2.0f * skelY - worldVerts[i0 * 2 + 1] + mAnchorY + mRenderOffsetY,
+                                                  u0, 1.0f - v0, vertColor);
+                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2] - mAnchorX + mRenderOffsetX,
+                                                  2.0f * skelY - worldVerts[i1 * 2 + 1] + mAnchorY + mRenderOffsetY,
+                                                  u1, 1.0f - v1, vertColor);
+                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2] - mAnchorX + mRenderOffsetX,
+                                                  2.0f * skelY - worldVerts[i2 * 2 + 1] + mAnchorY + mRenderOffsetY,
+                                                  u2, 1.0f - v2, vertColor);
                 validTris++;
             }
 
             if (validTris > 0) {
                 SPINE_LOG("[Draw] slot=%d mesh: tris=%d/%d", i, validTris, numTris);
                 g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
+                applyVisualEffects(g, this, tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
                 drawnSlots++;
             } else {
                 skippedSlots++;

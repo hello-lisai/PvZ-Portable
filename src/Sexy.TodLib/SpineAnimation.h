@@ -39,11 +39,25 @@ struct SpineAnimationParams
     std::string         mJSONPath;
     std::string         mAtlasPath;
     float               mDefaultScale;
+    float               mRenderOffsetX;      // Visual offset X
+    float               mRenderOffsetY;      // Visual offset Y (positive = down)
+    std::string         mAnchorBone;        // Anchor bone name (e.g. "bone2")
+    std::string         mBulletTrack;       // Bullet launch bone name (e.g. "bone10")
+    std::string         mCardImage;         // Card custom image path (e.g. "spinedemo/123.png")
 
-    SpineAnimationParams() : mType((SpineAnimationType)0), mDefaultScale(1.0f) {}
+    SpineAnimationParams()
+        : mType((SpineAnimationType)0), mDefaultScale(1.0f),
+          mRenderOffsetX(0.0f), mRenderOffsetY(0.0f) {}
+
     SpineAnimationParams(SpineAnimationType t, const std::string& j,
-                         const std::string& a, float s)
-        : mType(t), mJSONPath(j), mAtlasPath(a), mDefaultScale(s) {}
+                         const std::string& a, float s,
+                         float offX = 0.0f, float offY = 0.0f,
+                         const std::string& anchor = "",
+                         const std::string& bullet = "",
+                         const std::string& card = "")
+        : mType(t), mJSONPath(j), mAtlasPath(a), mDefaultScale(s),
+          mRenderOffsetX(offX), mRenderOffsetY(offY),
+          mAnchorBone(anchor), mBulletTrack(bullet), mCardImage(card) {}
 };
 
 class SpineAnimation
@@ -65,6 +79,10 @@ public:
     float                              mFPS;
     bool                               mExtraAdditiveDraw;
     Sexy::Color                        mExtraAdditiveColor;
+    bool                               mExtraOverlayDraw;
+    Sexy::Color                        mExtraOverlayColor;
+    float                              mRenderOffsetX;
+    float                              mRenderOffsetY;
 
     // spine-c runtime objects
     spAtlas*                           mAtlas;
@@ -74,14 +92,25 @@ public:
     spAnimationState*                  mAnimState;
     SpineAnimationParams*              mSpineParams;
 
+    // Anchor bone world position cache
+    float                              mAnchorX;     // Anchor bone world coordinate X
+    float                              mAnchorY;     // Anchor bone world coordinate Y
+
+    // Pre-allocated vertex buffers to avoid per-frame allocation
+    std::vector<float>                 mWorldVertsCache;  // Pre-allocated vertex buffer
+    std::vector<Sexy::TriVertex>      mTriBatchCache;    // Pre-allocated triangle buffer
+
     SpineAnimation()  : mSpineType((SpineAnimationType)0),
         mPosX(0), mPosY(0), mAnimTime(0), mLastAnimTime(0),
         mFrameDelay(0.05f), mAnimFrame(0), mFlip(false), mDead(false),
         mColorOverride(Sexy::Color::White), mRenderGroup(0),
         mRenderOrder(0), mFrameTime(0), mFPS(30.0f),
         mExtraAdditiveDraw(false), mExtraAdditiveColor(Sexy::Color::White),
+        mExtraOverlayDraw(false), mExtraOverlayColor(Sexy::Color::White),
+        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f),
         mAtlas(nullptr), mSkeletonData(nullptr), mSkeleton(nullptr),
-        mAnimStateData(nullptr), mAnimState(nullptr), mSpineParams(nullptr) {}
+        mAnimStateData(nullptr), mAnimState(nullptr), mSpineParams(nullptr),
+        mAnchorX(0.0f), mAnchorY(0.0f) {}
 
     ~SpineAnimation();
 
@@ -100,8 +129,12 @@ public:
     void    SetColorOverride(const Sexy::Color& theColor) { mColorOverride = theColor; }
     void    SetAdditiveColor(const Sexy::Color& theColor) { mExtraAdditiveColor = theColor; }
     void    SetPosition(float theX, float theY);
-    void    OverrideScale(float theScaleX, float theScaleY)
-            { (void)theScaleX; (void)theScaleY; }
+    void    OverrideScale(float theScaleX, float theScaleY);
+    bool    GetBoneWorldPosition(const char* boneName, float* outX, float* outY);
+    void    SetEnableExtraAdditiveDraw(bool theEnable) { mExtraAdditiveDraw = theEnable; }
+    void    SetAdditiveColor(const Sexy::Color& theColor) { mExtraAdditiveColor = theColor; }
+    void    SetEnableExtraOverlayDraw(bool theEnable) { mExtraOverlayDraw = theEnable; }
+    void    SetOverlayColor(const Sexy::Color& theColor) { mExtraOverlayColor = theColor; }
     void    UpdateSkeletonWorld();
     int     GetNumAnimations();
     const char* GetAnimationName(int theIndex);

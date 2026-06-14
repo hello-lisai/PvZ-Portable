@@ -564,6 +564,47 @@ void BlendTransform(ReanimatorTransform* theResult, const ReanimatorTransform& t
 // GOTY @Patoke: 0x476580
 void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* theTransformCurrent)
 {
+	if (mIsSpine && mSpineAnimation != nullptr)
+	{
+		float boneX = 0.0f, boneY = 0.0f;
+		bool found = false;
+
+		// 1st: Try bulletTrack from config (explicit gun muzzle bone)
+		if (mSpineAnimation->mSpineParams != nullptr &&
+		    !mSpineAnimation->mSpineParams->mBulletTrack.empty())
+		{
+			found = mSpineAnimation->GetBoneWorldPosition(
+				mSpineAnimation->mSpineParams->mBulletTrack.c_str(), &boneX, &boneY);
+		}
+
+		// 2nd: Fall back to candidate search
+		if (!found) {
+			const char* candidates[] = {
+				"head", "stem", "body", "gun", "muzzle",
+				"bone10", "bone11", "bone3", "bone6",
+				"root", nullptr
+			};
+			for (int i = 0; candidates[i] != nullptr && !found; i++)
+				found = mSpineAnimation->GetBoneWorldPosition(candidates[i], &boneX, &boneY);
+		}
+		if (!found) {
+			mSpineAnimation->GetBoneWorldPosition("root", &boneX, &boneY);
+		}
+
+		theTransformCurrent->mTransX = boneX;
+		theTransformCurrent->mTransY = boneY;
+		theTransformCurrent->mSkewX = 0.0f;
+		theTransformCurrent->mSkewY = 0.0f;
+		theTransformCurrent->mScaleX = 1.0f;
+		theTransformCurrent->mScaleY = 1.0f;
+		theTransformCurrent->mAlpha = 1.0f;
+		theTransformCurrent->mFrame = 0.0f;
+		theTransformCurrent->mImage = nullptr;
+		theTransformCurrent->mFont = nullptr;
+		theTransformCurrent->mText = "";
+		return;
+	}
+
 	ReanimatorFrameTime aFrameTime;
 	GetFrameTime(&aFrameTime);
 	GetTransformAtTime(theTrackIndex, theTransformCurrent, &aFrameTime);  // 结合两帧之间的自然补间取得基础变换
