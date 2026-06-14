@@ -4187,21 +4187,18 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
                 const SpineAnimationParams& params = SpineAnimation::gSpineAnimArray[(size_t)spineType];
                 if (!params.mCardImage.empty())
                 {
-                    ImageLib::Image* cardImg = ImageLib::GetImage(params.mCardImage.c_str(), false);
-                    if (cardImg != nullptr)
+                    // Load custom card image via ResourceManager (standard project API)
+                    SharedImageRef cardImg = gSexyAppBase->GetSharedImage(params.mCardImage);
+                    if (cardImg.get() != nullptr)
                     {
-                        Sexy::MemoryImage* memImg = new Sexy::MemoryImage();
-                        memImg->mFilePath = params.mCardImage;
-                        memImg->SetBits(cardImg->GetBits(), cardImg->GetWidth(), cardImg->GetHeight(), true);
-                        delete cardImg;
-                        float imgW = (float)memImg->mWidth;
-                        float imgH = (float)memImg->mHeight;
+                        Image* img = cardImg.get();
+                        float imgW = (float)img->mWidth;
+                        float imgH = (float)img->mHeight;
                         // Center the image at the target position
-                        TodDrawImageScaledF(&aSeedG, memImg,
+                        TodDrawImageScaledF(&aSeedG, img,
                             thePosX + aOffsetX - imgW * 0.5f * aSeedG.mScaleX,
                             thePosY + aOffsetY - imgH * 0.5f * aSeedG.mScaleY,
                             aSeedG.mScaleX, aSeedG.mScaleY);
-                        delete memImg;
                         return;  // Done — skip legacy DrawCachedPlant
                     }
                 }
