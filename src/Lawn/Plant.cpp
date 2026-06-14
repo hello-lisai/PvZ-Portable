@@ -4175,7 +4175,40 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
             aSeedG.mScaleY *= 1.4f;
             TodDrawImageScaledF(&aSeedG, IMAGE_REANIM_WALLNUT_BODY, thePosX - 53.0f, thePosY - 56.0f, aSeedG.mScaleX, aSeedG.mScaleY);
         }
-        else if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)
+        // --- Spine custom card image: replaces legacy cached render ---
+        {
+            SpineAnimationType spineType = SpineAnimationType::SPINE_NONE;
+            if (aSeedType == SeedType::SEED_PEASHOOTER)
+                spineType = SpineAnimationType::SPINE_PEASHOOTER;
+
+            if (spineType != SpineAnimationType::SPINE_NONE &&
+                (size_t)spineType < SpineAnimation::gSpineAnimArray.size())
+            {
+                const SpineAnimationParams& params = SpineAnimation::gSpineAnimArray[(size_t)spineType];
+                if (!params.mCardImage.empty())
+                {
+                    ImageLib::Image* cardImg = ImageLib::GetImage(params.mCardImage.c_str(), false);
+                    if (cardImg != nullptr)
+                    {
+                        Sexy::MemoryImage* memImg = new Sexy::MemoryImage();
+                        memImg->mFilePath = params.mCardImage;
+                        memImg->SetBits(cardImg->GetBits(), cardImg->GetWidth(), cardImg->GetHeight(), true);
+                        delete cardImg;
+                        float imgW = (float)memImg->mWidth;
+                        float imgH = (float)memImg->mHeight;
+                        // Center the image at the target position
+                        TodDrawImageScaledF(&aSeedG, memImg,
+                            thePosX + aOffsetX - imgW * 0.5f * aSeedG.mScaleX,
+                            thePosY + aOffsetY - imgH * 0.5f * aSeedG.mScaleY,
+                            aSeedG.mScaleX, aSeedG.mScaleY);
+                        delete memImg;
+                        return;  // Done — skip legacy DrawCachedPlant
+                    }
+                }
+            }
+        }
+
+        if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)
         {
             gLawnApp->mReanimatorCache->DrawCachedPlant(&aSeedG, thePosX + aOffsetX, thePosY + aOffsetY, aSeedType, aDrawVariation);
         }

@@ -39,28 +39,25 @@ struct SpineAnimationParams
     std::string         mJSONPath;
     std::string         mAtlasPath;
     float               mDefaultScale;
-    // Visual offset applied after coordinate transform (fine-tuning).
-    // Positive Y pushes animation DOWN on screen.
-    float               mRenderOffsetX;
-    float               mRenderOffsetY;
-    // Anchor bone name: the bone that sits at SetPosition() location.
-    std::string         mAnchorBone;
-    // Bullet track bone: the bone used as gun muzzle for bullet spawn position.
-    // Used by GetCurrentTransform() → Fire() to determine where bullets emit.
-    // If empty, falls back to the candidate search (head/stem/bone10/etc).
-    std::string         mBulletTrack;
+    float               mRenderOffsetX;      // Visual offset X
+    float               mRenderOffsetY;      // Visual offset Y (positive = down)
+    std::string         mAnchorBone;        // Anchor bone name (e.g. "bone2")
+    std::string         mBulletTrack;       // Bullet launch bone name (e.g. "bone10")
+    std::string         mCardImage;         // Card custom image path (e.g. "spinedemo/123.png")
 
-    SpineAnimationParams() : mType((SpineAnimationType)0), mDefaultScale(1.0f),
-        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f),
-        mAnchorBone("root"), mBulletTrack("") {}
+    SpineAnimationParams()
+        : mType((SpineAnimationType)0), mDefaultScale(1.0f),
+          mRenderOffsetX(0.0f), mRenderOffsetY(0.0f) {}
+
     SpineAnimationParams(SpineAnimationType t, const std::string& j,
                          const std::string& a, float s,
                          float offX = 0.0f, float offY = 0.0f,
-                         const std::string& anchor = "root",
-                         const std::string& bulletTrack = "")
+                         const std::string& anchor = "",
+                         const std::string& bullet = "",
+                         const std::string& card = "")
         : mType(t), mJSONPath(j), mAtlasPath(a), mDefaultScale(s),
           mRenderOffsetX(offX), mRenderOffsetY(offY),
-          mAnchorBone(anchor), mBulletTrack(bulletTrack) {}
+          mAnchorBone(anchor), mBulletTrack(bullet), mCardImage(card) {}
 };
 
 class SpineAnimation
@@ -95,15 +92,13 @@ public:
     spAnimationState*                  mAnimState;
     SpineAnimationParams*              mSpineParams;
 
-    // Anchor bone offset (cached after skeleton init).
-    // World position of the anchor bone in Spine Y-up space.
-    // All coordinate transforms use this as the effective origin.
-    float                              mAnchorX;
-    float                              mAnchorY;
+    // Anchor bone world position cache
+    float                              mAnchorX;     // Anchor bone world coordinate X
+    float                              mAnchorY;     // Anchor bone world coordinate Y
 
-    // Pre-allocated draw buffers (avoid per-frame heap alloc)
-    std::vector<float>                 mWorldVertsCache;
-    std::vector<Sexy::TriVertex>      mTriBatchCache;
+    // Pre-allocated vertex buffers to avoid per-frame allocation
+    std::vector<float>                 mWorldVertsCache;  // Pre-allocated vertex buffer
+    std::vector<Sexy::TriVertex>      mTriBatchCache;    // Pre-allocated triangle buffer
 
     SpineAnimation()  : mSpineType((SpineAnimationType)0),
         mPosX(0), mPosY(0), mAnimTime(0), mLastAnimTime(0),
@@ -112,10 +107,10 @@ public:
         mRenderOrder(0), mFrameTime(0), mFPS(30.0f),
         mExtraAdditiveDraw(false), mExtraAdditiveColor(Sexy::Color::White),
         mExtraOverlayDraw(false), mExtraOverlayColor(Sexy::Color::White),
-        mRenderOffsetX(0), mRenderOffsetY(0),
+        mRenderOffsetX(0.0f), mRenderOffsetY(0.0f),
         mAtlas(nullptr), mSkeletonData(nullptr), mSkeleton(nullptr),
         mAnimStateData(nullptr), mAnimState(nullptr), mSpineParams(nullptr),
-        mAnchorX(0), mAnchorY(0) {}
+        mAnchorX(0.0f), mAnchorY(0.0f) {}
 
     ~SpineAnimation();
 
@@ -133,20 +128,18 @@ public:
     void    SetColor(const Sexy::Color& theColor);
     void    SetColorOverride(const Sexy::Color& theColor) { mColorOverride = theColor; }
     void    SetAdditiveColor(const Sexy::Color& theColor) { mExtraAdditiveColor = theColor; }
-    void    SetEnableExtraAdditiveDraw(bool theEnable) { mExtraAdditiveDraw = theEnable; }
-    void    SetOverlayColor(const Sexy::Color& theColor) { mExtraOverlayColor = theColor; }
-    void    SetEnableExtraOverlayDraw(bool theEnable) { mExtraOverlayDraw = theEnable; }
     void    SetPosition(float theX, float theY);
     void    OverrideScale(float theScaleX, float theScaleY);
+    bool    GetBoneWorldPosition(const char* boneName, float* outX, float* outY);
+    void    SetEnableExtraAdditiveDraw(bool theEnable) { mExtraAdditiveDraw = theEnable; }
+    void    SetAdditiveColor(const Sexy::Color& theColor) { mExtraAdditiveColor = theColor; }
+    void    SetEnableExtraOverlayDraw(bool theEnable) { mExtraOverlayDraw = theEnable; }
+    void    SetOverlayColor(const Sexy::Color& theColor) { mExtraOverlayColor = theColor; }
     void    UpdateSkeletonWorld();
     int     GetNumAnimations();
     const char* GetAnimationName(int theIndex);
     const char* GetCurrentAnimationName();
     bool    IsAnimComplete();
-
-    // Query world position of a named bone after skeleton update.
-    // Returns true if bone found, false otherwise.
-    bool    GetBoneWorldPosition(const char* boneName, float* outX, float* outY);
 
     static void InitializeSpineAnimArray();
     static std::vector<SpineAnimationParams>  gSpineAnimArray;

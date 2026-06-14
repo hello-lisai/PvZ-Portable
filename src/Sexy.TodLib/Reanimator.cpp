@@ -37,15 +37,6 @@ ReanimatorDefinition* gReanimatorDefArray;
 unsigned int gReanimationParamArraySize;
 ReanimationParams* gReanimationParamArray;
 
-// ============================================================
-//  Sentinel: empty ReanimatorDefinition for Spine reanimations.
-//  Spine reanimations don't use legacy track data, but many
-//  Reanimation methods access mDefinition unconditionally.
-//  Pointing mDefinition here (count=0) makes all count-gated
-//  loops and checks safe without per-function guards.
-// ============================================================
-static ReanimatorDefinition sSpineEmptyDef;  // {mTracks={nullptr,0}, mFPS=12, mAtlas=nullptr}
-
 ReanimationParams gLawnReanimationArray[ReanimationType::NUM_REANIMS] = {
 	{ ReanimationType::REANIM_LOADBAR_SPROUT,                       "reanim/LoadBar_sprout.reanim",                    1 },
 	{ ReanimationType::REANIM_LOADBAR_ZOMBIEHEAD,                   "reanim/LoadBar_Zombiehead.reanim",                1 },
@@ -429,11 +420,8 @@ void Reanimation::Update()
 
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		// Use the standard frame time (SECONDS_PER_UPDATE = 0.01s).
-		// Do NOT multiply by mAnimRate here — spAnimationState_update()
-		// takes real seconds, not normalized 0-1 time like the legacy system.
-		// Speed control is handled via Spine's own timeScale instead.
-		mSpineAnimation->mFrameDelay = (float)SECONDS_PER_UPDATE;
+		// Scale Spine's frame delay by the reanim rate
+		mSpineAnimation->mFrameDelay = 0.01f * mAnimRate;
 		mSpineAnimation->Update();
 		mAnimTime = mSpineAnimation->mAnimTime;
 		mLastFrameTime = mAnimTime;
@@ -578,9 +566,6 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 {
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		// For Spine reanimations, query actual skeleton bone positions.
-		// This makes GetPeaHeadOffset() / Fire() work correctly —
-		// bullets spawn from the configured bullet track bone.
 		float boneX = 0.0f, boneY = 0.0f;
 		bool found = false;
 
@@ -592,13 +577,12 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 				mSpineAnimation->mSpineParams->mBulletTrack.c_str(), &boneX, &boneY);
 		}
 
-		// 2nd: Fall back to candidate search (common naming patterns)
+		// 2nd: Fall back to candidate search
 		if (!found) {
 			const char* candidates[] = {
 				"head", "stem", "body", "gun", "muzzle",
 				"bone10", "bone11", "bone3", "bone6",
-				"root",
-				nullptr
+				"root", nullptr
 			};
 			for (int i = 0; candidates[i] != nullptr && !found; i++)
 				found = mSpineAnimation->GetBoneWorldPosition(candidates[i], &boneX, &boneY);
@@ -635,12 +619,6 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 
 void Reanimation::GetTransformAtTime(int theTrackIndex, ReanimatorTransform* theTransform, ReanimatorFrameTime* theFrameTime)
 {
-	if (mIsSpine)
-	{
-		memset(theTransform, 0, sizeof(ReanimatorTransform));
-		return;
-	}
-
 	TOD_ASSERT(theTrackIndex >= 0 && theTrackIndex < mDefinition->mTracks.count);
 	ReanimatorTrack* aTrack = &mDefinition->mTracks.tracks[theTrackIndex];
 	TOD_ASSERT(aTrack->mTransforms.count == mDefinition->mTracks.tracks[0].mTransforms.count);
@@ -901,8 +879,6 @@ bool Reanimation::DrawTrack(Graphics* g, int theTrackIndex, int theRenderGroup, 
 
 Image* Reanimation::GetCurrentTrackImage(const char* theTrackName)
 {
-	if (mIsSpine)
-		return nullptr;
 	int aTrackIndex = FindTrackIndex(theTrackName);
 	ReanimatorTrackInstance* aTrackInstance = &mTrackInstances[aTrackIndex];
 	if (aTrackInstance->mImageOverride != nullptr)
@@ -922,12 +898,6 @@ Image* Reanimation::GetCurrentTrackImage(const char* theTrackName)
 
 void Reanimation::GetTrackMatrix(int theTrackIndex, SexyTransform2D& theMatrix)
 {
-	if (mIsSpine)
-	{
-		theMatrix.LoadIdentity();
-		return;
-	}
-
 	ReanimatorTrackInstance* aTrackInstance = &mTrackInstances[theTrackIndex];
 	ReanimatorTransform aTransform;
 	GetCurrentTransform(theTrackIndex, &aTransform);
@@ -985,14 +955,6 @@ void Reanimation::GetTrackMatrix(int theTrackIndex, SexyTransform2D& theMatrix)
 
 void Reanimation::GetFrameTime(ReanimatorFrameTime* theFrameTime)
 {
-	if (mIsSpine)
-	{
-		theFrameTime->mFraction = 0.0f;
-		theFrameTime->mAnimFrameBeforeInt = 0;
-		theFrameTime->mAnimFrameAfterInt = 0;
-		return;
-	}
-
 	TOD_ASSERT(mFrameStart + mFrameCount <= mDefinition->mTracks.tracks[0].mTransforms.count);
 	int aFrameCount;
 	if (mLoopType == ReanimLoopType::REANIM_PLAY_ONCE_FULL_LAST_FRAME || mLoopType == ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME ||
@@ -1055,8 +1017,6 @@ void Reanimation::Draw(Graphics* g)
 // GOTY @Patoke: 0x477640
 int Reanimation::FindTrackIndex(const char* theTrackName)
 {
-	if (mIsSpine)
-		return -1;
 	for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
 		if (strcasecmp(mDefinition->mTracks.tracks[aTrackIndex].mName, theTrackName) == 0)
 			return aTrackIndex;
@@ -1073,7 +1033,7 @@ ReanimatorTrackInstance* Reanimation::GetTrackInstanceByName(const char* theTrac
 
 void Reanimation::AttachToAnotherReanimation(Reanimation* theAttachReanim, const char* theTrackName)
 {
-	if (theAttachReanim->mIsSpine || theAttachReanim->mDefinition->mTracks.count <= 0)
+	if (theAttachReanim->mDefinition->mTracks.count <= 0)
 		return;
 
 	if (theAttachReanim->mFrameBasePose == -1)
@@ -1090,12 +1050,6 @@ void Reanimation::SetBasePoseFromAnim(const char* theTrackName)
 
 void Reanimation::GetTrackBasePoseMatrix(int theTrackIndex, SexyTransform2D& theBasePosMatrix)
 {
-	if (mIsSpine)
-	{
-		theBasePosMatrix.LoadIdentity();
-		return;
-	}
-
 	if (mFrameBasePose == NO_BASE_POSE)
 	{
 		theBasePosMatrix.LoadIdentity();
@@ -1111,9 +1065,6 @@ void Reanimation::GetTrackBasePoseMatrix(int theTrackIndex, SexyTransform2D& the
 
 AttachEffect* Reanimation::AttachParticleToTrack(const char* theTrackName, TodParticleSystem* theParticleSystem, float thePosX, float thePosY)
 {
-	if (mIsSpine)
-		return nullptr;
-
 	int aTrackIndex = FindTrackIndex(theTrackName);
 	ReanimatorTrackInstance* aTrackInstance = &mTrackInstances[aTrackIndex];
 	SexyTransform2D aBasePoseMatrix;
@@ -1125,12 +1076,6 @@ AttachEffect* Reanimation::AttachParticleToTrack(const char* theTrackName, TodPa
 // GOTY @Patoke: 0x477810
 void Reanimation::GetAttachmentOverlayMatrix(int theTrackIndex, SexyTransform2D& theOverlayMatrix)
 {
-	if (mIsSpine)
-	{
-		theOverlayMatrix.LoadIdentity();
-		return;
-	}
-
 	ReanimatorTransform aTransform;
 	GetCurrentTransform(theTrackIndex, &aTransform);  // 取得含混合、不含覆写的自然变换
 	SexyTransform2D aTransformMatrix;
@@ -1257,9 +1202,7 @@ void Reanimation::ReanimationDie()
 }
 
 void Reanimation::SetShakeOverride(const char* theTrackName, float theShakeAmount)
-{
-	if (mIsSpine)
-		return;
+{ 
 	GetTrackInstanceByName(theTrackName)->mShakeOverride = theShakeAmount;
 }
 
@@ -1285,24 +1228,17 @@ void Reanimation::OverrideScale(float theScaleX, float theScaleY)
 
 Image* Reanimation::GetImageOverride(const char* theTrackName)
 {
-	if (mIsSpine)
-		return nullptr;
 	return GetTrackInstanceByName(theTrackName)->mImageOverride;
 }
 
 // GOTY @Patoke: 0x477BB0
 void Reanimation::SetImageOverride(const char* theTrackName, Image* theImage)
 {
-	if (mIsSpine)
-		return;
 	GetTrackInstanceByName(theTrackName)->mImageOverride = theImage;
 }
 
 void Reanimation::SetTruncateDisappearingFrames(const char* theTrackName, bool theTruncateDisappearingFrames)
 {
-	if (mIsSpine)
-		return;
-
 	if (theTrackName == nullptr)  // 若给出的轨道名称为空指针
 	{
 		for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)  // 依次设置每一轨道
@@ -1343,49 +1279,14 @@ Reanimation* ReanimationHolder::AllocSpineAsReanimation(float theX, float theY, 
 	Reanimation* aReanim = mReanimations.DataArrayAlloc();
 	aReanim->mRenderOrder = theRenderOrder;
 	aReanim->mReanimationHolder = this;
-
-	// --- Core identity ---
 	aReanim->mIsSpine = true;
 	aReanim->mSpineType = theSpineType;
 	aReanim->mReanimationType = ReanimationType::REANIM_NONE;
 	aReanim->mDead = false;
-
-	// --- Point mDefinition to empty sentinel so all legacy code
-	//     that accesses mDefinition->mTracks sees count=0 and
-	//     safely skips / returns early.  This is the root fix:
-	//     instead of guarding every method individually, we make
-	//     the data structure itself valid.
-	aReanim->mDefinition = &sSpineEmptyDef;
-	aReanim->mTrackInstances = nullptr;  // 0 tracks → no instances
-
-	// --- Animation state (safe defaults matching ReanimationInitialize) ---
-	aReanim->mAnimTime = 0.0f;
-	aReanim->mAnimRate = sSpineEmptyDef.mFPS;  // 12.0f
-	aReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
-	aReanim->mFrameStart = 0;
-	aReanim->mFrameCount = 0;
-	aReanim->mFrameBasePose = NO_BASE_POSE;
-	aReanim->mLoopCount = 0;
-	aReanim->mLastFrameTime = -1.0f;
-
-	// --- Transform (identity) ---
-	aReanim->mOverlayMatrix.LoadIdentity();
-
-	// --- Color / effects (neutral defaults) ---
-	aReanim->mColorOverride = Sexy::Color(255, 255, 255, 255);
-	aReanim->mExtraAdditiveColor = Sexy::Color(255, 255, 255, 255);
-	aReanim->mEnableExtraAdditiveDraw = false;
-	aReanim->mExtraOverlayColor = Sexy::Color(255, 255, 255, 255);
-	aReanim->mEnableExtraOverlayDraw = false;
-	aReanim->mIsAttachment = false;
-	aReanim->mFilterEffect = FilterEffect::FILTER_EFFECT_NONE;
-
-	// --- Create Spine animation object ---
 	aReanim->mSpineAnimation = new SpineAnimation();
 	aReanim->mSpineAnimation->SpineAnimationInitialize(theX, theY, theSpineType);
 	aReanim->mSpineAnimation->mRenderOrder = theRenderOrder;
 	aReanim->SetPosition(theX, theY);
-
 	return aReanim;
 }
 
@@ -1458,9 +1359,6 @@ void ReanimatorFreeDefinitions()
 
 float Reanimation::GetTrackVelocity(const char* theTrackName)
 {
-	if (mIsSpine)
-		return 0.0f;
-
 	ReanimatorFrameTime aFrameTime;
 	GetFrameTime(&aFrameTime);
 	int aTrackIndex = FindTrackIndex(theTrackName);
@@ -1473,8 +1371,6 @@ float Reanimation::GetTrackVelocity(const char* theTrackName)
 
 bool Reanimation::IsTrackShowing(const char* theTrackName)
 {
-	if (mIsSpine)
-		return false;
 	ReanimatorFrameTime aFrameTime;
 	GetFrameTime(&aFrameTime);
 	int aTrackIndex = FindTrackIndex(theTrackName);
@@ -1485,8 +1381,6 @@ bool Reanimation::IsTrackShowing(const char* theTrackName)
 
 void Reanimation::ShowOnlyTrack(const char* theTrackName)
 {
-	if (mIsSpine)
-		return;
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
 	{
 		// 轨道名与指定名称相同时，设置轨道渲染分组为正常显示，否则设置轨道渲染分组为隐藏
@@ -1497,8 +1391,6 @@ void Reanimation::ShowOnlyTrack(const char* theTrackName)
 // GOTY @Patoke: 0x478120
 void Reanimation::AssignRenderGroupToTrack(const char* theTrackName, int theRenderGroup)
 {
-	if (mIsSpine)
-		return;
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
 		if (strcasecmp(mDefinition->mTracks.tracks[i].mName, theTrackName) == 0)
 		{
@@ -1510,8 +1402,6 @@ void Reanimation::AssignRenderGroupToTrack(const char* theTrackName, int theRend
 // GOTY @Patoke: 0x478170
 void Reanimation::AssignRenderGroupToPrefix(const char* theTrackName, int theRenderGroup)
 {
-	if (mIsSpine)
-		return;
 	size_t aPrifixLength = strlen(theTrackName);
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
 	{
@@ -1526,12 +1416,8 @@ void Reanimation::PropogateColorToAttachments()
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
 		mSpineAnimation->SetColorOverride(mColorOverride);
-		mSpineAnimation->SetEnableExtraAdditiveDraw(mEnableExtraAdditiveDraw);
 		if (mEnableExtraAdditiveDraw)
 			mSpineAnimation->SetAdditiveColor(mExtraAdditiveColor);
-		mSpineAnimation->SetEnableExtraOverlayDraw(mEnableExtraOverlayDraw);
-		if (mEnableExtraOverlayDraw)
-			mSpineAnimation->SetOverlayColor(mExtraOverlayColor);
 		return;
 	}
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
@@ -1752,8 +1638,6 @@ bool Reanimation::IsAnimPlaying(const char* theTrackName)
 
 Reanimation* Reanimation::FindSubReanim(ReanimationType theReanimType)
 {
-	if (mIsSpine)
-		return nullptr;
 	if (mReanimationType == theReanimType)
 		return this;
 
