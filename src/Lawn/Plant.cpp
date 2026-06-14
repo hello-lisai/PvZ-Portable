@@ -39,6 +39,7 @@
 #include "../Sexy.TodLib/Attachment.h"
 #include "../Sexy.TodLib/Reanimator.h"
 #include "../Sexy.TodLib/SpineAnimation.h"
+#include "../Sexy.TodLib/SpineCardRenderer.h"
 #include "../Sexy.TodLib/TodParticle.h"
 #include "../Sexy.TodLib/EffectSystem.h"
 #include "../Sexy.TodLib/TodStringFile.h"
@@ -4175,34 +4176,12 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
             aSeedG.mScaleY *= 1.4f;
             TodDrawImageScaledF(&aSeedG, IMAGE_REANIM_WALLNUT_BODY, thePosX - 53.0f, thePosY - 56.0f, aSeedG.mScaleX, aSeedG.mScaleY);
         }
-        // --- Spine custom card image: replaces legacy cached render ---
+        // --- Spine custom card image: independent renderer ---
+        if (SpineCardRenderer_DrawSeedCard(&aSeedG, (int)aSeedType,
+            thePosX, thePosY, aOffsetX, aOffsetY,
+            aSeedG.mScaleX, aSeedG.mScaleY))
         {
-            SpineAnimationType spineType = SpineAnimationType::SPINE_NONE;
-            if (aSeedType == SeedType::SEED_PEASHOOTER)
-                spineType = SpineAnimationType::SPINE_PEASHOOTER;
-
-            if (spineType != SpineAnimationType::SPINE_NONE &&
-                (size_t)spineType < SpineAnimation::gSpineAnimArray.size())
-            {
-                const SpineAnimationParams& params = SpineAnimation::gSpineAnimArray[(size_t)spineType];
-                if (!params.mCardImage.empty())
-                {
-                    // Load custom card image via ResourceManager (standard project API)
-                    SharedImageRef cardImg = gSexyAppBase->GetSharedImage(params.mCardImage);
-                    if ((Image*)cardImg != nullptr)
-                    {
-                        Image* img = cardImg;  // implicit conversion via operator Image*()
-                        float imgW = (float)img->mWidth;
-                        float imgH = (float)img->mHeight;
-                        // Center the image at the target position
-                        TodDrawImageScaledF(&aSeedG, img,
-                            thePosX + aOffsetX - imgW * 0.5f * aSeedG.mScaleX,
-                            thePosY + aOffsetY - imgH * 0.5f * aSeedG.mScaleY,
-                            aSeedG.mScaleX, aSeedG.mScaleY);
-                        return;  // Done — skip legacy DrawCachedPlant
-                    }
-                }
-            }
+            return;  // Done — skip legacy DrawCachedPlant
         }
 
         if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)

@@ -23,6 +23,7 @@
 #include "TodCommon.h"
 #include "Definition.h"
 #include "Reanimator.h"
+#include "SpineIntegration.h"
 #include "../LawnApp.h"
 #include "Attachment.h"
 #include "ReanimAtlas.h"
@@ -420,15 +421,7 @@ void Reanimation::Update()
 
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		// Scale Spine's frame delay by the reanim rate
-		mSpineAnimation->mFrameDelay = 0.01f * mAnimRate;
-		mSpineAnimation->Update();
-		mAnimTime = mSpineAnimation->mAnimTime;
-		mLastFrameTime = mAnimTime;
-		if (mSpineAnimation->mDead)
-		{
-			mDead = true;
-		}
+		SpineIntegrate_Update(this);
 		return;
 	}
 
@@ -566,42 +559,7 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 {
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		float boneX = 0.0f, boneY = 0.0f;
-		bool found = false;
-
-		// 1st: Try bulletTrack from config (explicit gun muzzle bone)
-		if (mSpineAnimation->mSpineParams != nullptr &&
-		    !mSpineAnimation->mSpineParams->mBulletTrack.empty())
-		{
-			found = mSpineAnimation->GetBoneWorldPosition(
-				mSpineAnimation->mSpineParams->mBulletTrack.c_str(), &boneX, &boneY);
-		}
-
-		// 2nd: Fall back to candidate search
-		if (!found) {
-			const char* candidates[] = {
-				"head", "stem", "body", "gun", "muzzle",
-				"bone10", "bone11", "bone3", "bone6",
-				"root", nullptr
-			};
-			for (int i = 0; candidates[i] != nullptr && !found; i++)
-				found = mSpineAnimation->GetBoneWorldPosition(candidates[i], &boneX, &boneY);
-		}
-		if (!found) {
-			mSpineAnimation->GetBoneWorldPosition("root", &boneX, &boneY);
-		}
-
-		theTransformCurrent->mTransX = boneX;
-		theTransformCurrent->mTransY = boneY;
-		theTransformCurrent->mSkewX = 0.0f;
-		theTransformCurrent->mSkewY = 0.0f;
-		theTransformCurrent->mScaleX = 1.0f;
-		theTransformCurrent->mScaleY = 1.0f;
-		theTransformCurrent->mAlpha = 1.0f;
-		theTransformCurrent->mFrame = 0.0f;
-		theTransformCurrent->mImage = nullptr;
-		theTransformCurrent->mFont = nullptr;
-		theTransformCurrent->mText = "";
+		SpineIntegrate_GetCurrentTransform(this, theTransformCurrent);
 		return;
 	}
 
@@ -983,7 +941,7 @@ void Reanimation::DrawRenderGroup(Graphics* g, int theRenderGroup)
 
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		mSpineAnimation->DrawRenderGroup(g, theRenderGroup);
+		SpineIntegrate_DrawRenderGroup(g, this, theRenderGroup);
 		return;
 	}
 
@@ -1008,7 +966,7 @@ void Reanimation::Draw(Graphics* g)
 { 
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		mSpineAnimation->Draw(g);
+		SpineIntegrate_Draw(g, this);
 		return;
 	}
 	DrawRenderGroup(g, RENDER_GROUP_NORMAL);
@@ -1093,8 +1051,7 @@ void Reanimation::GetFramesForLayer(const char* theTrackName, int& theFrameStart
 {
 	if (mIsSpine)
 	{
-		theFrameStart = 0;
-		theFrameCount = 0;
+		SpineIntegrate_GetFramesForLayer(this, theFrameStart, theFrameCount);
 		return;
 	}
 
@@ -1125,9 +1082,7 @@ void Reanimation::SetFramesForLayer(const char* theTrackName)
 {
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		bool aShouldLoop = (mLoopType == ReanimLoopType::REANIM_LOOP ||
-			mLoopType == ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME);
-		mSpineAnimation->SetAnimation(theTrackName, aShouldLoop);
+		SpineIntegrate_SetFramesForLayer(this, theTrackName);
 		return;
 	}
 
@@ -1143,14 +1098,7 @@ bool Reanimation::TrackExists(const char* theTrackName)
 {
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		int aCount = mSpineAnimation->GetNumAnimations();
-		for (int i = 0; i < aCount; i++)
-		{
-			const char* aName = mSpineAnimation->GetAnimationName(i);
-			if (aName != nullptr && strcasecmp(aName, theTrackName) == 0)
-				return true;
-		}
-		return false;
+		return SpineIntegrate_TrackExists(this, theTrackName);
 	}
 
 	for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
@@ -1162,7 +1110,7 @@ bool Reanimation::TrackExists(const char* theTrackName)
 void Reanimation::StartBlend(int theBlendTime)
 {
 	if (mIsSpine)
-		return;
+		return;  // Spine animations handle blending internally via AnimationState.
 
 	for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
 	{
@@ -1188,9 +1136,7 @@ void Reanimation::ReanimationDie()
 		mDead = true;
 		if (mIsSpine && mSpineAnimation != nullptr)
 		{
-			mSpineAnimation->SpineAnimationDie();
-			delete mSpineAnimation;
-			mSpineAnimation = nullptr;
+			SpineIntegrate_Die(this);
 			return;
 		}
 		for (int aTrackIndex = 0; aTrackIndex < mDefinition->mTracks.count; aTrackIndex++)
@@ -1206,24 +1152,18 @@ void Reanimation::SetShakeOverride(const char* theTrackName, float theShakeAmoun
 	GetTrackInstanceByName(theTrackName)->mShakeOverride = theShakeAmount;
 }
 
-void Reanimation::SetPosition(float theX, float theY) 
-{ 
+void Reanimation::SetPosition(float theX, float theY)
+{
 	mOverlayMatrix.m02 = theX;
 	mOverlayMatrix.m12 = theY;
-	if (mIsSpine && mSpineAnimation != nullptr)
-	{
-		mSpineAnimation->SetPosition(theX, theY);
-	}
+	SpineIntegrate_SetPosition(this, theX, theY);
 }
 
 void Reanimation::OverrideScale(float theScaleX, float theScaleY)
 {
 	mOverlayMatrix.m00 = theScaleX;
 	mOverlayMatrix.m11 = theScaleY;
-	if (mIsSpine && mSpineAnimation != nullptr)
-	{
-		mSpineAnimation->OverrideScale(theScaleX, theScaleY);
-	}
+	SpineIntegrate_OverrideScale(this, theScaleX, theScaleY);
 }
 
 Image* Reanimation::GetImageOverride(const char* theTrackName)
@@ -1415,9 +1355,7 @@ void Reanimation::PropogateColorToAttachments()
 {
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		mSpineAnimation->SetColorOverride(mColorOverride);
-		if (mEnableExtraAdditiveDraw)
-			mSpineAnimation->SetAdditiveColor(mExtraAdditiveColor);
+		SpineIntegrate_PropogateColor(this);
 		return;
 	}
 	for (int i = 0; i < mDefinition->mTracks.count; i++)
@@ -1442,11 +1380,7 @@ void Reanimation::PlayReanim(const char* theTrackName, ReanimLoopType theLoopTyp
 {
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		bool aShouldLoop = (theLoopType == ReanimLoopType::REANIM_LOOP || 
-			theLoopType == ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME);
-		if (theAnimRate != 0.0f)
-			mSpineAnimation->SetTimeScale(theAnimRate / 12.0f);
-		mSpineAnimation->SetAnimation(theTrackName, aShouldLoop);
+		SpineIntegrate_PlayReanim(this, theTrackName, theLoopType, theAnimRate);
 		return;
 	}
 
@@ -1629,7 +1563,7 @@ bool Reanimation::IsAnimPlaying(const char* theTrackName)
 {
 	if (mIsSpine && mSpineAnimation != nullptr)
 	{
-		return strcasecmp(mSpineAnimation->GetCurrentAnimationName(), theTrackName) == 0;
+		return SpineIntegrate_IsAnimPlaying(this, theTrackName);
 	}
 	int aFrameStart, aFrameCount;
 	GetFramesForLayer(theTrackName, aFrameStart, aFrameCount);
