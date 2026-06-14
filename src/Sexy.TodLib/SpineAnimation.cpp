@@ -182,13 +182,8 @@ static bool parseJsonObject(const char* data, SpineAnimationParams& out)
     return true;
 }
 
-static bool loadConfigFromFile(const char* path, SpineAnimationParams& out)
-{
-    std::vector<char> data = readSpineFile(path);
-    if (data.empty()) return false;
-    SPINE_LOG("[loadConfigFromFile] Loaded config from: %s (size=%zu)", path, data.size());
-    return parseJsonObject(data.data(), out);
-}
+// Forward declaration for config loader (defined after readSpineFile)
+static bool loadConfigFromFile(const char* path, SpineAnimationParams& out);
 
 // ============================================================
 //  Helper: read a Spine file (atlas or JSON) through the project's
@@ -303,6 +298,17 @@ char* _spUtil_readFile(const char* path, int* length)
 }
 
 } // extern "C"
+
+// ============================================================
+//  Config file loader — defined here so readSpineFile() is visible
+// ============================================================
+static bool loadConfigFromFile(const char* path, SpineAnimationParams& out)
+{
+    std::vector<char> data = readSpineFile(path);
+    if (data.empty()) return false;
+    SPINE_LOG("[loadConfigFromFile] Loaded config from: %s (size=%zu)", path, data.size());
+    return parseJsonObject(data.data(), out);
+}
 
 static spAtlas* pvzCreateAtlas(const char* data, int length, const char* dir)
 {
@@ -543,12 +549,20 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
                 }
 
                 // Pre-allocate vertex buffers for Draw()
+                // Iterate slot data (not runtime slots) to find max vertices
                 int maxWorldVerts = 0;
                 for (int s = 0; s < mSkeletonData->slotsCount; s++) {
-                    spSlot* slot = mSkeletonData->slots[s];
-                    if (slot == nullptr || slot->data == nullptr || slot->data->attachmentName == nullptr)
+                    spSlotData* slotData = mSkeletonData->slots[s];
+                    if (slotData == nullptr || slotData->attachmentName == nullptr)
                         continue;
-                    spAttachment* att = spSkeletonData_findAttachment(mSkeletonData, slot->data->attachmentName);
+                    // Look up attachment from default skin
+                    spAttachment* att = nullptr;
+                    if (mSkeletonData->defaultSkin != nullptr) {
+                        att = spSkin_getAttachment(mSkeletonData->defaultSkin, slotData->name, slotData->attachmentName);
+                    }
+                    if (att == nullptr && mSkeletonData->skinsCount > 0 && mSkeletonData->skins[0] != nullptr) {
+                        att = spSkin_getAttachment(mSkeletonData->skins[0], slotData->name, slotData->attachmentName);
+                    }
                     if (att == nullptr) continue;
                     if (att->type == SP_ATTACHMENT_REGION)
                         maxWorldVerts = (maxWorldVerts > 8) ? maxWorldVerts : 8;
