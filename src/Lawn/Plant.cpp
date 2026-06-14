@@ -4189,7 +4189,7 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
                 {
                     // Load custom card image via ResourceManager (standard project API)
                     SharedImageRef cardImg = gSexyAppBase->GetSharedImage(params.mCardImage);
-                    if (cardImg != nullptr)
+                    if ((Image*)cardImg != nullptr)
                     {
                         Image* img = cardImg;  // implicit conversion via operator Image*()
                         float imgW = (float)img->mWidth;
