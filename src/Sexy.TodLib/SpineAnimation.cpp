@@ -549,31 +549,9 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
                 }
 
                 // Pre-allocate vertex buffers for Draw()
-                // Iterate slot data (not runtime slots) to find max vertices
-                int maxWorldVerts = 0;
-                for (int s = 0; s < mSkeletonData->slotsCount; s++) {
-                    spSlotData* slotData = mSkeletonData->slots[s];
-                    if (slotData == nullptr || slotData->attachmentName == nullptr)
-                        continue;
-                    // Look up attachment from default skin
-                    spAttachment* att = nullptr;
-                    if (mSkeletonData->defaultSkin != nullptr) {
-                        att = spSkin_getAttachment(mSkeletonData->defaultSkin, s, slotData->attachmentName);
-                    }
-                    if (att == nullptr && mSkeletonData->skinsCount > 0 && mSkeletonData->skins[0] != nullptr) {
-                        att = spSkin_getAttachment(mSkeletonData->skins[0], s, slotData->attachmentName);
-                    }
-                    if (att == nullptr) continue;
-                    if (att->type == SP_ATTACHMENT_REGION)
-                        maxWorldVerts = (maxWorldVerts > 8) ? maxWorldVerts : 8;
-                    else if (att->type == SP_ATTACHMENT_MESH || att->type == SP_ATTACHMENT_LINKED_MESH) {
-                        spMeshAttachment* meshAtt = SUB_CAST(spMeshAttachment, att);
-                        if (meshAtt && meshAtt->super.worldVerticesLength > maxWorldVerts)
-                            maxWorldVerts = meshAtt->super.worldVerticesLength;
-                    }
-                }
-                mWorldVertsCache.resize((size_t)(maxWorldVerts + 1));
-                // Reserve reasonable capacity for triangle batch (will grow if needed)
+                // Use a safe fixed size — avoid iterating skin attachments at init time
+                // (spSkin_getAttachment can be fragile depending on skeleton data state)
+                mWorldVertsCache.resize(256);     // enough for most meshes
                 mTriBatchCache.reserve(256);
 
                 SPINE_LOG("[SpineAnimationInitialize] Skeleton initialized at (%f, %f) scale=%f",
