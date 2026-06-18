@@ -28,6 +28,14 @@
 #include "Attachment.h"
 #include "ReanimAtlas.h"
 #include "EffectSystem.h"
+
+// ============================================================
+//  Static sentinel: empty definition for Spine-backed reanimations.
+//  Spine reanimations don't use legacy .reanim track data, but many
+//  functions in this file access mDefinition->mTracks unconditionally.
+//  This sentinel provides a safe (count=0) target that prevents crashes.
+// ============================================================
+static ReanimatorDefinition sSpineEmptyDef;
 #include "../GameConstants.h"
 #include "graphics/Font.h"
 #include "misc/PerfTimer.h"
@@ -1219,10 +1227,32 @@ Reanimation* ReanimationHolder::AllocSpineAsReanimation(float theX, float theY, 
 	Reanimation* aReanim = mReanimations.DataArrayAlloc();
 	aReanim->mRenderOrder = theRenderOrder;
 	aReanim->mReanimationHolder = this;
+
+	// --- Critical: initialize ALL fields that legacy code may access ---
+	// DataArrayAlloc() does NOT call constructor, so fields contain pool garbage.
 	aReanim->mIsSpine = true;
 	aReanim->mSpineType = theSpineType;
+	aReanim->mDefinition = &sSpineEmptyDef;       // sentinel: safe for any mDefinition-> access
+	aReanim->mTrackInstances = nullptr;            // prevents ReanimationDelete from freeing garbage
 	aReanim->mReanimationType = ReanimationType::REANIM_NONE;
 	aReanim->mDead = false;
+	aReanim->mAnimTime = 0;
+	aReanim->mAnimRate = 12.0f;
+	aReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
+	aReanim->mFrameStart = 0;
+	aReanim->mFrameCount = 0;
+	aReanim->mFrameBasePose = -1;
+	aReanim->mOverlayMatrix.LoadIdentity();
+	aReanim->mColorOverride = Sexy::Color::White;
+	aReanim->mExtraAdditiveColor = Sexy::Color::White;
+	aReanim->mEnableExtraAdditiveDraw = false;
+	aReanim->mExtraOverlayColor = Sexy::Color::White;
+	aReanim->mEnableExtraOverlayDraw = false;
+	aReanim->mLoopCount = 0;
+	aReanim->mIsAttachment = true;
+	aReanim->mFilterEffect = FilterEffect::FILTER_EFFECT_NONE;
+
+	// --- Create Spine runtime ---
 	aReanim->mSpineAnimation = new SpineAnimation();
 	aReanim->mSpineAnimation->SpineAnimationInitialize(theX, theY, theSpineType);
 	aReanim->mSpineAnimation->mRenderOrder = theRenderOrder;
