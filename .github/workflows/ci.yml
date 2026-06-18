@@ -133,6 +133,8 @@ jobs:
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgJsonGlob: vcpkg.json
+        # Ensure vcpkg cache is not stale
+        doNotUpdateVcpkg: false
 
     - name: Compile PvZ-Portable for Windows (MSVC)
       shell: pwsh
