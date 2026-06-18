@@ -182,6 +182,8 @@ static bool parseJsonObject(const char* data, SpineAnimationParams& out)
     return true;
 }
 
+// Forward declaration — loadConfigFromFile is defined before readSpineFile
+static std::vector<char> readSpineFile(const std::string& path);
 static bool loadConfigFromFile(const char* path, SpineAnimationParams& out)
 {
     std::vector<char> data = readSpineFile(path);
@@ -543,24 +545,9 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
                 }
 
                 // Pre-allocate vertex buffers for Draw()
-                int maxWorldVerts = 0;
-                for (int s = 0; s < mSkeletonData->slotsCount; s++) {
-                    spSlot* slot = mSkeletonData->slots[s];
-                    if (slot == nullptr || slot->data == nullptr || slot->data->attachmentName == nullptr)
-                        continue;
-                    spAttachment* att = spSkeletonData_findAttachment(mSkeletonData, slot->data->attachmentName);
-                    if (att == nullptr) continue;
-                    if (att->type == SP_ATTACHMENT_REGION)
-                        maxWorldVerts = (maxWorldVerts > 8) ? maxWorldVerts : 8;
-                    else if (att->type == SP_ATTACHMENT_MESH || att->type == SP_ATTACHMENT_LINKED_MESH) {
-                        spMeshAttachment* meshAtt = SUB_CAST(spMeshAttachment, att);
-                        if (meshAtt && meshAtt->super.worldVerticesLength > maxWorldVerts)
-                            maxWorldVerts = meshAtt->super.worldVerticesLength;
-                    }
-                }
-                mWorldVertsCache.resize((size_t)(maxWorldVerts + 1));
-                // Reserve reasonable capacity for triangle batch (will grow if needed)
-                mTriBatchCache.reserve(256);
+                // Fixed-size allocation — avoids fragile per-attachment iteration
+                mWorldVertsCache.resize(512);     // 256 verts × 2 coords
+                mTriBatchCache.resize(512 * 3);   // 512 triangles × 3 vertices
 
                 SPINE_LOG("[SpineAnimationInitialize] Skeleton initialized at (%f, %f) scale=%f",
                           theX, theY, mSpineParams->mDefaultScale);
@@ -631,8 +618,6 @@ void SpineAnimation::Update()
 
     float dt = mFrameDelay;
     if (dt <= 0.0f) dt = 1.0f / 60.0f;
-
-    SPINE_LOG("[Update] dt=%f frame=%d", dt, mAnimFrame);
 
     spAnimationState_update(mAnimState, dt);
     spAnimationState_apply(mAnimState, mSkeleton);
@@ -762,6 +747,10 @@ bool SpineAnimation::IsAnimComplete()
 
 // ============================================================
 //  Draw – the core rendering function.
+//
+//  IMPORTANT: Uses pre-allocated buffers (mWorldVertsCache, mTriBatchCache)
+//  to avoid per-frame heap allocations that cause memory fragmentation
+//  and delayed crashes after prolonged runtime.
 // ============================================================
 static Sexy::TriVertex makeVert(float x, float y, float u, float v, uint32_t color)
 {
@@ -777,51 +766,15 @@ static uint32_t colorToUInt(float r, float g, float b, float a)
     return ((uint32_t)A << 24) | ((uint32_t)R << 16) | ((uint32_t)G << 8) | (uint32_t)B;
 }
 
-// Helper: apply additive/overlay visual effects after main draw pass
-static void applyVisualEffects(Sexy::Graphics* g,
-                                const SpineAnimation* anim,
-                                Sexy::Image* tex,
-                                const Sexy::TriVertex tri[][3],
-                                int triCount)
-{
-    // Additive draw for gnawing flash effect
-    if (anim->mExtraAdditiveDraw && tex != nullptr && triCount > 0) {
-        Sexy::Color prevColor = g->GetColor();
-        int prevMode = g->GetDrawMode();
-        g->SetColor(anim->mExtraAdditiveColor);
-        g->SetDrawMode(Sexy::Graphics::DRAWMODE_ADDITIVE);
-        g->DrawTrianglesTex(tex, tri, triCount);
-        g->SetDrawMode(prevMode);
-        g->SetColor(prevColor);
-    }
-
-    // Overlay draw for hypnosis glow effect
-    if (anim->mExtraOverlayDraw && tex != nullptr && triCount > 0) {
-        Sexy::Color prevColor = g->GetColor();
-        int prevMode = g->GetDrawMode();
-        g->SetColor(anim->mExtraOverlayColor);
-        g->SetDrawMode(Sexy::Graphics::DRAWMODE_NORMAL);
-        g->DrawTrianglesTex(tex, tri, triCount);
-        g->SetDrawMode(prevMode);
-        g->SetColor(prevColor);
-    }
-}
-
 void SpineAnimation::Draw(Sexy::Graphics* g)
 {
-    if (g == nullptr || mSkeleton == nullptr) {
-        SPINE_LOG("[Draw] EARLY EXIT: g=%p skeleton=%p", (void*)g, (void*)mSkeleton);
+    if (g == nullptr || mSkeleton == nullptr)
         return;
-    }
 
-    if (mSkeleton->drawOrder == nullptr || mSkeleton->slotsCount <= 0) {
-        SPINE_LOG("[Draw] EARLY EXIT: drawOrder=%p slotsCount=%d",
-                  (void*)mSkeleton->drawOrder, mSkeleton->slotsCount);
+    if (mSkeleton->drawOrder == nullptr || mSkeleton->slotsCount <= 0)
         return;
-    }
 
-    SPINE_LOG("[Draw] BEGIN skeleton=%p slots=%d", (void*)mSkeleton, mSkeleton->slotsCount);
-
+    // --- Pre-compute values used by every slot ---
     uint32_t baseColor = 0;
     if (mColorOverride.mRed != 255 || mColorOverride.mGreen != 255 ||
         mColorOverride.mBlue != 255 || mColorOverride.mAlpha != 255) {
@@ -831,50 +784,50 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
                     (uint32_t)mColorOverride.mBlue;
     }
 
-    float skelR = mSkeleton->color.r;
-    float skelG = mSkeleton->color.g;
-    float skelB = mSkeleton->color.b;
-    float skelA = mSkeleton->color.a;
-
-    // Anchor-based coordinate transformation:
-    // screenX = worldVertX - anchorX + renderOffsetX
-    // screenY = 2*skelY - worldVertY + anchorY + renderOffsetY
+    const float skelR = mSkeleton->color.r;
+    const float skelG = mSkeleton->color.g;
+    const float skelB = mSkeleton->color.b;
+    const float skelA = mSkeleton->color.a;
     const float skelY = mSkeleton->y;
 
-    int drawnSlots = 0;
-    int skippedSlots = 0;
+    // Ensure pre-allocated buffers are large enough.
+    // Use a generous size that covers typical Spine meshes.
+    // These buffers persist across frames — zero heap allocation during Draw.
+    {
+        size_t neededVerts = 512;   // max vertices (256 verts × 2 coords)
+        size_t neededTris = 512;    // max triangles
+        if (mWorldVertsCache.size() < neededVerts)
+            mWorldVertsCache.resize(neededVerts);
+        if (mTriBatchCache.size() < neededTris * 3)
+            mTriBatchCache.resize(neededTris * 3);
+    }
 
+    float* worldVertsBuf = mWorldVertsCache.data();
+    Sexy::TriVertex* triBuf = mTriBatchCache.data();
+
+    int drawnSlots = 0;
     const int slotCount = mSkeleton->slotsCount;
+
     for (int i = 0; i < slotCount; i++) {
         spSlot* slot = mSkeleton->drawOrder[i];
-        if (slot == nullptr) {
-            skippedSlots++;
+        if (slot == nullptr)
             continue;
-        }
 
         spAttachment* attachment = slot->attachment;
-        if (attachment == nullptr) {
-            skippedSlots++;
+        if (attachment == nullptr)
             continue;
-        }
 
-        // --- Region attachment ---
+        // --- Region attachment (simple quad: 2 triangles, 4 vertices) ---
         if (attachment->type == SP_ATTACHMENT_REGION) {
             spRegionAttachment* region = (spRegionAttachment*)attachment;
-            if (region == nullptr) {
-                skippedSlots++;
-                continue;
-            }
+            if (region == nullptr) continue;
 
             spAtlasRegion* regionData = (spAtlasRegion*)region->region;
             Sexy::Image* tex = nullptr;
             if (regionData != nullptr && regionData->page != nullptr)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
-            if (tex == nullptr) {
-                SPINE_LOG("[Draw] slot=%d region: NO TEXTURE", i);
-                skippedSlots++;
+            if (tex == nullptr)
                 continue;
-            }
 
             float r = region->color.r * slot->color.r * skelR;
             float gC = region->color.g * slot->color.g * skelG;
@@ -882,64 +835,50 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             float a = region->color.a * slot->color.a * skelA;
             uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gC, b, a);
 
-            float worldVerts[8];
-            spRegionAttachment_computeWorldVertices(region, slot, worldVerts, 0, 2);
+            // Stack-allocated: 4 vertices × 2 coords = 8 floats
+            float rv[8];
+            spRegionAttachment_computeWorldVertices(region, slot, rv, 0, 2);
 
+            // Stack-allocated: 2 triangles × 3 vertices = 6 TriVertex
             Sexy::TriVertex tri[2][3];
-
-            // Anchor-based transform: screenX = worldVertX - anchorX + renderOffsetX
-            tri[0][0] = makeVert(worldVerts[0] - mAnchorX + mRenderOffsetX,
-                                  2.0f * skelY - worldVerts[1] + mAnchorY + mRenderOffsetY,
+            tri[0][0] = makeVert(rv[0] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - rv[1] + mAnchorY + mRenderOffsetY,
                                   region->uvs[0], 1.0f - region->uvs[1], vertColor);
-            tri[0][1] = makeVert(worldVerts[2] - mAnchorX + mRenderOffsetX,
-                                  2.0f * skelY - worldVerts[3] + mAnchorY + mRenderOffsetY,
+            tri[0][1] = makeVert(rv[2] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - rv[3] + mAnchorY + mRenderOffsetY,
                                   region->uvs[2], 1.0f - region->uvs[3], vertColor);
-            tri[0][2] = makeVert(worldVerts[4] - mAnchorX + mRenderOffsetX,
-                                  2.0f * skelY - worldVerts[5] + mAnchorY + mRenderOffsetY,
+            tri[0][2] = makeVert(rv[4] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - rv[5] + mAnchorY + mRenderOffsetY,
                                   region->uvs[4], 1.0f - region->uvs[5], vertColor);
-
-            tri[1][0] = makeVert(worldVerts[0] - mAnchorX + mRenderOffsetX,
-                                  2.0f * skelY - worldVerts[1] + mAnchorY + mRenderOffsetY,
+            tri[1][0] = makeVert(rv[0] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - rv[1] + mAnchorY + mRenderOffsetY,
                                   region->uvs[0], 1.0f - region->uvs[1], vertColor);
-            tri[1][1] = makeVert(worldVerts[4] - mAnchorX + mRenderOffsetX,
-                                  2.0f * skelY - worldVerts[5] + mAnchorY + mRenderOffsetY,
+            tri[1][1] = makeVert(rv[4] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - rv[5] + mAnchorY + mRenderOffsetY,
                                   region->uvs[4], 1.0f - region->uvs[5], vertColor);
-            tri[1][2] = makeVert(worldVerts[6] - mAnchorX + mRenderOffsetX,
-                                  2.0f * skelY - worldVerts[7] + mAnchorY + mRenderOffsetY,
+            tri[1][2] = makeVert(rv[6] - mAnchorX + mRenderOffsetX,
+                                  2.0f * skelY - rv[7] + mAnchorY + mRenderOffsetY,
                                   region->uvs[6], 1.0f - region->uvs[7], vertColor);
 
-            SPINE_LOG("[Draw] slot=%d region: verts=(%.1f,%.1f)-(%.1f,%.1f)-(%.1f,%.1f)-(%.1f,%.1f)",
-                      i, worldVerts[0], worldVerts[1], worldVerts[2], worldVerts[3],
-                      worldVerts[4], worldVerts[5], worldVerts[6], worldVerts[7]);
-
             g->DrawTrianglesTex(tex, tri, 2);
-            applyVisualEffects(g, this, tex, tri, 2);
             drawnSlots++;
         }
-        // --- Mesh attachment ---
+        // --- Mesh attachment (variable triangle count) ---
         else if (attachment->type == SP_ATTACHMENT_MESH ||
                  attachment->type == SP_ATTACHMENT_LINKED_MESH) {
             spMeshAttachment* mesh = (spMeshAttachment*)attachment;
-            if (mesh == nullptr) {
-                skippedSlots++;
-                continue;
-            }
+            if (mesh == nullptr) continue;
 
             spAtlasRegion* regionData = (spAtlasRegion*)mesh->region;
             Sexy::Image* tex = nullptr;
             if (regionData != nullptr && regionData->page != nullptr)
                 tex = (Sexy::Image*)regionData->page->rendererObject;
-            if (tex == nullptr) {
-                SPINE_LOG("[Draw] slot=%d mesh: NO TEXTURE", i);
-                skippedSlots++;
+            if (tex == nullptr)
                 continue;
-            }
 
             const int worldVertsLen = mesh->super.worldVerticesLength;
-            if (worldVertsLen <= 0) {
-                skippedSlots++;
-                continue;
-            }
+            if (worldVertsLen <= 0 || worldVertsLen > 256)
+                continue;   // sanity check — must fit in pre-allocated buffer
 
             float r = mesh->color.r * slot->color.r * skelR;
             float gC = mesh->color.g * slot->color.g * skelG;
@@ -947,69 +886,61 @@ void SpineAnimation::Draw(Sexy::Graphics* g)
             float a = mesh->color.a * slot->color.a * skelA;
             uint32_t vertColor = baseColor != 0 ? baseColor : colorToUInt(r, gC, b, a);
 
-            std::vector<float> worldVerts((size_t)worldVertsLen);
+            // Write into pre-allocated buffer — NO heap allocation
             spVertexAttachment_computeWorldVertices(
-                &mesh->super, slot, 0, worldVertsLen, worldVerts.data(), 0, 2);
+                &mesh->super, slot, 0, worldVertsLen, worldVertsBuf, 0, 2);
 
             const int trianglesCount = mesh->trianglesCount;
-            if (trianglesCount <= 0 || (trianglesCount % 3) != 0) {
-                skippedSlots++;
+            if (trianglesCount <= 0 || (trianglesCount % 3) != 0)
                 continue;
-            }
             const int numTris = trianglesCount / 3;
 
-            if (mesh->uvs == nullptr || mesh->triangles == nullptr) {
-                skippedSlots++;
+            if (mesh->uvs == nullptr || mesh->triangles == nullptr)
                 continue;
-            }
+
+            if (numTris > 170)   // 170×3 = 510 ≤ buffer size 512
+                continue;   // safety: won't fit in pre-allocated triBuf
 
             const int maxIdx = worldVertsLen / 2;
-
-            std::vector<Sexy::TriVertex> triBatch((size_t)numTris * 3);
             int validTris = 0;
             for (int t = 0; t < numTris; t++) {
                 const int i0 = mesh->triangles[t * 3];
                 const int i1 = mesh->triangles[t * 3 + 1];
                 const int i2 = mesh->triangles[t * 3 + 2];
-                if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx) {
+                if (i0 < 0 || i0 >= maxIdx || i1 < 0 || i1 >= maxIdx || i2 < 0 || i2 >= maxIdx)
                     continue;
-                }
 
                 const float u0 = mesh->uvs[i0 * 2], v0 = mesh->uvs[i0 * 2 + 1];
                 const float u1 = mesh->uvs[i1 * 2], v1 = mesh->uvs[i1 * 2 + 1];
                 const float u2 = mesh->uvs[i2 * 2], v2 = mesh->uvs[i2 * 2 + 1];
 
-                triBatch[t * 3]     = makeVert(worldVerts[i0 * 2] - mAnchorX + mRenderOffsetX,
-                                                  2.0f * skelY - worldVerts[i0 * 2 + 1] + mAnchorY + mRenderOffsetY,
-                                                  u0, 1.0f - v0, vertColor);
-                triBatch[t * 3 + 1] = makeVert(worldVerts[i1 * 2] - mAnchorX + mRenderOffsetX,
-                                                  2.0f * skelY - worldVerts[i1 * 2 + 1] + mAnchorY + mRenderOffsetY,
-                                                  u1, 1.0f - v1, vertColor);
-                triBatch[t * 3 + 2] = makeVert(worldVerts[i2 * 2] - mAnchorX + mRenderOffsetX,
-                                                  2.0f * skelY - worldVerts[i2 * 2 + 1] + mAnchorY + mRenderOffsetY,
-                                                  u2, 1.0f - v2, vertColor);
+                int base = validTris * 3;
+                mTriBatchCache[base]     = makeVert(worldVertsBuf[i0 * 2] - mAnchorX + mRenderOffsetX,
+                                                      2.0f * skelY - worldVertsBuf[i0 * 2 + 1] + mAnchorY + mRenderOffsetY,
+                                                      u0, 1.0f - v0, vertColor);
+                mTriBatchCache[base + 1] = makeVert(worldVertsBuf[i1 * 2] - mAnchorX + mRenderOffsetX,
+                                                      2.0f * skelY - worldVertsBuf[i1 * 2 + 1] + mAnchorY + mRenderOffsetY,
+                                                      u1, 1.0f - v1, vertColor);
+                mTriBatchCache[base + 2] = makeVert(worldVertsBuf[i2 * 2] - mAnchorX + mRenderOffsetX,
+                                                      2.0f * skelY - worldVertsBuf[i2 * 2 + 1] + mAnchorY + mRenderOffsetY,
+                                                      u2, 1.0f - v2, vertColor);
                 validTris++;
             }
 
             if (validTris > 0) {
-                SPINE_LOG("[Draw] slot=%d mesh: tris=%d/%d", i, validTris, numTris);
-                g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
-                applyVisualEffects(g, this, tex, (const Sexy::TriVertex(*)[3])triBatch.data(), numTris);
+                // Pass validTris, NOT numTris — avoid sending uninitialized triangles
+                g->DrawTrianglesTex(tex, (const Sexy::TriVertex(*)[3])triBuf, validTris);
                 drawnSlots++;
-            } else {
-                skippedSlots++;
             }
         }
+        // --- Unknown attachment type: skip ---
         else {
-            skippedSlots++;
+            continue;
         }
     }
-
-    SPINE_LOG("[Draw] END drawn=%d skipped=%d", drawnSlots, skippedSlots);
 }
 
-void SpineAnimation::DrawRenderGroup(Sexy::Graphics* g, int theRenderGroup)
+void SpineAnimation::DrawRenderGroup(Sexy::Graphics* g, int /*theRenderGroup*/)
 {
-    (void)theRenderGroup;
     Draw(g);
 }

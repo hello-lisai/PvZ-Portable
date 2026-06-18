@@ -132,7 +132,6 @@ public:
     void    OverrideScale(float theScaleX, float theScaleY);
     bool    GetBoneWorldPosition(const char* boneName, float* outX, float* outY);
     void    SetEnableExtraAdditiveDraw(bool theEnable) { mExtraAdditiveDraw = theEnable; }
-    void    SetAdditiveColor(const Sexy::Color& theColor) { mExtraAdditiveColor = theColor; }
     void    SetEnableExtraOverlayDraw(bool theEnable) { mExtraOverlayDraw = theEnable; }
     void    SetOverlayColor(const Sexy::Color& theColor) { mExtraOverlayColor = theColor; }
     void    UpdateSkeletonWorld();
