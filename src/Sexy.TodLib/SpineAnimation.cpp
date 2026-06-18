@@ -569,21 +569,15 @@ void SpineAnimation::SpineAnimationInitialize(float theX, float theY, SpineAnima
 // ============================================================
 void SpineAnimation::SetAnimation(const char* theAnimName, bool theLoop)
 {
-    SPINE_LOG("[SetAnimation] name=%s loop=%d", theAnimName ? theAnimName : "(null)", theLoop);
     if (mAnimState == nullptr || mSkeletonData == nullptr) {
-        SPINE_LOG("[SetAnimation] FAILED: animState=%p skeletonData=%p", (void*)mAnimState, (void*)mSkeletonData);
         return;
     }
 
     if (spSkeletonData_findAnimation(mSkeletonData, theAnimName) != nullptr) {
         spAnimationState_setAnimationByName(mAnimState, 0, theAnimName, theLoop ? 1 : 0);
-        SPINE_LOG("[SetAnimation] Set animation: %s", theAnimName);
     } else if (mSkeletonData->animationsCount > 0) {
         spAnimation* first = mSkeletonData->animations[0];
         spAnimationState_setAnimation(mAnimState, 0, first, theLoop ? 1 : 0);
-        SPINE_LOG("[SetAnimation] Fallback to first animation: %s", first->name);
-    } else {
-        SPINE_LOG("[SetAnimation] FAILED: no animations found");
     }
 
     if (mSkeleton != nullptr)
@@ -592,17 +586,12 @@ void SpineAnimation::SetAnimation(const char* theAnimName, bool theLoop)
 
 void SpineAnimation::AddAnimation(const char* theAnimName, bool theLoop, float theDelay)
 {
-    SPINE_LOG("[AddAnimation] name=%s loop=%d delay=%f", theAnimName ? theAnimName : "(null)", theLoop, theDelay);
-    if (mAnimState == nullptr) {
-        SPINE_LOG("[AddAnimation] FAILED: animState is null");
-        return;
-    }
+    if (mAnimState == nullptr || mSkeletonData == nullptr) return;
     spAnimationState_addAnimationByName(mAnimState, 0, theAnimName, theLoop ? 1 : 0, theDelay);
 }
 
 void SpineAnimation::SetTimeScale(float theScale)
 {
-    SPINE_LOG("[SetTimeScale] %f", theScale);
     if (mAnimState == nullptr) return;
     mAnimState->timeScale = theScale;
 }
@@ -613,9 +602,6 @@ void SpineAnimation::SetTimeScale(float theScale)
 void SpineAnimation::Update()
 {
     if (mAnimState == nullptr || mSkeleton == nullptr) {
-        if (mAnimFrame % 60 == 0) {  // log sparingly
-            SPINE_LOG("[Update] SKIPPED: animState=%p skeleton=%p", (void*)mAnimState, (void*)mSkeleton);
-        }
         return;
     }
 
@@ -645,7 +631,6 @@ void SpineAnimation::SetFlipX(bool theFlip)
     float magnitude = mSkeleton->scaleX < 0 ? -mSkeleton->scaleX : mSkeleton->scaleX;
     if (magnitude == 0.0f) magnitude = 1.0f;
     mSkeleton->scaleX = theFlip ? -magnitude : magnitude;
-    SPINE_LOG("[SetFlipX] flip=%d scaleX=%f", theFlip, mSkeleton->scaleX);
 }
 
 void SpineAnimation::SetFlipY(bool theFlip)
@@ -654,12 +639,10 @@ void SpineAnimation::SetFlipY(bool theFlip)
     float magnitude = mSkeleton->scaleY < 0 ? -mSkeleton->scaleY : mSkeleton->scaleY;
     if (magnitude == 0.0f) magnitude = 1.0f;
     mSkeleton->scaleY = theFlip ? -magnitude : magnitude;
-    SPINE_LOG("[SetFlipY] flip=%d scaleY=%f", theFlip, mSkeleton->scaleY);
 }
 
 void SpineAnimation::SetScale(float theScale)
 {
-    SPINE_LOG("[SetScale] %f", theScale);
     if (mSkeleton == nullptr) return;
     mSkeleton->scaleX = theScale;
     mSkeleton->scaleY = theScale;
@@ -671,35 +654,26 @@ void SpineAnimation::OverrideScale(float theScaleX, float theScaleY)
     float mult = (mSpineParams != nullptr) ? mSpineParams->mDefaultScale : 1.0f;
     mSkeleton->scaleX = theScaleX * mult;
     mSkeleton->scaleY = theScaleY * mult;
-    SPINE_LOG("[OverrideScale] (%f, %f) * %f -> (%f, %f)",
-              theScaleX, theScaleY, mult, mSkeleton->scaleX, mSkeleton->scaleY);
 }
 
 bool SpineAnimation::GetBoneWorldPosition(const char* boneName, float* outX, float* outY)
 {
     if (mSkeleton == nullptr || boneName == nullptr || outX == nullptr || outY == nullptr) {
-        SPINE_ERR("[GetBoneWorldPosition] Invalid args: skeleton=%p name=%p outX=%p outY=%p",
-                  (void*)mSkeleton, (const void*)boneName, (void*)outX, (void*)outY);
         return false;
     }
 
     spBone* bone = spSkeleton_findBone(mSkeleton, boneName);
     if (bone == nullptr) {
-        SPINE_WARN("[GetBoneWorldPosition] Bone '%s' not found", boneName);
         return false;
     }
 
-    // Return offset relative to anchor in game coordinate system (Y-down) + renderOffset
     *outX = (bone->worldX - mAnchorX) + mRenderOffsetX;
     *outY = -(bone->worldY - mAnchorY) + mRenderOffsetY;
-
-    SPINE_LOG("[GetBoneWorldPosition] '%s' -> (%f, %f)", boneName, *outX, *outY);
     return true;
 }
 
 void SpineAnimation::SetPosition(float theX, float theY)
 {
-    SPINE_LOG("[SetPosition] (%f, %f)", theX, theY);
     if (mSkeleton == nullptr) return;
     mSkeleton->x = theX;
     mSkeleton->y = theY;
